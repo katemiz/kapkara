@@ -62,7 +62,7 @@ function get_each_context_1(ctx, list, i) {
   child_ctx[3] = list[i];
   child_ctx[5] = i;
   return child_ctx;
-} // (45:8) {#if key % 2 == 0}
+} // (41:8) {#if key % 2 == 0}
 
 
 function create_if_block_1(ctx) {
@@ -91,7 +91,7 @@ function create_if_block_1(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div);
     }
   };
-} // (63:8) {#if key % 2 != 0}
+} // (59:8) {#if key % 2 != 0}
 
 
 function create_if_block(ctx) {
@@ -120,7 +120,7 @@ function create_if_block(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div);
     }
   };
-} // (41:4) {#each uygulamalar.apps as uygulama,key}
+} // (37:4) {#each uygulamalar.apps as uygulama,key}
 
 
 function create_each_block_1(ctx) {
@@ -193,7 +193,7 @@ function create_each_block_1(ctx) {
       if (if_block1) if_block1.d();
     }
   };
-} // (37:0) {#each params.software as uygulamalar}
+} // (33:0) {#each params.software as uygulamalar}
 
 
 function create_each_block(ctx) {

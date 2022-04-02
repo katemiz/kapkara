@@ -28,10 +28,6 @@ function unlight(el) {
 </script>
 
 
-
-
-
-
 <section class="section container">
 
 {#each params.software as uygulamalar}
