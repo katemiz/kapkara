@@ -17,3 +17,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Index');
 });
+
+Route::get('/katemiz', function () {
+    return Inertia::render('Katemiz');
+});
