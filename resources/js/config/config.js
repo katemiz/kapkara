@@ -86,7 +86,7 @@ export let params = {
 
         {
           name: 'eDoc',
-          label: 'Write Enterprise Documentation',
+          label: 'Write Your Documentation in HTML',
           img: 'edoc_brand_logo.svg',
           url: 'https://edoc.kapkara.one',
           desc: `
