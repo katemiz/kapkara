@@ -1144,7 +1144,7 @@ function create_fragment(ctx) {
   return {
     c: function c() {
       section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
-      section.innerHTML = "<div class=\"hero-body has-background-grey\"><div class=\"container has-text-right\"><div class=\"columns\"><div class=\"column is-half\"><img src=\"/images/hero.svg\" alt=\"Logo\"/></div> \n                <div class=\"column\"><h1 class=\"title has-text-weight-light is-size-1 has-text-black\"><span class=\"has-text-weight-bold\">kapkara</span> web house</h1> \n\n                    <h2 class=\"title has-text-weight-light is-size-1 has-text-white\">productivity<br/> for aerospace and defense <br/>with web technologies</h2> \n                    <p class=\"has-text-warning\">kapkara is a web development company.<br/>kapkara is specialized in providing consultancy services in aerospace industry<br/> and web technologies. kapkara produces web software for <br/>productivity of engineering development especially required for aerospace and defense industries.</p></div></div></div></div>";
+      section.innerHTML = "<div class=\"hero-body has-background-grey\"><div class=\"container has-text-right\"><div class=\"columns\"><div class=\"column is-half\"><img src=\"/images/hero.svg\" alt=\"Logo\"/></div> \n        <div class=\"column\"><h1 class=\"title has-text-weight-light is-size-1 has-text-black\"><span class=\"has-text-weight-bold\">kapkara</span>\n            web house</h1> \n\n          <h2 class=\"title has-text-weight-light is-size-1 has-text-white\">productivity\n            <br/>\n            with web technologies</h2> \n          <p class=\"has-text-warning\">kapkara is a web development company.\n            <br/>\n            kapkara is specialized in providing consultancy services in\n            aerospace industry\n            <br/>\n            and web technologies. kapkara produces web software for\n            <br/>\n            productivity of engineering development especially required for\n            aerospace and defense industries.</p></div></div></div></div>";
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "hero is-medium is-bold");
     },
     m: function m(target, anchor) {
@@ -1969,9 +1969,9 @@ var params = {
     title: 'web technologies | design house'
   },
   app: {
-    name: 'Tensor',
-    title: 'Yöneticinin Akıllı Uygulaması',
-    description: 'Description here',
+    name: 'kapkara',
+    title: 'kapkara web house',
+    description: 'web technologies',
     app_header_logo: 'app_header_logo.svg',
     app_footer_logo: 'app_footer_logo.svg',
     version: '1.0',
@@ -1998,6 +1998,12 @@ var params = {
       desc: 'Communication Made Easy',
       url: 'https://ememo.kapkara.one'
     }, "desc", "\n            <p>Memo Exchange Platform for multi-group, multi-company, multi-national projects</p>\n            <ul>\n            <li>Centralized platform for exchanging (engineering, program, quality, manufacturing etc) memo</li>\n            <li>All memos are automatically distributed to all members of receiving group, company.</li>\n            <li>Groups can access received and sent memos only</li>\n            <li>For multi company projects, a prime company can manage all subcontactors.</li>\n            </ul>"), {
+      name: 'k-library',
+      label: 'Personal Digital Library - PDL',
+      img: 'app_header_logo.svg',
+      url: 'https://k-library.kapkara.one',
+      desc: "\n            <p>k-library, \"Personal Digital Library\" is an app designed to keep your digital assets in one place and accessible only for you.</p>  <p>You can store them in your server and tag them.</p>\n              <ul>\n              <li>Doc files such as pdf, doc, xls</li>\n              <li>Audio files (music)</li>\n              <li>Video and Film films</li>\n              <li>Images and Photos.</li>\n              <li>Any file that is in digital format.</li>\n            </ul>"
+    }, {
       name: 'eDoc',
       label: 'Write Enterprise Documentation',
       img: 'edoc_brand_logo.svg',

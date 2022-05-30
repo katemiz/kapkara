@@ -8,9 +8,9 @@ export let params = {
   },
 
   app: {
-    name: 'Tensor',
-    title: 'Yöneticinin Akıllı Uygulaması',
-    description: 'Description here',
+    name: 'kapkara',
+    title: 'kapkara web house',
+    description: 'web technologies',
     app_header_logo: 'app_header_logo.svg',
     app_footer_logo: 'app_footer_logo.svg',
     version: '1.0',
@@ -67,6 +67,23 @@ export let params = {
             <li>For multi company projects, a prime company can manage all subcontactors.</li>
             </ul>`,
         },
+
+        {
+          name: 'k-library',
+          label: 'Personal Digital Library - PDL',
+          img: 'app_header_logo.svg',
+          url: 'https://k-library.kapkara.one',
+          desc: `
+            <p>k-library, "Personal Digital Library" is an app designed to keep your digital assets in one place and accessible only for you.</p>  <p>You can store them in your server and tag them.</p>
+              <ul>
+              <li>Doc files such as pdf, doc, xls</li>
+              <li>Audio files (music)</li>
+              <li>Video and Film films</li>
+              <li>Images and Photos.</li>
+              <li>Any file that is in digital format.</li>
+            </ul>`,
+        },
+
         {
           name: 'eDoc',
           label: 'Write Enterprise Documentation',
