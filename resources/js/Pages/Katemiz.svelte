@@ -19,6 +19,15 @@
       })
     })
   })
+
+  var stylesheet =
+      'https://www.testdome.com/content/source/stylesheets/embed.css',
+    link = document.createElement('link')
+  ;(link.href = stylesheet),
+    (link.type = 'text/css'),
+    (link.rel = 'stylesheet'),
+    (link.media = 'screen,print'),
+    document.getElementsByTagName('head')[0].appendChild(link)
 </script>
 
 <style>
@@ -235,4 +244,20 @@
       </li>
     </ul>
   </div>
+
+  <div class="column card">
+    <a
+      href="https://www.testdome.com/certificates/c00141f97ac04c1ca9646468cc00ea91"
+      class="testdome-certificate-stamp gold">
+      <span class="testdome-certificate-name">Kılıç Ali Temiz</span>
+      <span class="testdome-certificate-test-name">PHP and Laravel</span>
+      <span class="testdome-certificate-card-logo">
+        TestDome
+        <br />
+        Certificate
+      </span>
+    </a>
+
+  </div>
+
 </div>
