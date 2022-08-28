@@ -1,8 +1,10 @@
 <script>
   import { params } from '@/config/config.js'
+
+  import baykus from '/images/baykus_orange.svg'
 </script>
 
-<nav class="navbar">
+<nav class="navbar is-dark">
   <div class="container">
 
     <div class="navbar-brand">
@@ -10,7 +12,8 @@
         <span class="icon-text is-size-5">
 
           <span class="icon">
-            <img src="/images/baykus_orange.svg" alt="Logo" />
+            <img src={baykus} alt="baykus logo" />
+
           </span>
 
           <span class="has-text-weight-bold">kapkara</span>

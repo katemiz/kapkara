@@ -44,7 +44,7 @@
 
 </footer>
 
-<nav
+<!-- <nav
   class="breadcrumb is-centered has-bullet-separator is-small my-4"
   aria-label="breadcrumbs">
   <ul>
@@ -54,4 +54,4 @@
       </li>
     {/each}
   </ul>
-</nav>
+</nav> -->
