@@ -2,7 +2,6 @@
   export let uygulama
 </script>
 
-<!-- <div class="card"> -->
 <div class="card-image box">
   <a href={uygulama.url}>
 
@@ -23,4 +22,3 @@
     {@html uygulama.desc}
   </div>
 </div>
-<!-- </div> -->

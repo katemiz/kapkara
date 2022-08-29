@@ -49,7 +49,9 @@
         </div>
 
         <a href="/services" class="navbar-item">Services</a>
-        <a href="/katemiz" class="navbar-item">Team</a>
+        <a href="/team" class="navbar-item">Team</a>
+        <!-- <a href="/katemiz" class="navbar-item">Team</a> -->
+
         <a href="/contact" class="navbar-item">Contact</a>
 
       </div>

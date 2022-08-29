@@ -8,7 +8,7 @@ export let params = {
   },
 
   app: {
-    name: 'kapkara',
+    name: 'kapkara.one',
     title: 'kapkara web house',
     description: 'web technologies',
     app_header_logo: 'app_header_logo.svg',

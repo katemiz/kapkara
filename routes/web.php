@@ -18,6 +18,18 @@ Route::get('/', function () {
     return Inertia::render('Index');
 });
 
+Route::get('/team', function () {
+    return Inertia::render('Team');
+});
+
 Route::get('/katemiz', function () {
     return Inertia::render('Katemiz');
+});
+
+Route::get('/services', function () {
+    return Inertia::render('Services');
+});
+
+Route::get('/contact', function () {
+    return Inertia::render('Contact');
 });
