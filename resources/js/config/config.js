@@ -133,6 +133,63 @@ export let params = {
     { name: 'Svelte', url: 'https://svelte.dev' },
     { name: 'Bulma', url: 'https://bulma.io' },
   ],
+
+  engineers: [
+    {
+      name: 'Kılıç Ali Temiz',
+      profession: 'Mechanical Engineer',
+      expertise:
+        '30+ years of aerospace experience and 15+ years of web programming',
+      img: 'katemiz.jpg',
+      mail: 'katemiz@gmail.com',
+      link: 'katemiz',
+      media: {
+        linkedin:
+          'https://tr.linkedin.com/in/k%C4%B1l%C4%B1%C3%A7-ali-temiz-134a1262',
+        github: 'https://github.com/katemiz',
+        twitter: 'https://twitter.com/katemiz1',
+      },
+    },
+
+    {
+      name: 'Ayşe Şolpan Temiz',
+      profession: 'Aeronautical Engineer',
+      expertise:
+        '30+ years of aerospace experience. Experience in aerostructures production, structural design, system safety analysis, airworthiness and certification, technology management',
+      img: 'astemiz.jpg',
+      mail: 'astemiz@gmail.com',
+      link: null,
+    },
+
+    {
+      name: 'Zeynep Albayrak',
+      profession: 'Electrical-Electronics Engineer',
+      expertise:
+        'Junior Python Programmer. Just completed certificate program for python',
+      img: 'zeynep.jpg',
+      mail: 'z@gmail.com',
+      link: null,
+    },
+
+    {
+      name: 'Merve Duru Temiz',
+      profession: 'To Be Front-End Developer',
+      expertise: 'just starting off.',
+      img: 'mdtemiz.jpg',
+      mail: 'merve.duru@metu.edu.tr',
+      link: null,
+    },
+
+    {
+      name: 'Harun Emre Temiz',
+      profession: 'To Be Game Developer',
+      expertise:
+        'Has more than 10 years of active gaming experience. Not developed and but hope to be ready soon',
+      img: 'hetemiz.jpg',
+      mail: 'hetemiz@gmail.com',
+      link: null,
+    },
+  ],
 }
 
 export let gui = {

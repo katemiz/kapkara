@@ -13,7 +13,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
 /* harmony import */ var _config_config_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/config/config.js */ "./resources/js/config/config.js");
-/* harmony import */ var _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Shared/AppCard.svelte */ "./resources/js/Pages/Shared/AppCard.svelte");
+/* harmony import */ var _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/Pages/Shared/AppCard.svelte */ "./resources/js/Pages/Shared/AppCard.svelte");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -87,37 +87,39 @@ function create_fragment(ctx) {
   var div21;
   var appcard6;
   var current;
-  appcard0 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  var mounted;
+  var dispose;
+  appcard0 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[0].apps[0]
     }
   });
-  appcard1 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  appcard1 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[0].apps[1]
     }
   });
-  appcard2 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  appcard2 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[0].apps[2]
     }
   });
-  appcard3 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  appcard3 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[0].apps[3]
     }
   });
-  appcard4 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  appcard4 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[0].apps[4]
     }
   });
-  appcard5 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  appcard5 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[1].apps[0]
     }
   });
-  appcard6 = new _Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+  appcard6 = new _Pages_Shared_AppCard_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       uygulama: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.software[1].apps[1]
     }
@@ -185,7 +187,7 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div11, "class", "tile");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div12, "class", "tile is-vertical ");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div13, "class", "tile is-ancestor");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div14, "class", "tile is-child notification has-background-grey-light card");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div14, "class", "tile is-child notification is-light card");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div15, "class", "tile is-parent is-vertical");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div16, "class", "tile");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div17, "class", "tile is-vertical ");
@@ -246,6 +248,11 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div22, div21);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(appcard6, div21, null);
       current = true;
+
+      if (!mounted) {
+        dispose = [(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div0, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div0, "mouseleave", unlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div2, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div2, "mouseleave", unlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div7, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div7, "mouseleave", unlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div9, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div9, "mouseleave", unlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div14, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div14, "mouseleave", unlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div19, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div19, "mouseleave", unlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div21, "mouseenter", highlight), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(div21, "mouseleave", unlight)];
+        mounted = true;
+      }
     },
     p: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     i: function i(local) {
@@ -278,17 +285,19 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(appcard4);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(appcard5);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(appcard6);
+      mounted = false;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.run_all)(dispose);
     }
   };
 }
 
-function highlight() {
-  console.log(el);
-} //el.classList.add("has-background-info-light")
+function highlight(el) {
+  el.target.classList.remove('is-light');
+}
 
-
-function unlight(el) {} //el.classList.remove("has-background-info-light")
-
+function unlight(el) {
+  el.target.classList.add('is-light');
+}
 
 var Apps = /*#__PURE__*/function (_SvelteComponent) {
   _inherits(Apps, _SvelteComponent);
@@ -716,7 +725,7 @@ function create_fragment(ctx) {
   return {
     c: function c() {
       nav = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("nav");
-      nav.innerHTML = "<div class=\"container\"><div class=\"navbar-brand\"><a class=\"navbar-item\" href=\"../\"><span class=\"icon-text is-size-5\"><span class=\"icon\"><img src=\"/images/baykus_orange.svg\" alt=\"Logo\"/></span> \n\n          <span class=\"has-text-weight-light\">K\u0131l\u0131\xE7 Ali</span> \n          <span class=\"has-text-weight-bold\">\xA0Temiz</span></span></a> \n\n      <span onclick=\"BurgerMenu(this)\" class=\"navbar-burger burger\" data-target=\"navbarMenu\"><span></span> \n        <span></span> \n        <span></span></span></div> \n    <div id=\"navbarMenu\" class=\"navbar-menu\"><div class=\"navbar-end\"><a href=\"#home\" class=\"navbar-item\">Home</a> \n        <a href=\"#about\" class=\"navbar-item\">About</a> \n        <a href=\"#resume\" class=\"navbar-item\">Resume</a> \n        <a href=\"#works\" class=\"navbar-item\">Works</a> \n        <a href=\"#contact\" class=\"navbar-item\">Contact</a></div></div></div>";
+      nav.innerHTML = "<div class=\"container\"><div class=\"navbar-brand\"><a class=\"navbar-item\" href=\"../\"><span class=\"icon-text is-size-5\"><span class=\"icon\"><img src=\"/images/baykus_orange.svg\" alt=\"Logo\"/></span> \n\n          <span class=\"has-text-weight-light\">K\u0131l\u0131\xE7 Ali</span> \n          <span class=\"has-text-weight-bold\">\xA0Temiz</span></span></a> \n\n      <span class=\"navbar-burger burger\" data-target=\"navbarMenu\"><span></span> \n        <span></span> \n        <span></span></span></div> \n    <div id=\"navbarMenu\" class=\"navbar-menu\"><div class=\"navbar-end\"><a href=\"#home\" class=\"navbar-item\">Home</a> \n        <a href=\"#about\" class=\"navbar-item\">About</a> \n        <a href=\"#resume\" class=\"navbar-item\">Resume</a> \n        <a href=\"#works\" class=\"navbar-item\">Works</a> \n        <a href=\"#contact\" class=\"navbar-item\">Contact</a></div></div></div>";
       t17 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
       section.innerHTML = "<div class=\"hero-body\"><div class=\"columns\"><div class=\"column is-2\"><figure class=\"image\"><img class=\"is-rounded\" src=\"/images/katemiz.jpg\" alt=\"katemiz\"/></figure></div> \n      <div class=\"column\"><p class=\"has-text-centered has-text-font-light is-size-1 baslik svelte-17c3b1\">I&#39;m K\u0131l\u0131\xE7 Ali Temiz</p> \n\n        <p class=\"subtitle has-text-centered has-text-font-light has-text-light mt-6 is-size-5\">Professionally I&#39;m a mechanical engineer with 30+ years of aerospace\n          experience (manufacturing and engineering).</p> \n\n        <div class=\"has-text-centered my-3\"><span class=\"tag is-success genislik is-size-5 mx-2 has-text-font-light svelte-17c3b1\">Self-Trained</span> \n          <span class=\"tag is-warning genislik is-size-5 mx-2 svelte-17c3b1\">Amateur</span> \n          <span class=\"tag is-success genislik is-size-5 mx-2 svelte-17c3b1\">Web Developer</span></div> \n\n        <div class=\"columns is-mobile\"><div class=\"column is-8 is-offset-2\"><p class=\"subtitle has-text-centered has-text-font-light is-size-5 baslik svelte-17c3b1\">During my professional career, my hobby (programming and computer\n              aided engineering) helped me develop skills in web programming.\n              <br/>\n              turned into a self-trained full-stack web developer.</p></div></div></div></div></div>";
@@ -749,21 +758,6 @@ function create_fragment(ctx) {
 }
 
 function instance($$self) {
-  document.addEventListener('DOMContentLoaded', function () {
-    // Get all "navbar-burger" elements
-    var $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0); // Add a click event on each of them
-
-    $navbarBurgers.forEach(function (el) {
-      el.addEventListener('click', function () {
-        // Get the target from the "data-target" attribute
-        var target = el.dataset.target;
-        var deneme = document.getElementById(target); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-
-        el.classList.toggle('is-active');
-        deneme.classList.toggle('is-active');
-      });
-    });
-  });
   var stylesheet = 'https://www.testdome.com/content/source/stylesheets/embed.css',
       link = document.createElement('link');
   link.href = stylesheet, link.type = 'text/css', link.rel = 'stylesheet', link.media = 'screen,print', document.getElementsByTagName('head')[0].appendChild(link);
@@ -1331,6 +1325,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
+/* harmony import */ var _Pages_Shared_Icon_svelte__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Pages/Shared/Icon.svelte */ "./resources/js/Pages/Shared/Icon.svelte");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -1368,7 +1363,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 /* resources/js/Pages/Shared/EngineerCard.svelte generated by Svelte v3.49.0 */
 
 
-function create_if_block(ctx) {
+
+function create_if_block_4(ctx) {
   var p;
   var a;
   var t;
@@ -1398,6 +1394,300 @@ function create_if_block(ctx) {
     },
     d: function d(detaching) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(p);
+    }
+  };
+} // (32:6) {#if person.media}
+
+
+function create_if_block(ctx) {
+  var div;
+  var t0;
+  var t1;
+  var current;
+  var if_block0 =
+  /*person*/
+  ctx[0].media.linkedin && create_if_block_3(ctx);
+  var if_block1 =
+  /*person*/
+  ctx[0].media.github && create_if_block_2(ctx);
+  var if_block2 =
+  /*person*/
+  ctx[0].media.twitter && create_if_block_1(ctx);
+  return {
+    c: function c() {
+      div = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
+      if (if_block0) if_block0.c();
+      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if (if_block1) if_block1.c();
+      t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if (if_block2) if_block2.c();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div, "class", "mt-2");
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, div, anchor);
+      if (if_block0) if_block0.m(div, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t0);
+      if (if_block1) if_block1.m(div, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t1);
+      if (if_block2) if_block2.m(div, null);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      if (
+      /*person*/
+      ctx[0].media.linkedin) {
+        if (if_block0) {
+          if_block0.p(ctx, dirty);
+
+          if (dirty &
+          /*person*/
+          1) {
+            (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0, 1);
+          }
+        } else {
+          if_block0 = create_if_block_3(ctx);
+          if_block0.c();
+          (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0, 1);
+          if_block0.m(div, t0);
+        }
+      } else if (if_block0) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block0, 1, 1, function () {
+          if_block0 = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+      }
+
+      if (
+      /*person*/
+      ctx[0].media.github) {
+        if (if_block1) {
+          if_block1.p(ctx, dirty);
+
+          if (dirty &
+          /*person*/
+          1) {
+            (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1, 1);
+          }
+        } else {
+          if_block1 = create_if_block_2(ctx);
+          if_block1.c();
+          (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1, 1);
+          if_block1.m(div, t1);
+        }
+      } else if (if_block1) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block1, 1, 1, function () {
+          if_block1 = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+      }
+
+      if (
+      /*person*/
+      ctx[0].media.twitter) {
+        if (if_block2) {
+          if_block2.p(ctx, dirty);
+
+          if (dirty &
+          /*person*/
+          1) {
+            (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block2, 1);
+          }
+        } else {
+          if_block2 = create_if_block_1(ctx);
+          if_block2.c();
+          (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block2, 1);
+          if_block2.m(div, null);
+        }
+      } else if (if_block2) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block2, 1, 1, function () {
+          if_block2 = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+      }
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block2);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block2);
+      current = false;
+    },
+    d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div);
+      if (if_block0) if_block0.d();
+      if (if_block1) if_block1.d();
+      if (if_block2) if_block2.d();
+    }
+  };
+} // (35:10) {#if person.media.linkedin}
+
+
+function create_if_block_3(ctx) {
+  var a;
+  var span;
+  var icon;
+  var a_href_value;
+  var current;
+  icon = new _Pages_Shared_Icon_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    props: {
+      name: "linkedin",
+      color: "link"
+    }
+  });
+  return {
+    c: function c() {
+      a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
+      span = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("span");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(icon.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span, "class", "icon has-text-link");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value =
+      /*person*/
+      ctx[0].media.linkedin);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, a, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(a, span);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(icon, span, null);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      if (!current || dirty &
+      /*person*/
+      1 && a_href_value !== (a_href_value =
+      /*person*/
+      ctx[0].media.linkedin)) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value);
+      }
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(icon.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(icon.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(a);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(icon);
+    }
+  };
+} // (43:10) {#if person.media.github}
+
+
+function create_if_block_2(ctx) {
+  var a;
+  var span;
+  var icon;
+  var a_href_value;
+  var current;
+  icon = new _Pages_Shared_Icon_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    props: {
+      name: "github",
+      color: "link"
+    }
+  });
+  return {
+    c: function c() {
+      a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
+      span = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("span");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(icon.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span, "class", "icon has-text-link");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value =
+      /*person*/
+      ctx[0].media.github);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, a, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(a, span);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(icon, span, null);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      if (!current || dirty &
+      /*person*/
+      1 && a_href_value !== (a_href_value =
+      /*person*/
+      ctx[0].media.github)) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value);
+      }
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(icon.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(icon.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(a);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(icon);
+    }
+  };
+} // (51:10) {#if person.media.twitter}
+
+
+function create_if_block_1(ctx) {
+  var a;
+  var span;
+  var icon;
+  var a_href_value;
+  var current;
+  icon = new _Pages_Shared_Icon_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    props: {
+      name: "twitter",
+      color: "link"
+    }
+  });
+  return {
+    c: function c() {
+      a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
+      span = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("span");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(icon.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span, "class", "icon has-text-link");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value =
+      /*person*/
+      ctx[0].media.twitter);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, a, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(a, span);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(icon, span, null);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      if (!current || dirty &
+      /*person*/
+      1 && a_href_value !== (a_href_value =
+      /*person*/
+      ctx[0].media.twitter)) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value);
+      }
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(icon.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(icon.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(a);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(icon);
     }
   };
 }
@@ -1439,9 +1729,14 @@ function create_fragment(ctx) {
   ctx[0].mail + "";
   var t8;
   var a_href_value;
-  var if_block =
+  var t9;
+  var current;
+  var if_block0 =
   /*person*/
-  ctx[0].link && create_if_block(ctx);
+  ctx[0].link && create_if_block_4(ctx);
+  var if_block1 =
+  /*person*/
+  ctx[0].media && create_if_block(ctx);
   return {
     c: function c() {
       div5 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
@@ -1462,10 +1757,12 @@ function create_fragment(ctx) {
       p2 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("p");
       t5 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(t5_value);
       t6 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
-      if (if_block) if_block.c();
+      if (if_block0) if_block0.c();
       t7 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
       t8 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(t8_value);
+      t9 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if (if_block1) if_block1.c();
       if (!(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.src_url_equal)(img.src, img_src_value = "/images/" +
       /*person*/
       ctx[0].img)) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "src", img_src_value);
@@ -1504,16 +1801,19 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div3, p2);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(p2, t5);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div3, t6);
-      if (if_block) if_block.m(div3, null);
+      if (if_block0) if_block0.m(div3, null);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div3, t7);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div3, a);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(a, t8);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div3, t9);
+      if (if_block1) if_block1.m(div3, null);
+      current = true;
     },
     p: function p(ctx, _ref) {
       var _ref2 = _slicedToArray(_ref, 1),
           dirty = _ref2[0];
 
-      if (dirty &
+      if (!current || dirty &
       /*person*/
       1 && !(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.src_url_equal)(img.src, img_src_value = "/images/" +
       /*person*/
@@ -1521,7 +1821,7 @@ function create_fragment(ctx) {
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "src", img_src_value);
       }
 
-      if (dirty &
+      if (!current || dirty &
       /*person*/
       1 && img_alt_value !== (img_alt_value = "Image of " +
       /*person*/
@@ -1529,56 +1829,89 @@ function create_fragment(ctx) {
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "alt", img_alt_value);
       }
 
-      if (dirty &
+      if ((!current || dirty &
       /*person*/
-      1 && t1_value !== (t1_value =
+      1) && t1_value !== (t1_value =
       /*person*/
       ctx[0].name + "")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t1, t1_value);
-      if (dirty &
+      if ((!current || dirty &
       /*person*/
-      1 && t3_value !== (t3_value =
+      1) && t3_value !== (t3_value =
       /*person*/
       ctx[0].profession + "")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t3, t3_value);
-      if (dirty &
+      if ((!current || dirty &
       /*person*/
-      1 && t5_value !== (t5_value =
+      1) && t5_value !== (t5_value =
       /*person*/
       ctx[0].expertise + "")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t5, t5_value);
 
       if (
       /*person*/
       ctx[0].link) {
-        if (if_block) {
-          if_block.p(ctx, dirty);
+        if (if_block0) {
+          if_block0.p(ctx, dirty);
         } else {
-          if_block = create_if_block(ctx);
-          if_block.c();
-          if_block.m(div3, t7);
+          if_block0 = create_if_block_4(ctx);
+          if_block0.c();
+          if_block0.m(div3, t7);
         }
-      } else if (if_block) {
-        if_block.d(1);
-        if_block = null;
+      } else if (if_block0) {
+        if_block0.d(1);
+        if_block0 = null;
       }
 
-      if (dirty &
+      if ((!current || dirty &
       /*person*/
-      1 && t8_value !== (t8_value =
+      1) && t8_value !== (t8_value =
       /*person*/
       ctx[0].mail + "")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t8, t8_value);
 
-      if (dirty &
+      if (!current || dirty &
       /*person*/
       1 && a_href_value !== (a_href_value = "mailto:" +
       /*person*/
       ctx[0].mail)) {
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", a_href_value);
       }
+
+      if (
+      /*person*/
+      ctx[0].media) {
+        if (if_block1) {
+          if_block1.p(ctx, dirty);
+
+          if (dirty &
+          /*person*/
+          1) {
+            (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1, 1);
+          }
+        } else {
+          if_block1 = create_if_block(ctx);
+          if_block1.c();
+          (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1, 1);
+          if_block1.m(div3, null);
+        }
+      } else if (if_block1) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block1, 1, 1, function () {
+          if_block1 = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+      }
     },
-    i: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
-    o: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block1);
+      current = false;
+    },
     d: function d(detaching) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div5);
-      if (if_block) if_block.d();
+      if (if_block0) if_block0.d();
+      if (if_block1) if_block1.d();
     }
   };
 }
@@ -2328,7 +2661,7 @@ function get_each_context_1(ctx, list, i) {
   var child_ctx = ctx.slice();
   child_ctx[3] = list[i];
   return child_ctx;
-} // (42:14) {#each uygulamalar.apps as uygulama}
+} // (39:14) {#each uygulamalar.apps as uygulama}
 
 
 function create_each_block_1(ctx) {
@@ -2356,7 +2689,7 @@ function create_each_block_1(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(a);
     }
   };
-} // (41:12) {#each params.software as uygulamalar}
+} // (38:12) {#each params.software as uygulamalar}
 
 
 function create_each_block(ctx) {
@@ -2516,7 +2849,6 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span3, "class", "icon-text is-size-5");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a0, "class", "navbar-item");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a0, "href", "../");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span7, "onclick", "BurgerMenu(this)");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span7, "class", "navbar-burger burger");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span7, "data-target", "navbarMenu");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "navbar-brand");
@@ -2724,37 +3056,27 @@ function create_default_slot(ctx) {
   var current;
   engineercard0 = new _Pages_Shared_EngineerCard_svelte__WEBPACK_IMPORTED_MODULE_3__["default"]({
     props: {
-      person:
-      /*engineers*/
-      ctx[0][0]
+      person: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.engineers[0]
     }
   });
   engineercard1 = new _Pages_Shared_EngineerCard_svelte__WEBPACK_IMPORTED_MODULE_3__["default"]({
     props: {
-      person:
-      /*engineers*/
-      ctx[0][1]
+      person: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.engineers[1]
     }
   });
   engineercard2 = new _Pages_Shared_EngineerCard_svelte__WEBPACK_IMPORTED_MODULE_3__["default"]({
     props: {
-      person:
-      /*engineers*/
-      ctx[0][2]
+      person: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.engineers[2]
     }
   });
   engineercard3 = new _Pages_Shared_EngineerCard_svelte__WEBPACK_IMPORTED_MODULE_3__["default"]({
     props: {
-      person:
-      /*engineers*/
-      ctx[0][3]
+      person: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.engineers[3]
     }
   });
   engineercard4 = new _Pages_Shared_EngineerCard_svelte__WEBPACK_IMPORTED_MODULE_3__["default"]({
     props: {
-      person:
-      /*engineers*/
-      ctx[0][4]
+      person: _config_config_js__WEBPACK_IMPORTED_MODULE_1__.params.engineers[4]
     }
   });
   return {
@@ -2919,7 +3241,7 @@ function create_fragment(ctx) {
 
       if (dirty &
       /*$$scope*/
-      2) {
+      1) {
         layout_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -2945,46 +3267,6 @@ function create_fragment(ctx) {
   };
 }
 
-function instance($$self) {
-  var engineers = [{
-    name: 'Kılıç Ali Temiz',
-    profession: 'Mechanical Engineer',
-    expertise: '30+ years of aerospace experience and 15+ years of web programming',
-    img: 'katemiz.jpg',
-    mail: 'katemiz@gmail.com',
-    link: 'katemiz'
-  }, {
-    name: 'Ayşe Şolpan Temiz',
-    profession: 'Aeronautical Engineer',
-    expertise: '30+ years of aerospace experience. Experience in aerostructures production, structural design, system safety analysis, airworthiness and certification, technology management',
-    img: 'astemiz.jpg',
-    mail: 'astemiz@gmail.com',
-    link: null
-  }, {
-    name: 'Zeynep Albayrak',
-    profession: 'Electrical-Electronics Engineer',
-    expertise: 'Junior Python Programmer. Just completed certificate program for python',
-    img: 'zeynep.jpg',
-    mail: 'z@gmail.com',
-    link: null
-  }, {
-    name: 'Merve Duru Temiz',
-    profession: 'To Be Front-End Developer',
-    expertise: 'just starting off.',
-    img: 'mdtemiz.jpg',
-    mail: 'merve.duru@metu.edu.tr',
-    link: null
-  }, {
-    name: 'Harun Emre Temiz',
-    profession: 'To Be Game Developer',
-    expertise: 'Has more than 10 years of active gaming experience. Not developed and but hope to be ready soon',
-    img: 'hetemiz.jpg',
-    mail: 'hetemiz@gmail.com',
-    link: null
-  }];
-  return [engineers];
-}
-
 var Team = /*#__PURE__*/function (_SvelteComponent) {
   _inherits(Team, _SvelteComponent);
 
@@ -2996,7 +3278,7 @@ var Team = /*#__PURE__*/function (_SvelteComponent) {
     _classCallCheck(this, Team);
 
     _this = _super.call(this);
-    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {});
+    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, null, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {});
     return _this;
   }
 
@@ -3120,7 +3402,7 @@ var SVGS = (_SVGS = {
   toggle_off: '<path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>',
   save: '<path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm2 16H5V5h11.17L19 7.83V19zm-7-7c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zM6 6h9v4H6z"/>',
   live_help: '<path d="M19 2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h4l3 3 3-3h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 16h-4.83l-.59.59L12 20.17l-1.59-1.59-.58-.58H5V4h14v14zm-8-3h2v2h-2zm1-8c1.1 0 2 .9 2 2 0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4S8 6.79 8 9h2c0-1.1.9-2 2-2z"/>'
-}, _defineProperty(_SVGS, "info", '<path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>'), _defineProperty(_SVGS, "people", '<path d="M4,13c1.1,0,2-0.9,2-2c0-1.1-0.9-2-2-2s-2,0.9-2,2C2,12.1,2.9,13,4,13z M5.13,14.1C4.76,14.04,4.39,14,4,14 c-0.99,0-1.93,0.21-2.78,0.58C0.48,14.9,0,15.62,0,16.43V18l4.5,0v-1.61C4.5,15.56,4.73,14.78,5.13,14.1z M20,13c1.1,0,2-0.9,2-2 c0-1.1-0.9-2-2-2s-2,0.9-2,2C18,12.1,18.9,13,20,13z M24,16.43c0-0.81-0.48-1.53-1.22-1.85C21.93,14.21,20.99,14,20,14 c-0.39,0-0.76,0.04-1.13,0.1c0.4,0.68,0.63,1.46,0.63,2.29V18l4.5,0V16.43z M16.24,13.65c-1.17-0.52-2.61-0.9-4.24-0.9 c-1.63,0-3.07,0.39-4.24,0.9C6.68,14.13,6,15.21,6,16.39V18h12v-1.61C18,15.21,17.32,14.13,16.24,13.65z M8.07,16 c0.09-0.23,0.13-0.39,0.91-0.69c0.97-0.38,1.99-0.56,3.02-0.56s2.05,0.18,3.02,0.56c0.77,0.3,0.81,0.46,0.91,0.69H8.07z M12,8 c0.55,0,1,0.45,1,1s-0.45,1-1,1s-1-0.45-1-1S11.45,8,12,8 M12,6c-1.66,0-3,1.34-3,3c0,1.66,1.34,3,3,3s3-1.34,3-3 C15,7.34,13.66,6,12,6L12,6z"/>'), _defineProperty(_SVGS, "service", '<path d="M18.98 17H2v2h20v-2zM21 16c-.27-4.07-3.25-7.4-7.16-8.21.1-.24.16-.51.16-.79 0-1.1-.9-2-2-2s-2 .9-2 2c0 .28.06.55.16.79C6.25 8.6 3.27 11.93 3 16h18zm-9-6.42c2.95 0 5.47 1.83 6.5 4.41h-13c1.03-2.58 3.55-4.41 6.5-4.41z"/>'), _SVGS);
+}, _defineProperty(_SVGS, "info", '<path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>'), _defineProperty(_SVGS, "people", '<path d="M4,13c1.1,0,2-0.9,2-2c0-1.1-0.9-2-2-2s-2,0.9-2,2C2,12.1,2.9,13,4,13z M5.13,14.1C4.76,14.04,4.39,14,4,14 c-0.99,0-1.93,0.21-2.78,0.58C0.48,14.9,0,15.62,0,16.43V18l4.5,0v-1.61C4.5,15.56,4.73,14.78,5.13,14.1z M20,13c1.1,0,2-0.9,2-2 c0-1.1-0.9-2-2-2s-2,0.9-2,2C18,12.1,18.9,13,20,13z M24,16.43c0-0.81-0.48-1.53-1.22-1.85C21.93,14.21,20.99,14,20,14 c-0.39,0-0.76,0.04-1.13,0.1c0.4,0.68,0.63,1.46,0.63,2.29V18l4.5,0V16.43z M16.24,13.65c-1.17-0.52-2.61-0.9-4.24-0.9 c-1.63,0-3.07,0.39-4.24,0.9C6.68,14.13,6,15.21,6,16.39V18h12v-1.61C18,15.21,17.32,14.13,16.24,13.65z M8.07,16 c0.09-0.23,0.13-0.39,0.91-0.69c0.97-0.38,1.99-0.56,3.02-0.56s2.05,0.18,3.02,0.56c0.77,0.3,0.81,0.46,0.91,0.69H8.07z M12,8 c0.55,0,1,0.45,1,1s-0.45,1-1,1s-1-0.45-1-1S11.45,8,12,8 M12,6c-1.66,0-3,1.34-3,3c0,1.66,1.34,3,3,3s3-1.34,3-3 C15,7.34,13.66,6,12,6L12,6z"/>'), _defineProperty(_SVGS, "service", '<path d="M18.98 17H2v2h20v-2zM21 16c-.27-4.07-3.25-7.4-7.16-8.21.1-.24.16-.51.16-.79 0-1.1-.9-2-2-2s-2 .9-2 2c0 .28.06.55.16.79C6.25 8.6 3.27 11.93 3 16h18zm-9-6.42c2.95 0 5.47 1.83 6.5 4.41h-13c1.03-2.58 3.55-4.41 6.5-4.41z"/>'), _defineProperty(_SVGS, "twitter", "<path\n  d=\"M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14\n  0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0\n  1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0\n  1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0\n  1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64\n  6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0\n  1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067\n  2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344\n  9.344 0 0 0 5.026 15z\" />"), _defineProperty(_SVGS, "github", "<path fill-rule=\"evenodd\" d=\"M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z\" />"), _defineProperty(_SVGS, "linkedin", "<path d=\"M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z\"/>"), _SVGS);
 
 /***/ }),
 
@@ -3153,6 +3435,22 @@ _inertiajs_progress__WEBPACK_IMPORTED_MODULE_1__.InertiaProgress.init({
       props: props
     });
   }
+}); // *************************************************************
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Get all "navbar-burger" elements
+  var $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0); // Add a click event on each of them
+
+  $navbarBurgers.forEach(function (el) {
+    el.addEventListener('click', function () {
+      // Get the target from the "data-target" attribute
+      var target = el.dataset.target;
+      var $target = document.getElementById(target); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+
+      el.classList.toggle('is-active');
+      $target.classList.toggle('is-active');
+    });
+  });
 });
 
 /***/ }),
@@ -3249,6 +3547,47 @@ var params = {
   }, {
     name: 'Bulma',
     url: 'https://bulma.io'
+  }],
+  engineers: [{
+    name: 'Kılıç Ali Temiz',
+    profession: 'Mechanical Engineer',
+    expertise: '30+ years of aerospace experience and 15+ years of web programming',
+    img: 'katemiz.jpg',
+    mail: 'katemiz@gmail.com',
+    link: 'katemiz',
+    media: {
+      linkedin: 'https://tr.linkedin.com/in/k%C4%B1l%C4%B1%C3%A7-ali-temiz-134a1262',
+      github: 'https://github.com/katemiz',
+      twitter: 'https://twitter.com/katemiz1'
+    }
+  }, {
+    name: 'Ayşe Şolpan Temiz',
+    profession: 'Aeronautical Engineer',
+    expertise: '30+ years of aerospace experience. Experience in aerostructures production, structural design, system safety analysis, airworthiness and certification, technology management',
+    img: 'astemiz.jpg',
+    mail: 'astemiz@gmail.com',
+    link: null
+  }, {
+    name: 'Zeynep Albayrak',
+    profession: 'Electrical-Electronics Engineer',
+    expertise: 'Junior Python Programmer. Just completed certificate program for python',
+    img: 'zeynep.jpg',
+    mail: 'z@gmail.com',
+    link: null
+  }, {
+    name: 'Merve Duru Temiz',
+    profession: 'To Be Front-End Developer',
+    expertise: 'just starting off.',
+    img: 'mdtemiz.jpg',
+    mail: 'merve.duru@metu.edu.tr',
+    link: null
+  }, {
+    name: 'Harun Emre Temiz',
+    profession: 'To Be Game Developer',
+    expertise: 'Has more than 10 years of active gaming experience. Not developed and but hope to be ready soon',
+    img: 'hetemiz.jpg',
+    mail: 'hetemiz@gmail.com',
+    link: null
   }]
 };
 var gui = {

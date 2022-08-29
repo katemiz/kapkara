@@ -1,14 +1,13 @@
 <script>
   import { params } from '@/config/config.js'
-  import AppCard from './Shared/AppCard.svelte'
+  import AppCard from '@/Pages/Shared/AppCard.svelte'
 
-  function highlight() {
-    console.log(el)
-    //el.classList.add("has-background-info-light")
+  function highlight(el) {
+    el.target.classList.remove('is-light')
   }
 
   function unlight(el) {
-    //el.classList.remove("has-background-info-light")
+    el.target.classList.add('is-light')
   }
 </script>
 
@@ -23,13 +22,20 @@
       <div class="tile">
 
         <div class="tile is-parent is-vertical">
-          <div class="tile is-child notification is-primary is-light card">
+          <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+          <div
+            class="tile is-child notification is-primary is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[0].apps[0]} />
           </div>
         </div>
 
         <div class="tile is-parent">
-          <div class="tile is-child notification is-info is-light card">
+          <div
+            class="tile is-child notification is-info is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[0].apps[1]} />
           </div>
         </div>
@@ -43,13 +49,19 @@
       <div class="tile">
 
         <div class="tile is-parent is-vertical">
-          <div class="tile is-child notification is-link is-light card">
+          <div
+            class="tile is-child notification is-link is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[0].apps[2]} />
           </div>
         </div>
 
         <div class="tile is-parent">
-          <div class="tile is-child notification is-success is-light card">
+          <div
+            class="tile is-child notification is-success is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[0].apps[3]} />
           </div>
         </div>
@@ -64,7 +76,9 @@
 
         <div class="tile is-parent is-vertical">
           <div
-            class="tile is-child notification has-background-grey-light card">
+            class="tile is-child notification is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[0].apps[4]} />
           </div>
         </div>
@@ -83,13 +97,19 @@
       <div class="tile">
 
         <div class="tile is-parent is-vertical">
-          <div class="tile is-child notification is-warning is-light card">
+          <div
+            class="tile is-child notification is-warning is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[1].apps[0]} />
           </div>
         </div>
 
         <div class="tile is-parent">
-          <div class="tile is-child notification is-danger is-light card">
+          <div
+            class="tile is-child notification is-danger is-light card"
+            on:mouseenter={highlight}
+            on:mouseleave={unlight}>
             <AppCard uygulama={params.software[1].apps[1]} />
           </div>
         </div>

@@ -21,10 +21,7 @@
         </span>
       </a>
 
-      <span
-        onclick="BurgerMenu(this)"
-        class="navbar-burger burger"
-        data-target="navbarMenu">
+      <span class="navbar-burger burger" data-target="navbarMenu">
         <span />
         <span />
         <span />
