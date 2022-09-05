@@ -3513,10 +3513,10 @@ var params = {
       url: 'https://k-library.kapkara.one',
       desc: "\n            <p>k-library, \"Personal Digital Library\" is an app designed to keep your digital assets in one place and accessible only for you.</p>  <p>You can store them in your server and tag them.</p>\n              <ul>\n              <li>Doc files such as pdf, doc, xls</li>\n              <li>Audio files (music)</li>\n              <li>Video and Film films</li>\n              <li>Images and Photos.</li>\n              <li>Any file that is in digital format.</li>\n            </ul>"
     }, {
-      name: 'eDoc',
+      name: 'hDocumentor',
       label: 'Write Your Documentation in HTML',
       img: 'edoc_brand_logo.svg',
-      url: 'https://edoc.kapkara.one',
+      url: 'https://documentor.kapkara.one',
       desc: "\n            <p>Centralized platform for writing enterprise level documentation</p>\n            <ul>\n            <li>Web based (HTML) infrastructure.</li>\n            <li>Standards, Specifications, Procedures etc</li>\n            <li>Standardized formats for each company</li>\n            <li>Configuration controlled, with release and change control flow.</li>\n            <li>Mobile friendly access accross.</li>\n            </ul>"
     }]
   }, {
@@ -3579,7 +3579,7 @@ var params = {
     profession: 'To Be Front-End Developer',
     expertise: 'just starting off.',
     img: 'mdtemiz.jpg',
-    mail: 'merve.duru@metu.edu.tr',
+    mail: 'merve.temiz@metu.edu.tr',
     link: null
   }, {
     name: 'Harun Emre Temiz',

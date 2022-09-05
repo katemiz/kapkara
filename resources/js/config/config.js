@@ -85,10 +85,10 @@ export let params = {
         },
 
         {
-          name: 'eDoc',
+          name: 'hDocumentor',
           label: 'Write Your Documentation in HTML',
           img: 'edoc_brand_logo.svg',
-          url: 'https://edoc.kapkara.one',
+          url: 'https://documentor.kapkara.one',
           desc: `
             <p>Centralized platform for writing enterprise level documentation</p>
             <ul>
@@ -176,7 +176,7 @@ export let params = {
       profession: 'To Be Front-End Developer',
       expertise: 'just starting off.',
       img: 'mdtemiz.jpg',
-      mail: 'merve.duru@metu.edu.tr',
+      mail: 'merve.temiz@metu.edu.tr',
       link: null,
     },
 
