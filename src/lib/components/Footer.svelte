@@ -1,15 +1,5 @@
-<!-- <footer class="footer">
-  <div class="content has-text-centered">
-    <p>
-      <strong>My App</strong> © 2024. All rights reserved.
-    </p>
-  </div>
-</footer> -->
-
-
-
 <script>
-  import { APP,KAPKARA,MYAPPS,MEMBERS } from '$lib/config';
+  import { KAPKARA,MYAPPS,MEMBERS } from '$lib/config';
 </script>
 
 
@@ -19,34 +9,34 @@
 
       <div class="column has-text-centered-mobile">
         <img
-          src="{APP.logo}"
+          src="{KAPKARA.logo}"
           width="28px"
           alt="Company Icon" />
         <br />
-        <a href={APP.url} class="has-text-weight-light has-text-white">
-          {APP.name}
+        <a href={KAPKARA.url} class="has-text-weight-light has-text-white">
+          {KAPKARA.name}
         </a>
       </div>
 
       <div class="column">
         <p
           class="has-text-weight-light has-text-centered has-text-centered-mobile">
-          {APP.title}
+          {KAPKARA.title}
         </p>
         <p
           class="has-text-weight-light has-text-centered has-text-centered-mobile is-size-7">
-          {APP.version}
+          {KAPKARA.version}
         </p>
       </div>
 
       <div class="column">
         <p class="has-text-weight-light has-text-right has-text-centered-mobile">
-            {APP.copyright}
+            {KAPKARA.copyright}
         </p>
         <p
           class="has-text-weight-light has-text-right has-text-centered-mobile
           is-size-7">
-          {APP.motto}
+          {KAPKARA.motto}
         </p>
       </div>
 

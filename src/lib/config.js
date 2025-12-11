@@ -2,9 +2,10 @@
 
 
 
-export const APP = {
-    name : 'kapkara',
-    link : 'https://kapkara.one',
+
+export const KAPKARA = {
+    name  :  'kapkara',
+    link  :  'https://kapkara.one',
     logo : 'images/baykus_orange.svg',
     motto : 'simplicity in action',
     title : 'kapkara web technologies | design house',
@@ -14,14 +15,7 @@ export const APP = {
     app_footer_logo : 'app_footer_logo.svg',
     version : '1.0',
     copyright : '© 2022',
-} 
 
-export const KAPKARA = {
-    name  :  'kapkara',
-    logo  :  'baykus_orange.svg',
-    link  :  'https://kapkara.one',
-    motto  :  'simplicity in action',
-    title  :  'web technologies | design house',
 }
 
 
@@ -51,7 +45,7 @@ export const MYAPPS = [
 
 
     {
-        name : 'RM',
+        name : 'Requirements Management',
         label : 'Requirements Management',
         banner_img : 'requirements_banner.svg',
         img : 'requirements-stack.svg',

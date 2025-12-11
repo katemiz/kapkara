@@ -1,5 +1,5 @@
 <script>
-  import { APP,KAPKARA,MYAPPS,MEMBERS } from '$lib/config';
+  import { KAPKARA,MYAPPS,MEMBERS } from '$lib/config';
 </script>
 
 
@@ -12,7 +12,7 @@
           <span class="icon-text is-size-5">
 
             <span class="icon">
-              <img src="{APP.logo}" alt="baykus logo" />
+              <img src="{KAPKARA.logo}" alt="baykus logo" />
 
             </span>
 
@@ -42,10 +42,9 @@
 
 
               {#each MYAPPS as app}
-
-                                      <a class="navbar-item" href="{app.label}">
-                        {app.url}{app.name} 
-                        </a>
+                <a class="navbar-item" href="{app.url}">
+                  {app.name} 
+                </a>
               {/each}
 
             </div>
