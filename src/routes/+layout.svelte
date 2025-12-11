@@ -1,5 +1,4 @@
 <script lang="ts">
-
 	import 'bulma/css/bulma.min.css';
 	import favicon from '$lib/assets/favicon.svg';
 
@@ -9,44 +8,28 @@
 	let { children } = $props();
 </script>
 
-
-<style>
-  .app-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  main {
-    flex: 1;
-  }
-</style>
-
-
-
-
-
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-
-
-
-
-
-
 <div class="app-container">
-  <Navbar />
-  
-  <main>
+	<Navbar />
 
-	{@render children()}
+	<main>
+		{@render children()}
+	</main>
 
-  </main>
-  
-  <Footer />
+	<Footer />
 </div>
 
+<style>
+	.app-container {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
 
-
+	main {
+		flex: 1;
+	}
+</style>
