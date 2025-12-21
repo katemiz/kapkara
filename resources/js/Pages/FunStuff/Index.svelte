@@ -17,3 +17,9 @@
         </aside>
     </section>
 </Layout>
+
+<style>
+    .section {
+        height: 100dvh;
+    }
+</style>
