@@ -1,7 +1,7 @@
 export const KAPKARA = {
     name: "kapkara",
     link: "https://kapkara.one",
-    logo: "images/baykus_orange.svg",
+    logo: "baykus_orange.svg",
     motto: "simplicity in action",
     title: "kapkara web technologies | design house",
     url: "kapkara.one",
@@ -106,18 +106,17 @@ export const MYAPPS = [
     {
         name: "Fun Stuff",
         label: "Engineering Fun Stuff",
-        logo: "klib.svg",
-        app_hero: "AppHero-KL.svg",
+        logo: "fun.svg",
+        app_hero: "AppHero-Fun.svg",
         img: "app_header_logo.svg",
         url: "/funstuff",
         desc: `
-        <p>k-library, "Personal Digital Library" is an app designed to keep your digital assets in one place and accessible only for you.</p>  <p>You can store them in your server and tag them.</p>
+        <p>Some engineering related fun stuff including calculators and simulators.</p>
             <ul>
-            <li>Doc files such as pdf, doc, xls</li>
-            <li>Audio files (music)</li>
-            <li>Video and Film films</li>
-            <li>Images and Photos.</li>
-            <li>Any file that is in digital format.</li>
+            <li>Gauss Random Number Simulator</li>
+            <li>Beam Deflection Calculator</li>
+            <li>RC Circuit Simulator</li>
+            <li>And more to come...</li>
         </ul>`,
     },
 ];
@@ -178,3 +177,9 @@ export const MEMBERS = [
         link: null,
     },
 ];
+
+
+export const PATHS = {
+    path_images_prefix: "/images/",
+    path_images_apps_prefix: "/images/Apps/"
+};

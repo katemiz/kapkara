@@ -1,6 +1,6 @@
 <script>
     import Layout from "../../Shared/Layout.svelte";
-    import { Gauss } from "../../gauss.js";
+    import { Gauss } from "./gauss.js";
 
     let boxNo = 9;
     let cycleNo = 100;
@@ -75,20 +75,16 @@
                 <div>
                     <p class="heading">Number of Random Run Iterations</p>
                     <p class="title" id="cycleNo"></p>
+
                     <button
                         class="button is-small is-hidden"
-                        onclick={Refresh(false, -1)}
+                        onclick={() => Refresh(false, -1)}
                         id="minusCycleNo">x/10</button
                     >
 
                     <button
-                        class="button is-small is-hidden"
-                        onclick={Refresh(false, -1)}
-                        id="minusCycleNo">x/10</button
-                    >
-
-                    <button class="button is-small" onclick={Refresh(false, 1)}
-                        >10x</button
+                        class="button is-small"
+                        onclick={() => Refresh(false, 1)}>10x</button
                     >
                 </div>
             </div>
@@ -99,11 +95,14 @@
                     <p class="title" id="boxNo"></p>
                     <button
                         class="button is-small is-hidden"
-                        onclick={Refresh(-1, false)}
-                        id="minusBoxNo">-</button
-                    >
-                    <button class="button is-small" onclick={Refresh(1, false)}
-                        >+</button
+                        onclick={() => Refresh(-1, false)}
+                        id="minusBoxNo"
+                        >-
+                    </button>
+
+                    <button
+                        class="button is-small"
+                        onclick={() => Refresh(1, false)}>+</button
                     >
                 </div>
             </div>

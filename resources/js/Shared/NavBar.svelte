@@ -1,5 +1,5 @@
 <script>
-    import { KAPKARA, MYAPPS, MEMBERS } from "$lib/config";
+    import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
 
     import { House, HandHelping, Users, ContactRound } from "@lucide/svelte";
 
@@ -31,7 +31,10 @@
             <a class="navbar-item" href="/">
                 <span class="icon-text is-size-5">
                     <span class="icon">
-                        <img src="/{KAPKARA.logo}" alt="baykus logo" />
+                        <img
+                            src="{PATHS.path_images_prefix}{KAPKARA.logo}"
+                            alt="baykus logo"
+                        />
                     </span>
 
                     <span class="has-text-weight-bold">kapkara</span>
@@ -40,8 +43,6 @@
                     </span>
                 </span>
             </a>
-
-            <!-- <span class="navbar-burger burger" data-target="navbarMenu"> </span> -->
 
             <button
                 href="#"
@@ -63,7 +64,6 @@
                     <span class="icon has-text-warning">
                         <House size={18} />
                     </span>
-                    <!-- <span>Home</span> -->
                 </a>
 
                 <div class="navbar-item has-dropdown is-hoverable">
@@ -74,7 +74,7 @@
                             <a class="navbar-item" href={app.url}>
                                 <span class="icon has-text-warning">
                                     <img
-                                        src="/images/Apps/{app.logo}"
+                                        src="{PATHS.path_images_apps_prefix}{app.logo}"
                                         alt={app.label}
                                     />
                                 </span>
