@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\QuestionController;
+
+
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -43,3 +46,8 @@ Route::get('/funstuff', function () {
 Route::get('/funstuff/gauss', function () {
     return Inertia::render('FunStuff/Gauss');
 });
+
+
+
+Route::get('/qview/{idQuestion}', [QuestionController::class, 'view']); 
+Route::post('/qstore', [QuestionController::class, 'store']); 
