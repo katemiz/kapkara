@@ -7,6 +7,9 @@
 
     let edContent = $state("<em>Your content will appear here...</em>");
 
+            let { question } = $props();
+
+
     // 1. Initialize the Inertia Form
     let form = useForm({
         myInput: "",
@@ -14,13 +17,13 @@
     });
 
     function submit(e) {
-        console.log("The form object is:", form);
+        console.log("The form object is:",$form);
         e.preventDefault();
         // 2. Post to the Laravel route 'posts.store'
-        form.post("/qstore", {
+       $form.post("/qstore", {
             onSuccess: () => {
                 console.log("Saved successfully!");
-                form.reset();
+               $form.reset();
             },
         });
     }

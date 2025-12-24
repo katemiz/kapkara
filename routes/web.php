@@ -48,6 +48,13 @@ Route::get('/funstuff/gauss', function () {
 });
 
 
+// Route::get('/question', [QuestionController::class, 'index']);           // list all
+// Route::get('/question/create', [QuestionController::class, 'create']);   // show create form
+// Route::post('/question', [QuestionController::class, 'store']);          // store new
+// Route::get('/question/{idQuestion}', [QuestionController::class, 'show']); // view one
+// Route::get('/question/{idQuestion}/edit', [QuestionController::class, 'edit']); // show edit form
+// Route::put('/question/{idQuestion}', [QuestionController::class, 'update']); // update existing
+// Route::delete('/question/{idQuestion}', [QuestionController::class, 'destroy']); // delete
 
-Route::get('/qview/{idQuestion}', [QuestionController::class, 'view']); 
-Route::post('/qstore', [QuestionController::class, 'store']); 
+
+Route::resource('question', QuestionController::class);
