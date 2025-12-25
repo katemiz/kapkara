@@ -22,6 +22,8 @@
 
         if (isEdit) {
 
+            console.log('trying to edit')
+
             $form.put(`/question/${question.id}`,{
                 onSuccess: () => {
                     console.log("Updated successfully!");
@@ -30,7 +32,7 @@
 
         } else {
 
-            console.log('trying to store')
+            console.log('trying to new')
 
             $form.post("/question", {
                 onSuccess: () => {
@@ -47,7 +49,30 @@
     <section class="section">
         <div class="container">
 
-            <h1 class="title">{isEdit ? 'Edit Question' : 'Create Question'}</h1>
+            
+
+
+
+
+
+            <div class="fixed-grid has-2-cols">
+            <div class="grid has-background-warning">
+                <div class="cell">
+                    <h1 class="title">{isEdit & question != null ? 'Edit Question' + question.id : 'Create Question'}</h1>
+                </div>
+                <div class="cell has-text-right"><a href="/question">Back</a></div>
+            </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
 
             <form onsubmit={submit} class="box">
 
@@ -70,7 +95,7 @@
                 <div class="field">
                     <label class="label" for="ed">Content (text)</label>
                     <div class="control" id="ed">
-                        <Editor onUpdate={(html) => ($form.text = html)} />
+                        <Editor onUpdate={(html) => ($form.text = html)} value={question != null ? question.text : ''}/>
                     </div>
                     {#if $form.errors.text}
                         <p class="help is-danger">{$form.errors.text}</p>

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\MediaController;
+
 
 
 // Route::get('/', function () {
@@ -58,3 +60,6 @@ Route::get('/funstuff/gauss', function () {
 
 
 Route::resource('question', QuestionController::class);
+
+Route::post('/upload-image', [MediaController::class, 'uploadImg'])->name('image.upload');
+

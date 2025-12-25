@@ -84,9 +84,11 @@ class QuestionController extends Controller
         $question = Question::findOrFail($idQuestion);
 
         $validated = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
+            // 'title' => 'required|max:255',
+            'text' => 'required',
         ]);
+
+        //dd($validated );
 
         $question->update($validated);
 
