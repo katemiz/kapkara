@@ -43,6 +43,7 @@ class QuestionController extends Controller
     {
         $validated = $request->validate([
             'text' => 'required|max:255',
+            'myInput' => 'required'
         ]);
 
         $question = Question::create($validated);

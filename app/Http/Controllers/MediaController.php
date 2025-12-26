@@ -21,7 +21,7 @@ class MediaController extends Controller
         // Get full URL
         //$url = Storage::disk('public')->url($path);
 
-            $url = url('storage/' . $path);
+        $url = url('storage/' . $path);
 
         
         // Debug: Log the values
