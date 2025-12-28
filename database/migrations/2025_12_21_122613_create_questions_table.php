@@ -15,6 +15,19 @@ return new class extends Migration
             $table->id();
             $table->text('text');
             $table->string('myInput');
+
+            $table->string('mySelect');
+            $table->string('myRadio');
+            $table->string('myCheckboxSingle');
+            $table->string('myCheckboxMultiple');
+            $table->string('myDate');
+            $table->string('myDateTime');
+
+            $table->string('myStepLevel1');
+            $table->string('myStepLevel2');
+            $table->string('myStepLevel3');
+            $table->string('myEditorText');
+
             $table->timestamps();
         });
     }
