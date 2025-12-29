@@ -9,17 +9,17 @@
     import FormCheckBoxSingle from "$lib/components/FormCheckBoxSingle.svelte";
     import FormCheckBoxMultiple from "$lib/components/FormCheckBoxMultiple.svelte";
     import FormDate from "$lib/components/FormDate.svelte";
-    import FormDateTime from "$lib/components/FormDateTime.svelte";
     import FormUpload from "$lib/components/FormUpload.svelte";
 
     let edContent = $state("<em>Your content will appear here...</em>");
 
-    let { question = null, isEdit = false, veri } = $props();
+    let { question = null, isEdit = false, fixedData } = $props();
+
 
     // 1. Initialize the Inertia Form
     let form = $derived(
         useForm({
-            myInput: question?.myValue ?? "",
+            myInput: question?.myInput ?? "",
             mySelect: question?.mySelect ?? "",
             myRadio: question?.myRadio ?? "",
             myCheckboxSingle: question?.myCheckboxSingle ?? false,
@@ -27,9 +27,10 @@
             myDate: question?.myDate ?? "",
             myDateTime: question?.myDateTime ?? "",
             myUpload: question?.myUpload ?? null,
-            level1: "",
-            level2: "",
-            level3: "",
+
+            // level1: "",
+            // level2: "",
+            // level3: "",
 
             myStepLevel1: question?.myStepLevel1 ?? "",
             myStepLevel2: question?.myStepLevel2 ?? "",
@@ -39,20 +40,28 @@
         }),
     );
 
+
+            console.log("The form object is:", $form);
+
+
     // Compute options for level 2 based on level 1 selection
     let level2Options = $derived(
-        $form.level1 ? veri.level2[$form.level1] || [] : [],
+        $form.myStepLevel1 ? fixedData.cascadedData.level2[$form.myStepLevel1] || [] : [],
     );
+
+            // console.log(" $form.myStepLevel1 is:", $form.myStepLevel1);
+
+
 
     // Compute options for level 3 based on level 2 selection
     let level3Options = $derived(
-        $form.level2 ? veri.level3[$form.level2] || [] : [],
+        $form.myStepLevel2 ? fixedData.cascadedData.level3[$form.myStepLevel2] || [] : [],
     );
 
     function submit(e) {
         console.log("The form object is:", $form);
         console.log("Form submitted:", $form.data());
-        alert(`Selected: ${$form.level1} > ${$form.level2} > ${$form.level3}`);
+        // alert(`Selected: ${$form.myStepLevel1} > ${$form.myStepLevel2} > ${$form.myStepLevel3}`);
 
         e.preventDefault();
 
@@ -108,20 +117,15 @@
                     name="mySelect"
                     label="Title (mySelect)"
                     placeholder="Enter a title"
-                    options={[
-                        { value: "1", label: "Option 1" },
-                        { value: "2", label: "Option 2" },
-                    ]}
+                    options= {fixedData.dpOptions}
+                    value = {$form.mySelect} 
                 />
 
                 <FormRadio
                     {form}
                     name="myRadio"
                     label="Gender"
-                    options={[
-                        { value: "M", label: "Male" },
-                        { value: "F", label: "Female" },
-                    ]}
+                    options={fixedData.radioOptions}
                 />
 
                 <FormCheckBoxSingle
@@ -134,25 +138,25 @@
                     {form}
                     name="myCheckboxMultiple"
                     label="Select your interests"
-                    options={[
-                        { value: "coding", label: "Coding" },
-                        { value: "design", label: "Design" },
-                    ]}
+                    options={fixedData.checkboxOptions}
                 />
 
                 <FormDate
                     {form}
                     name="myDate"
-                    label="Date of Birth"
+                    label="Pick a Date"
                     lang="en"
-                    timepicker="true"
-                    onlyTimepicker="true"
+                    timepicker={false} 
+                    onlyTimepicker={false} 
                 />
 
-                <FormDateTime
+                <FormDate
                     {form}
                     name="myDateTime"
-                    label="Appointment Date & Time"
+                    label="Pick Date & Time"
+                    lang="en"
+                    timepicker={true} 
+                    onlyTimepicker={true} 
                 />
 
                 <FormUpload
@@ -171,12 +175,14 @@
                             <!-- Level 1: Main Category -->
                             <FormSelect
                                 {form}
-                                name="level1"
+                                name="myStepLevel1"
                                 label="Category"
-                                options={veri.level1}
+                                options={fixedData.cascadedData.level1}
                                 onchange={() => {
-                                    $form.level2 = ""; // Manually clear
-                                    $form.level3 = "";
+                                    $form.myStepLevel2 = ""; // Manually clear
+                                    $form.myStepLevel3 = "";
+
+                                    console.log ("ON CHANGE",$form.myStepLevel1)
                                 }}
                             />
                         </div>
@@ -185,16 +191,16 @@
                             <!-- Level 2: Subcategory -->
                             <FormSelect
                                 {form}
-                                name="level2"
+                                name="myStepLevel2"
                                 label="Subcategory"
                                 options={level2Options}
-                                placeholder={$form.level1
+                                placeholder={$form.myStepLevel1
                                     ? "Select subcategory"
                                     : "Select a category first"}
-                                disabled={!$form.level1}
+                                disabled={!$form.myStepLevel1}
                                 required={true}
                                 onchange={() => {
-                                    $form.level3 = ""; // Manually clear
+                                    $form.myStepLevel3 = ""; // Manually clear
                                 }}
                             />
                         </div>
@@ -203,13 +209,13 @@
                             <!-- Level 3: Item -->
                             <FormSelect
                                 {form}
-                                name="level3"
+                                name="myStepLevel3"
                                 label="Item"
                                 options={level3Options}
-                                placeholder={$form.level2
+                                placeholder={$form.myStepLevel2
                                     ? "Select item"
                                     : "Select a subcategory first"}
-                                disabled={!$form.level2}
+                                disabled={!$form.myStepLevel2}
                                 required={true}
                             />
                         </div>

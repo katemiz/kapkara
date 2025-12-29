@@ -21,7 +21,7 @@
         {#each questions.data as question}
             <tr>
                 <td>{question.id}</td>
-                <td>{@html question.text}</td>
+                <td>{@html question.myEditorText}</td>
                 <td>
                     <a href="/question/{question.id}">View</a>
                 </td>

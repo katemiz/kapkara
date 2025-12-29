@@ -10,6 +10,30 @@ class QuestionController extends Controller
 {
 
 
+    public $dpOptions = [
+
+        [ "value" => 1,"label" => "Option1"],
+        [ "value" => 2,"label" => "Option2"],
+        [ "value" => 3,"label" => "Option3"],
+        [ "value" => 4,"label" => "Option4"] 
+    ];
+
+
+
+    public $radioOptions = [
+
+        [ "value" => 1,"label" => "Radio Option 1"],
+        [ "value" => 2,"label" => "Radio Option 2"],
+        [ "value" => 3,"label" => "Radio Option 3"],
+        [ "value" => 4,"label" => "Radio Option 4"] 
+    ];
+
+    public $checkboxOptions =  [       
+        [ "value" => 1,"label" => "Checkbox Option 1"],
+        [ "value" => 2,"label" => "Checkbox Option 2"],
+        [ "value" => 3,"label" => "Checkbox Option 3"],
+        [ "value" => 4,"label" => "Checkbox Option 4"] 
+    ];
 
     public $veri = [
         // Level 1 options
@@ -127,10 +151,18 @@ class QuestionController extends Controller
      */
     public function create()
     {
+
+        $fixedData["dpOptions"] =$this->dpOptions; 
+        $fixedData["radioOptions"] =$this->radioOptions;   
+        $fixedData["cascadedData"] =$this->veri;   
+        $fixedData["checkboxOptions"] =$this->checkboxOptions;   
+
+
+
         return Inertia::render('Question/Form', [
             'question' => null, // or new Question()
             'isEdit' => false,
-            'veri' => $this->veri
+            'fixedData' =>$fixedData  
         ]);
     }
 
@@ -139,19 +171,35 @@ class QuestionController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all() );
+
+        //dd('here');
+
+        //dd($request->all() );
 
 
-        $validated = $request->validate([
-            'text' => 'required|max:255',
-            'myInput' => 'required'
-        ]);
+        // $validated = $request->validate([
+        //     'myEditorText' => 'required|max:255',
+        //     'myInput' => 'required',
+        //         'myCheckboxMultiple' => 'nullable|array',
+
+        // ]);
 
 
+        // Add unvalidated parameters
+        $validated['myInput'] = $request->input('myInput');
+        $validated['mySelect'] = $request->input('mySelect');
+        $validated['myRadio'] = $request->input('myRadio');
+        $validated['myCheckboxSingle'] = $request->input('myCheckboxSingle');
+        $validated['myCheckboxMultiple'] = json_encode($request->input('myCheckboxMultiple'));
+        $validated['myDate'] = $request->input('myDate');
+        $validated['myDateTime'] = $request->input('myDateTime');
+        $validated['myStepLevel1'] = $request->input('myStepLevel1');
+        $validated['myStepLevel2'] = $request->input('myStepLevel2');
+        $validated['myStepLevel3'] = $request->input('myStepLevel3');
+        $validated['myEditorText'] = $request->input('myEditorText');
 
 
-
-
+        //dd($validated );
 
         $question = Question::create($validated);
 
@@ -177,11 +225,21 @@ class QuestionController extends Controller
     public function edit($idQuestion)
     {
         $question = Question::findOrFail($idQuestion);
+
+
+
+        $fixedData["dpOptions"] =$this->dpOptions; 
+        $fixedData["radioOptions"] =$this->radioOptions;   
+        $fixedData["cascadedData"] =$this->veri;   
+        $fixedData["checkboxOptions"] =$this->checkboxOptions;   
+
+
+
         
         return Inertia::render('Question/Form', [
             'question' => $question,
             'isEdit' => true,
-            'veri' => $this->veri
+            'fixedData' =>$fixedData  
         ]);
     }
 

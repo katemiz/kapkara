@@ -13,20 +13,17 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->text('text');
-            $table->string('myInput');
-
-            $table->string('mySelect');
-            $table->string('myRadio');
-            $table->string('myCheckboxSingle');
-            $table->string('myCheckboxMultiple');
-            $table->string('myDate');
-            $table->string('myDateTime');
-
-            $table->string('myStepLevel1');
-            $table->string('myStepLevel2');
-            $table->string('myStepLevel3');
-            $table->string('myEditorText');
+            $table->string('myInput')->nullable();
+            $table->string('mySelect')->nullable();
+            $table->string('myRadio')->nullable();
+            $table->string('myCheckboxSingle')->nullable();
+            $table->json('myCheckboxMultiple')->nullable(); // JSON column
+            $table->string('myDate')->nullable();
+            $table->string('myDateTime')->nullable();
+            $table->string('myStepLevel1')->nullable();
+            $table->string('myStepLevel2')->nullable();
+            $table->string('myStepLevel3')->nullable();
+            $table->text('myEditorText')->nullable();
 
             $table->timestamps();
         });

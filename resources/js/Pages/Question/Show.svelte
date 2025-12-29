@@ -30,7 +30,7 @@
 
 
 
-        <p>{@html  question.text} </p>
+        <p>{@html  question.myEditorText} </p>
 
 
         

@@ -24,6 +24,7 @@
         required = false,  // Required attribute
         disabled = false,  // Disabled attribute
         placeholder = 'Select an option', // Placeholder text
+        value='',
         class: customClass = '' // Additional CSS classes
     } = $props();
 </script>
@@ -39,7 +40,7 @@
     {/if}
     
     <div class="control">
-        <div class="select {customClass} {$form.errors[name] ? 'is-danger' : ''}">
+        <div class="select {customClass} {$form.errors[name] ? 'is-danger' : ''}" autocomplete="off">
             <select
                 {id}
                 {required}
@@ -52,11 +53,29 @@
                     </option>
                 {/if}
                 
-                {#each options as option}
-                    <option value={option.value}>
-                        {option.label}
+                <!-- {#each options as option}
+                    <option value={option.value} selected={String(option.value) == String(value)}>
+                        {option.label} -{value} : {option.value} {typeof value} { typeof String(option.value)} 
                     </option>
-                {/each}
+                {/each} -->
+
+
+                
+{#each options as option}
+    {#if String(option.value) === String(value)}
+        <option value={option.value} selected="">
+            {option.label}
+        </option>
+    {:else}
+        <option value={option.value}>
+            {option.label}
+        </option>
+    {/if}
+{/each}
+
+
+
+
             </select>
         </div>
     </div>

@@ -21,7 +21,7 @@
         form, // Inertia form object (required)
         name, // Field name (required)
         label = "", // Label text
-        placeholder = "", // Placeholder text
+        placeholder = "Choose Date", // Placeholder text
         id = name, // Input id (defaults to name)
         required = false, // Required attribute
         disabled = false, // Disabled attribute
@@ -38,6 +38,7 @@
     $effect(() => {
         // We use the direct element reference instead of a string selector
         const dp = new AirDatepicker(dateInput, {
+            isMobile:true,
             locale: lang === "en" ? localeEn : localeTr,
             dateFormat: "dd MMMM yyyy",
             timepicker: timepicker,
