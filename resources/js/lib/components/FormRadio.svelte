@@ -8,6 +8,7 @@
      *   form={form} 
      *   name="gender" 
      *   label="Gender"
+     *   value="defaultValue"
      *   options={[
      *     { value: 'male', label: 'Male' },
      *     { value: 'female', label: 'Female' }
@@ -28,7 +29,7 @@
 
 <div class="field {customClass}">
     {#if label}
-        <label class="label">
+        <label class="label" for={name}>
             {label}
             {#if required}
                 <span class="has-text-danger">*</span>
@@ -42,12 +43,12 @@
                 <input
                     type="radio"
                     {name}
-                    value={option.value}
+                    value={String(option.value)}
                     bind:group={$form[name]}
                     disabled={option.disabled || false}
                     {required}
                 />
-                {option.label}
+                {option.label} 
             </label>
             {#if !inline && index < options.length - 1}
                 <br />

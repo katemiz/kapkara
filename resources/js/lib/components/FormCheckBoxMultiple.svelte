@@ -30,13 +30,16 @@
     $effect(() => {
         if (!Array.isArray($form[name])) {
             $form[name] = [];
+
+            console.log('not array')
         }
+        console.log('effect ',$form[name]  )
     });
 </script>
 
 <div class="field {customClass}">
     {#if label}
-        <label class="label">
+        <label class="label" for={name}>
             {label}
             {#if required}
                 <span class="has-text-danger">*</span>
@@ -48,10 +51,13 @@
         {#each options as option, index}
             <label class="checkbox" class:is-inline={inline}>
                 <input
+                {name}
                     type="checkbox"
-                    value={option.value}
+                    value={String(option.value)}
                     bind:group={$form[name]}
                     disabled={option.disabled || false}
+
+                    
                 />
                 {option.label}
             </label>

@@ -17,16 +17,17 @@
     
     let {
         form,              // Inertia form object (required)
-        name,              // Field name (required)
+        name,              // Field name (required). Is to be used for id also
         options = [],      // Array of { value, label } objects (required)
         label = '',        // Label text
         id = name,         // Select id (defaults to name)
         required = false,  // Required attribute
         disabled = false,  // Disabled attribute
         placeholder = 'Select an option', // Placeholder text
-        value='',
         class: customClass = '' // Additional CSS classes
     } = $props();
+
+    
 </script>
 
 <div class="field">
@@ -49,33 +50,16 @@
             >
                 {#if placeholder}
                     <option value="" disabled selected={!$form[name]}>
-                        {placeholder}
+                        {placeholder} {!$form[name]}
                     </option>
                 {/if}
-                
-                <!-- {#each options as option}
-                    <option value={option.value} selected={String(option.value) == String(value)}>
-                        {option.label} -{value} : {option.value} {typeof value} { typeof String(option.value)} 
+
+                {#each options as option}
+                    <option value={option.value}>
+                        {option.label} $form[name] {$form[name]} {typeof $form[name]}
                     </option>
-                {/each} -->
-
-
+                {/each}
                 
-{#each options as option}
-    {#if String(option.value) === String(value)}
-        <option value={option.value} selected="">
-            {option.label}
-        </option>
-    {:else}
-        <option value={option.value}>
-            {option.label}
-        </option>
-    {/if}
-{/each}
-
-
-
-
             </select>
         </div>
     </div>

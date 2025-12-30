@@ -114,7 +114,7 @@ class QuestionController extends Controller
 
 
 
-
+    public $modelData = [];
 
 
 
@@ -152,17 +152,12 @@ class QuestionController extends Controller
     public function create()
     {
 
-        $fixedData["dpOptions"] =$this->dpOptions; 
-        $fixedData["radioOptions"] =$this->radioOptions;   
-        $fixedData["cascadedData"] =$this->veri;   
-        $fixedData["checkboxOptions"] =$this->checkboxOptions;   
-
-
+        $this->prepareProps(); 
 
         return Inertia::render('Question/Form', [
             'question' => null, // or new Question()
             'isEdit' => false,
-            'fixedData' =>$fixedData  
+            'fixedData' =>$this->modelData  
         ]);
     }
 
@@ -226,20 +221,12 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($idQuestion);
 
+        $this->prepareProps(); 
 
-
-        $fixedData["dpOptions"] =$this->dpOptions; 
-        $fixedData["radioOptions"] =$this->radioOptions;   
-        $fixedData["cascadedData"] =$this->veri;   
-        $fixedData["checkboxOptions"] =$this->checkboxOptions;   
-
-
-
-        
         return Inertia::render('Question/Form', [
             'question' => $question,
             'isEdit' => true,
-            'fixedData' =>$fixedData  
+            'fixedData' =>$this->modelData  
         ]);
     }
 
@@ -274,4 +261,17 @@ class QuestionController extends Controller
         return redirect()->route('question.index')
             ->with('success', 'Question deleted successfully.');
     }
+
+
+    public function prepareProps() {
+
+        $this->modelData =[];  
+
+        $this->modelData["dpOptions"] =$this->dpOptions; 
+        $this->modelData["radioOptions"] =$this->radioOptions;   
+        $this->modelData["cascadedData"] =$this->veri;   
+        $this->modelData["checkboxOptions"] = $this->checkboxOptions;   
+
+
+    } 
 }
