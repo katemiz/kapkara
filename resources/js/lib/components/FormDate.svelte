@@ -14,11 +14,11 @@
      *  form={form}
      *  name="birth_date"
      *  label="Date of Birth"
-     *  minDate = "", 
-     *  maxDate = "", 
-     *  lang = "tr", 
-     *  timepicker = false, 
-     *  onlyTimepicker = false, 
+     *  minDate = "",
+     *  maxDate = "",
+     *  lang = "tr",
+     *  timepicker = false,
+     *  onlyTimepicker = false,
      * />
      */
 
@@ -40,22 +40,19 @@
 
     let dateInput = $state(); // We will bind this to the element
 
-    let selectedDate = $derived(
-        $form[name] ? new Date($form[name]) : null
-    );
-
+    let selectedDate = $derived($form[name] ? new Date($form[name]) : "");
 
     $effect(() => {
         // We use the direct element reference instead of a string selector
         const dp = new AirDatepicker(dateInput, {
-            isMobile:true,
+            isMobile: true,
             locale: lang === "en" ? localeEn : localeTr,
             dateFormat: "dd MMMM yyyy",
             timepicker: timepicker,
             onlyTimepicker: onlyTimepicker,
-            selectedDates:[ selectedDate] ,
-            minDate: minDate ? new Date(minDate) : '',
-            maxDate: maxDate ? new Date(maxDate) : '',
+            selectedDates: [selectedDate],
+            minDate: minDate ? new Date(minDate) : "",
+            maxDate: maxDate ? new Date(maxDate) : "",
             autoClose: true,
             // Update the form store when a date is selected
             onSelect({ date }) {
@@ -83,24 +80,6 @@
             {/if}
         </label>
     {/if}
-
-    <!-- 
-
-    <div class="control">
-        <input
-            {id}
-            class="input {customClass} {$form.errors[name] ? 'is-danger' : ''}"
-            type="date"
-            {placeholder}
-            {required}
-            {disabled}
-            {min}
-            {max}
-            bind:value={$form[name]}
-        />
-    </div>
-
- -->
 
     <div class="control">
         <input

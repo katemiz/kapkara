@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('myStepLevel3')->nullable();
             $table->text('myEditorText')->nullable();
 
-            $table->userstamps();   // provided by App\Providers\McroServiceProvider.php
+            $table->userstamps();   // provided by App\Providers\AppServiceProvider
             $table->timestamps();
         });
     }

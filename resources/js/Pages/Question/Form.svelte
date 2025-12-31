@@ -15,7 +15,6 @@
 
     let { question = null, isEdit = false, fixedData } = $props();
 
-
     // 1. Initialize the Inertia Form
     let form = $derived(
         useForm({
@@ -34,15 +33,18 @@
         }),
     );
 
-
     // Compute options for level 2 based on level 1 selection
     let level2Options = $derived(
-        $form.myStepLevel1 ? fixedData.cascadedData.level2[$form.myStepLevel1] || [] : [],
+        $form.myStepLevel1
+            ? fixedData.cascadedData.level2[$form.myStepLevel1] || []
+            : [],
     );
 
     // Compute options for level 3 based on level 2 selection
     let level3Options = $derived(
-        $form.myStepLevel2 ? fixedData.cascadedData.level3[$form.myStepLevel2] || [] : [],
+        $form.myStepLevel2
+            ? fixedData.cascadedData.level3[$form.myStepLevel2] || []
+            : [],
     );
 
     function submit(e) {
@@ -104,9 +106,8 @@
                     name="mySelect"
                     label="Title (mySelect)"
                     placeholder="Enter a title"
-                    options= {fixedData.dpOptions}
+                    options={fixedData.dpOptions}
                     required={true}
-
                 />
 
                 <FormRadio
@@ -134,17 +135,18 @@
                     name="myDate"
                     label="Pick a Date"
                     lang="en"
-                    timepicker={false} 
-                    onlyTimepicker={false} 
+                    timepicker={false}
+                    onlyTimepicker={false}
                 />
 
                 <FormDate
                     {form}
                     name="myDateTime"
                     label="Pick Date & Time"
+                    placeholder="Select date and time"
                     lang="en"
-                    timepicker={true} 
-                    onlyTimepicker={true} 
+                    timepicker={true}
+                    onlyTimepicker={true}
                 />
 
                 <FormUpload
@@ -170,7 +172,10 @@
                                     $form.myStepLevel2 = ""; // Manually clear
                                     $form.myStepLevel3 = "";
 
-                                    console.log ("ON CHANGE",$form.myStepLevel1)
+                                    console.log(
+                                        "ON CHANGE",
+                                        $form.myStepLevel1,
+                                    );
                                 }}
                             />
                         </div>
