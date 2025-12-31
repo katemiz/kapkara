@@ -1,4 +1,10 @@
 <script>
+
+
+    import { Upload} from "@lucide/svelte";
+
+
+
     /**
      * Reusable Form Upload Component for Laravel-Inertia-Svelte 5
      * Supports single and multiple file uploads with preview
@@ -146,13 +152,15 @@
                     onchange={handleFileChange}
                 />
                 <span class="file-cta">
-                    <span class="file-icon">
-                        <i class="fas fa-upload"></i>
+                    <span class="file-icon ">
+                        <Upload size={18} />
                     </span>
+
                     <span class="file-label">
                         {multiple ? 'Choose files…' : 'Choose a file…'}
                     </span>
                 </span>
+
                 {#if fileNames.length > 0 && !multiple}
                     <span class="file-name">
                         {fileNames[0].name}

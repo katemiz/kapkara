@@ -11,9 +11,14 @@
      * @component
      * @example
      * <FormDate
-     *   form={form}
-     *   name="birth_date"
-     *   label="Date of Birth"
+     *  form={form}
+     *  name="birth_date"
+     *  label="Date of Birth"
+     *  minDate = "", 
+     *  maxDate = "", 
+     *  lang = "tr", 
+     *  timepicker = false, 
+     *  onlyTimepicker = false, 
      * />
      */
 
@@ -25,8 +30,8 @@
         id = name, // Input id (defaults to name)
         required = false, // Required attribute
         disabled = false, // Disabled attribute
-        minDate = "", // Minimum date (YYYY-MM-DD)
-        maxDate = "", // Maximum date (YYYY-MM-DD)
+        minDate = false, // Minimum date (YYYY-MM-DD)
+        maxDate = false, // Maximum date (YYYY-MM-DD)
         lang = "tr", // Language for datepicker
         timepicker = false, // Enable time picker
         onlyTimepicker = false, // Show only time picker
@@ -34,6 +39,11 @@
     } = $props();
 
     let dateInput = $state(); // We will bind this to the element
+
+    let selectedDate = $derived(
+        $form[name] ? new Date($form[name]) : null
+    );
+
 
     $effect(() => {
         // We use the direct element reference instead of a string selector
@@ -43,8 +53,9 @@
             dateFormat: "dd MMMM yyyy",
             timepicker: timepicker,
             onlyTimepicker: onlyTimepicker,
-            // minDate: minDate ? new Date(minDate) : null,
-            // maxDate: maxDate ? new Date(maxDate) : null,
+            selectedDates:[ selectedDate] ,
+            minDate: minDate ? new Date(minDate) : '',
+            maxDate: maxDate ? new Date(maxDate) : '',
             autoClose: true,
             // Update the form store when a date is selected
             onSelect({ date }) {

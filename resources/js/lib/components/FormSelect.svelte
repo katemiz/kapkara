@@ -27,7 +27,6 @@
         class: customClass = '' // Additional CSS classes
     } = $props();
 
-    
 </script>
 
 <div class="field">
@@ -56,7 +55,7 @@
 
                 {#each options as option}
                     <option value={option.value}>
-                        {option.label} $form[name] {$form[name]} {typeof $form[name]}
+                        {option.label}
                     </option>
                 {/each}
                 
@@ -67,4 +66,5 @@
     {#if $form.errors[name]}
         <p class="help is-danger">{$form.errors[name]}</p>
     {/if}
+    
 </div>

@@ -30,10 +30,8 @@
     $effect(() => {
         if (!Array.isArray($form[name])) {
             $form[name] = [];
-
             console.log('not array')
         }
-        console.log('effect ',$form[name]  )
     });
 </script>
 

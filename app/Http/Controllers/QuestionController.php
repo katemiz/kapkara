@@ -12,10 +12,10 @@ class QuestionController extends Controller
 
     public $dpOptions = [
 
-        [ "value" => 1,"label" => "Option1"],
-        [ "value" => 2,"label" => "Option2"],
-        [ "value" => 3,"label" => "Option3"],
-        [ "value" => 4,"label" => "Option4"] 
+        [ "value" => "1","label" => "Option1"],
+        [ "value" => "2","label" => "Option2"],
+        [ "value" => "3","label" => "Option3"],
+        [ "value" => "4","label" => "Option4"] 
     ];
 
 
@@ -29,10 +29,10 @@ class QuestionController extends Controller
     ];
 
     public $checkboxOptions =  [       
-        [ "value" => 1,"label" => "Checkbox Option 1"],
-        [ "value" => 2,"label" => "Checkbox Option 2"],
-        [ "value" => 3,"label" => "Checkbox Option 3"],
-        [ "value" => 4,"label" => "Checkbox Option 4"] 
+        [ "value" => "1","label" => "Checkbox Option 1"],
+        [ "value" => "2","label" => "Checkbox Option 2"],
+        [ "value" => "3","label" => "Checkbox Option 3"],
+        [ "value" => "4","label" => "Checkbox Option 4"] 
     ];
 
     public $veri = [
@@ -116,6 +116,8 @@ class QuestionController extends Controller
 
     public $modelData = [];
 
+    public $itemData;
+
 
 
 
@@ -151,7 +153,6 @@ class QuestionController extends Controller
      */
     public function create()
     {
-
         $this->prepareProps(); 
 
         return Inertia::render('Question/Form', [
@@ -181,22 +182,24 @@ class QuestionController extends Controller
 
 
         // Add unvalidated parameters
-        $validated['myInput'] = $request->input('myInput');
-        $validated['mySelect'] = $request->input('mySelect');
-        $validated['myRadio'] = $request->input('myRadio');
-        $validated['myCheckboxSingle'] = $request->input('myCheckboxSingle');
-        $validated['myCheckboxMultiple'] = json_encode($request->input('myCheckboxMultiple'));
-        $validated['myDate'] = $request->input('myDate');
-        $validated['myDateTime'] = $request->input('myDateTime');
-        $validated['myStepLevel1'] = $request->input('myStepLevel1');
-        $validated['myStepLevel2'] = $request->input('myStepLevel2');
-        $validated['myStepLevel3'] = $request->input('myStepLevel3');
-        $validated['myEditorText'] = $request->input('myEditorText');
+        // $validated['myInput'] = $request->input('myInput');
+        // $validated['mySelect'] = $request->input('mySelect');
+        // $validated['myRadio'] = $request->input('myRadio');
+        // $validated['myCheckboxSingle'] = $request->input('myCheckboxSingle');
+        // $validated['myCheckboxMultiple'] = json_encode($request->input('myCheckboxMultiple'));
+        // $validated['myDate'] = $request->input('myDate');
+        // $validated['myDateTime'] = $request->input('myDateTime');
+        // $validated['myStepLevel1'] = $request->input('myStepLevel1');
+        // $validated['myStepLevel2'] = $request->input('myStepLevel2');
+        // $validated['myStepLevel3'] = $request->input('myStepLevel3');
+        // $validated['myEditorText'] = $request->input('myEditorText');
+
+        $theData = $this->readInput($request);  
 
 
         //dd($validated );
 
-        $question = Question::create($validated);
+        $question = Question::create($theData);
 
         return redirect()->route('question.show', $question->id)
             ->with('success', 'Question created successfully.');
@@ -221,6 +224,8 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($idQuestion);
 
+        $question["myCheckboxMultiple"] =$this->convertArrayParamsToString($question["myCheckboxMultiple"]);
+
         $this->prepareProps(); 
 
         return Inertia::render('Question/Form', [
@@ -237,14 +242,17 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($idQuestion);
 
-        $validated = $request->validate([
-            // 'title' => 'required|max:255',
-            'text' => 'required',
-        ]);
+        // $validated = $request->validate([
+        //     // 'title' => 'required|max:255',
+        //     'text' => 'required',
+        // ]);
+
+                $theData = $this->readInput($request);  
+
 
         //dd($validated );
 
-        $question->update($validated);
+        $question->update($theData);
 
         return redirect()->route('question.show', $question->id)
             ->with('success', 'Question updated successfully.');
@@ -271,7 +279,57 @@ class QuestionController extends Controller
         $this->modelData["radioOptions"] =$this->radioOptions;   
         $this->modelData["cascadedData"] =$this->veri;   
         $this->modelData["checkboxOptions"] = $this->checkboxOptions;   
+    } 
+
+
+
+
+    public function readInput ($request) {
+
+
+
+        $validated['myInput'] = $request->input('myInput');
+        $validated['mySelect'] = $request->input('mySelect');
+        $validated['myRadio'] = $request->input('myRadio');
+        $validated['myCheckboxSingle'] = $request->input('myCheckboxSingle');
+        $validated['myCheckboxMultiple'] = json_encode($request->input('myCheckboxMultiple'));
+        $validated['myDate'] = $request->input('myDate');
+        $validated['myDateTime'] = $request->input('myDateTime');
+        $validated['myStepLevel1'] = $request->input('myStepLevel1');
+        $validated['myStepLevel2'] = $request->input('myStepLevel2');
+        $validated['myStepLevel3'] = $request->input('myStepLevel3');
+        $validated['myEditorText'] = $request->input('myEditorText');
+
+
+        return $validated;
+
+
+
 
 
     } 
+
+
+
+
+
+    public function convertArrayParamsToString ($arr) {
+
+        if ( !is_array($arr) ) {
+
+            // Multiple CheckBox Selection is stored in database like [3,4] for json formatted rows
+            // values to be converted to string
+
+            $arr =  json_decode($arr);
+        } 
+
+        $stringArr = array_combine(
+            array_map('strval', array_keys($arr)),  // Convert keys
+            array_map('strval', array_values($arr)) // Convert values
+        );
+
+        return $stringArr;
+    } 
+
+
 }

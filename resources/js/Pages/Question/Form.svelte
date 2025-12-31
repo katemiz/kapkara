@@ -23,87 +23,22 @@
             mySelect: String(question?.mySelect ?? ""),
             myRadio: String(question?.myRadio ?? ""),
             myCheckboxSingle: question?.myCheckboxSingle ?? false,
-            // myCheckboxMultiple: Array(question?.myCheckboxMultiple ?? []),
+            myCheckboxMultiple: question?.myCheckboxMultiple ?? [],
             myDate: question?.myDate ?? "",
             myDateTime: question?.myDateTime ?? "",
             myUpload: question?.myUpload ?? null,
-
-            // level1: "",
-            // level2: "",
-            // level3: "",
-
             myStepLevel1: question?.myStepLevel1 ?? "",
             myStepLevel2: question?.myStepLevel2 ?? "",
             myStepLevel3: question?.myStepLevel3 ?? "",
-
             myEditorText: question?.myEditorText ?? "",
-
-
-
-
-
-
-
-myCheckboxMultiple: (() => {
-            if (Array.isArray(question?.myCheckboxMultiple)) {
-                // If it's already an array (the ideal case), use it directly.
-                return question?.myCheckboxMultiple;
-            }
-
-            if (typeof question?.myCheckboxMultiple === 'string' && question?.myCheckboxMultiple.startsWith('[')) {
-                // If it's a JSON string (e.g., "[3, 4]"), parse it.
-                try {
-                    const parsed = JSON.parse(question?.myCheckboxMultiple);
-                    return Array.isArray(parsed) ? parsed : [];
-                } catch (e) {
-                    console.error("Failed to parse myCheckboxMultiple JSON string:", e);
-                    return [];
-                }
-            }
-            
-            // If it's a simple comma-separated string (e.g., "3,4"), split and map.
-            // This is less common but good for robustness.
-            if (typeof question?.myCheckboxMultiple === 'string' && question?.myCheckboxMultiple.includes(',')) {
-                return question?.myCheckboxMultiple.split(',').map(item => {
-                    const trimmed = item.trim();
-                    // Attempt to convert to a number if the value is numeric
-                    return isNaN(trimmed) ? trimmed : Number(trimmed);
-                });
-            }
-
-            // Default to an empty array for null, undefined, or other unexpected types
-            return [];
-        })(),
-
-
-
-
-
-
-
-
         }),
     );
-
-
-
-
-
-
-
-
-
-    console.log("The form object is:", $form.myCheckboxMultiple, typeof $form.myCheckboxMultiple);
 
 
     // Compute options for level 2 based on level 1 selection
     let level2Options = $derived(
         $form.myStepLevel1 ? fixedData.cascadedData.level2[$form.myStepLevel1] || [] : [],
     );
-
-            // console.log(" $form.myStepLevel1 is:", $form.myStepLevel1);
-
-
 
     // Compute options for level 3 based on level 2 selection
     let level3Options = $derived(
@@ -170,6 +105,8 @@ myCheckboxMultiple: (() => {
                     label="Title (mySelect)"
                     placeholder="Enter a title"
                     options= {fixedData.dpOptions}
+                    required={true}
+
                 />
 
                 <FormRadio
