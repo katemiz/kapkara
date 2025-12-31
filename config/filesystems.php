@@ -60,6 +60,26 @@ return [
             'report' => false,
         ],
 
+
+
+
+        'media' => [
+            'driver' => 'local',
+            'root'   => config('app.media'),
+            'url'    => env('APP_URL').'/media',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+
+        'editor' => [
+            'driver' => 'local',
+            'root'   => config('app.editor_media'),
+            'url'    => env('APP_URL').'/mediaEditor',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
     ],
 
     /*
@@ -73,8 +93,19 @@ return [
     |
     */
 
+
+
+
+
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('media') => config('app.media'),  // Add this
+        public_path('editor') => config('app.editor_media'),  // Add this
     ],
 
+
+
+
 ];
+
+

@@ -123,4 +123,33 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADDING userstamps() to migration
+    |--------------------------------------------------------------------------
+    |  
+    */
+
+
+    'providers' => [
+        App\Providers\MacroServiceProvider::class,
+    ],
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MEDIA AND EDITOR MEDIA FILES STORAGE
+    |--------------------------------------------------------------------------
+    |   spatie medialibrary file storage location
+    |   wysiwyg editor inline media files location
+    */
+
+    'media' => "/home/katemiz/STORAGE/mediaStorage",
+    'editor_media' => "/home/katemiz/STORAGE/editorStorage",
+
 ];

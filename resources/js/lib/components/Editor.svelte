@@ -145,6 +145,10 @@
                         quill.deleteText(range.index, 'Uploading...'.length);
                         quill.insertEmbed(range.index, 'image', response.data.url, 'user');
                         quill.setSelection(range.index + 1);
+
+                        console.log('Image uploaded on ', response.data.url)
+                        console.log('Image uploaded on 2', response.data.other)
+
                     } else {
                         quill.deleteText(range.index, 'Uploading...'.length);
                         alert('Upload failed!');

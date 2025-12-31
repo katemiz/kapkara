@@ -16,14 +16,19 @@ class MediaController extends Controller
         $file = $request->file('image');
         
         // Store in storage/app/public/images
-        $path = $file->store('images', 'public');
+        $path = $file->store('imagesY', 'editor');   // editor is disk name, images is folder name under disk
         
         // Get full URL
         //$url = Storage::disk('public')->url($path);
 
         $url = url('storage/' . $path);
 
-        
+
+        //$url = env('APP_URL').'/'. $path;
+
+        //dd([$path,$url  ] );
+
+
         // Debug: Log the values
         \Log::info('Path: ' . $path);
         \Log::info('URL: ' . $url);
@@ -34,17 +39,14 @@ class MediaController extends Controller
         //     'path' => $path  // For debugging
         // ]);
 
-
         return response()->json([
             'success' => true,
-            'url' => $url
+            'url' => $url,
+
+            'other' => config('app.media')
         ], 200, [
             'Content-Type' => 'application/json'
         ]);
-
-
-
-
     }
 }
 
