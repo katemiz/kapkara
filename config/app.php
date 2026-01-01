@@ -125,13 +125,6 @@ return [
 
 
 
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 283a9f2 (Added authentication with fortify)
-
     /*
     |--------------------------------------------------------------------------
     | MEDIA AND EDITOR MEDIA FILES STORAGE

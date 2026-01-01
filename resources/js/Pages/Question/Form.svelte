@@ -146,11 +146,7 @@
                     placeholder="Select date and time"
                     lang="en"
                     timepicker={true}
-<<<<<<< HEAD
-                    onlyTimepicker={true}
-=======
                     onlyTimepicker={false}
->>>>>>> 283a9f2 (Added authentication with fortify)
                 />
 
                 <FormUpload
