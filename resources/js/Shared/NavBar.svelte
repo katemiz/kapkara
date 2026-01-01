@@ -1,28 +1,48 @@
 <script>
-    import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
+    import { page } from "@inertiajs/svelte";
 
-    import { House, HandHelping, Users, ContactRound } from "@lucide/svelte";
+    import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
+    import {
+        House,
+        HandHelping,
+        Users,
+        ContactRound,
+        User,
+        LogOut,
+        Database,
+        Bird,
+    } from "@lucide/svelte";
+
+    import { router } from "@inertiajs/svelte";
+
+    let user = $derived($page.props.auth.user);
+
+    // console.log("Navbar user:", user);
 
     document.addEventListener("DOMContentLoaded", () => {
         // Get all "navbar-burger" elements
-        const $navbarBurgers = Array.prototype.slice.call(
+        const navbarBurgers = Array.prototype.slice.call(
             document.querySelectorAll(".navbar-burger"),
             0,
         );
 
         // Add a click event on each of them
-        $navbarBurgers.forEach((el) => {
+        navbarBurgers.forEach((el) => {
             el.addEventListener("click", () => {
                 // Get the target from the "data-target" attribute
                 const target = el.dataset.target;
-                const $target = document.getElementById(target);
+                const target2 = document.getElementById(target);
 
                 // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
                 el.classList.toggle("is-active");
-                $target.classList.toggle("is-active");
+                target2.classList.toggle("is-active");
             });
         });
     });
+
+    function logout() {
+        router.post("/logout");
+    }
 </script>
 
 <nav class="navbar is-dark">
@@ -102,6 +122,44 @@
                     </span>
                     <span>Contact</span>
                 </a>
+
+                {#if user}
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a
+                            href="/apps"
+                            class="navbar-item navbar-link has-text-info"
+                            >{user.name}</a
+                        >
+
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item" href="/question">
+                                <span class="icon">
+                                    <Database size={18} />
+                                </span>
+                                <span>Question</span>
+                            </a>
+                            <a class="navbar-item" href="/question">
+                                <span class="icon">
+                                    <Bird size={18} />
+                                </span>
+                                <span>Question 2</span>
+                            </a>
+
+                            <button onclick={logout} class="navbar-item">
+                                <span class="icon">
+                                    <LogOut size={18} />
+                                </span>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                {:else}
+                    <a href={"/login"} class="navbar-item">
+                        <span class="icon has-text-warning">
+                            <User size={18} />
+                        </span>
+                    </a>
+                {/if}
             </div>
         </div>
     </div>

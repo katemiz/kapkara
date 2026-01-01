@@ -50,7 +50,11 @@
             dateFormat: "dd MMMM yyyy",
             timepicker: timepicker,
             onlyTimepicker: onlyTimepicker,
+<<<<<<< HEAD
             selectedDates: [selectedDate],
+=======
+            selectedDates: selectedDate ? [selectedDate] : [],
+>>>>>>> 283a9f2 (Added authentication with fortify)
             minDate: minDate ? new Date(minDate) : "",
             maxDate: maxDate ? new Date(maxDate) : "",
             autoClose: true,

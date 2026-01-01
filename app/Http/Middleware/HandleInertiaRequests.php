@@ -33,11 +33,48 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
+    // public function share(Request $request): array
+    // {
+    //     return [
+    //         ...parent::share($request),
+    //         //
+    //     ];
+    // }
+
+
+
+
+
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
-            //
-        ];
+        return array_merge(parent::share($request), [
+            // Share the authenticated user data
+            'auth' => [
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    // Add any custom fields you need here
+                ] : null,
+            ],
+            // You can also share flash messages (e.g., from Fortify)
+            'flash' => [
+                'message' => fn () => $request->session()->get('message'),
+                'status' => fn () => $request->session()->get('status'),
+            ],
+        ]);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
