@@ -133,7 +133,8 @@ return [
     |   wysiwyg editor inline media files location
     */
 
-    'media' => "/home/katemiz/STORAGE/mediaStorage",
-    'editor_media' => "/home/katemiz/STORAGE/editorStorage",
+    'media_path' => "/home/katemiz/STORAGE/media",
+    'editor_path' => "/home/katemiz/STORAGE/editor",
+    
 
 ];

@@ -188,6 +188,7 @@
                             class="delete is-small"
                             onclick={() => removeFile(index)}
                             disabled={disabled}
+                            title='Remove'
                         ></button>
                     </div>
                 </div>

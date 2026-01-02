@@ -156,7 +156,7 @@
                 {:else}
                     <a href={"/login"} class="navbar-item">
                         <span class="icon has-text-warning">
-                            <User size={18} />
+                            <User size={18} color="#3e9392"/>
                         </span>
                     </a>
                 {/if}

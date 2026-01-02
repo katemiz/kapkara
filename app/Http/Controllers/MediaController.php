@@ -16,29 +16,14 @@ class MediaController extends Controller
         $file = $request->file('image');
         
         // Store in storage/app/public/images
-        $path = $file->store('imagesY', 'editor');   // editor is disk name, images is folder name under disk
-        
-        // Get full URL
-        //$url = Storage::disk('public')->url($path);
-
-        $url = url('storage/' . $path);
-
-
-        //$url = env('APP_URL').'/'. $path;
-
-        //dd([$path,$url  ] );
-
+        $path = $file->store('images', 'editor');   // editor is disk name, images is folder name under disk
+    
+        $url = Storage::disk('editor')->url($path);
 
         // Debug: Log the values
         \Log::info('Path: ' . $path);
         \Log::info('URL: ' . $url);
         
-        // return response()->json([
-        //     'success' => true,
-        //     'url' => $url,
-        //     'path' => $path  // For debugging
-        // ]);
-
         return response()->json([
             'success' => true,
             'url' => $url,

@@ -61,11 +61,9 @@ return [
         ],
 
 
-
-
         'media' => [
             'driver' => 'local',
-            'root'   => config('app.media'),
+            'root'   => config('app.media_path'),
             'url'    => env('APP_URL').'/media',
             'visibility' => 'public',
             'throw' => false,
@@ -74,8 +72,8 @@ return [
 
         'editor' => [
             'driver' => 'local',
-            'root'   => config('app.editor_media'),
-            'url'    => env('APP_URL').'/mediaEditor',
+            'root'   => config('app.editor_path'),
+            'url'    => env('APP_URL').'/editor',
             'visibility' => 'public',
             'throw' => false,
         ],

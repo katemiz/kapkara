@@ -35,7 +35,7 @@
                         ['bold', 'italic', 'underline', 'strike'],
                         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                         [{ 'color': [] }, { 'background': [] }],
-                        ['link', 'image', 'video'],
+                        ['link', 'image'],
                         ['clean']
                     ],
                     handlers: {
