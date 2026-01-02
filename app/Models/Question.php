@@ -6,9 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUserstamps;
 use App\Models\Answer;
 
-class Question extends Model {
+
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+
+class Question extends Model implements HasMedia {
 
     use HasUserstamps;
+    use InteractsWithMedia;
+
 
     protected $guarded = [];
 
@@ -31,3 +38,6 @@ class Question extends Model {
 
 
 }
+
+
+

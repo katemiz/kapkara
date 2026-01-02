@@ -252,7 +252,12 @@ class QuestionController extends Controller
 
         //dd($validated );
 
+        dd($_FILES );
+
         $question->update($theData);
+
+
+       $this->addFiles($idQuestion,$_FILES);
 
         return redirect()->route('question.show', $question->id)
             ->with('success', 'Question updated successfully.');
@@ -285,6 +290,10 @@ class QuestionController extends Controller
 
 
     public function readInput ($request) {
+
+
+
+        if ($request->myUpload )
 
 
 
@@ -330,6 +339,99 @@ class QuestionController extends Controller
 
         return $stringArr;
     } 
+
+
+    public function addFiles($idModel,$files,) {
+
+        $model = Question::find($idModel);
+
+        foreach ($files as $file) {
+
+            $model
+            ->addMedia($file)
+            ->toMediaCollection();
+        } 
+    } 
+
+
+
+
+
+
+public function spatieMultiple(Request $request)
+    {
+        // 1. Validation for the array of files
+        $request->validate([
+            // 'myUpload' should be an array, and each item in the array must be an image file
+            'myUpload'   => ['nullable', 'array'],
+            'myUpload.*' => ['image', 'max:5120'], // Max 5MB per file
+            // Add validation for your other fields (myInput, mySelect, etc.)
+            'myInput' => ['required', 'string', 'max:255'],
+            // ...
+        ]);
+
+        // 2. Create or find the target model
+        // In a real scenario, you might create a new model instance here:
+        $item = TempUpload::create([
+            'title' => $request->myInput,
+            'data'  => json_encode($request->all()),
+            // ... other fields
+        ]);
+        
+        $mediaCollectionName = 'gallery_images';
+        $uploadedCount = 0;
+
+        // 3. Check and process multiple files
+        if ($request->hasFile('myUpload')) {
+            
+            // The request->file('myUpload') returns an array of UploadedFile objects
+            $files = $request->file('myUpload'); 
+            
+            foreach ($files as $file) {
+                if ($file->isValid()) {
+                    try {
+                        // Spatie automatically handles the move, naming, and database entry
+                        $item
+                            ->addMedia($file)
+                            ->toMediaCollection($mediaCollectionName);
+
+                        $uploadedCount++;
+
+                    } catch (\Exception $e) {
+                        Log::error("Failed to upload file {$file->getClientOriginalName()}: " . $e->getMessage());
+                        // Handle the error (e.g., skip the file, or return an error response)
+                    }
+                }
+            }
+        }
+
+        // 4. Handle files uploaded via the editor (if any)
+        // If your editor text contains temporary media IDs, this is where you would re-associate them.
+        // For simplicity here, we assume the editor images are handled separately or by ID.
+        
+        Log::info("Form submitted successfully. Files uploaded: {$uploadedCount}");
+
+        return redirect()->route('item.index')->with('success', "Item saved and {$uploadedCount} files attached.");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
