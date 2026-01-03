@@ -8,8 +8,6 @@ use Inertia\Inertia;
 
 class QuestionController extends Controller
 {
-
-
     public $dpOptions = [
 
         [ "value" => "1","label" => "Option1"],
@@ -201,6 +199,8 @@ class QuestionController extends Controller
 
         $question = Question::create($theData);
 
+        $this->spatieMultiple($request,$question);
+
         return redirect()->route('question.show', $question->id)
             ->with('success', 'Question created successfully.');
     }
@@ -213,7 +213,7 @@ class QuestionController extends Controller
         $question = Question::findOrFail($idQuestion);
         
         return Inertia::render('Question/Show', [
-            'question' => $question,
+            'question' => $question
         ]);
     }
 
@@ -249,10 +249,12 @@ class QuestionController extends Controller
 
                 $theData = $this->readInput($request);  
 
+                $this->spatieMultiple($request,$question);
+
 
         //dd($validated );
 
-        dd($_FILES );
+        //dd($_FILES );
 
         $question->update($theData);
 
@@ -358,26 +360,19 @@ class QuestionController extends Controller
 
 
 
-public function spatieMultiple(Request $request)
+public function spatieMultiple(Request $request, $item)
     {
         // 1. Validation for the array of files
         $request->validate([
             // 'myUpload' should be an array, and each item in the array must be an image file
             'myUpload'   => ['nullable', 'array'],
-            'myUpload.*' => ['image', 'max:5120'], // Max 5MB per file
+            // 'myUpload.*' => ['image', 'max:5120'], // Max 5MB per file
             // Add validation for your other fields (myInput, mySelect, etc.)
             'myInput' => ['required', 'string', 'max:255'],
             // ...
         ]);
 
-        // 2. Create or find the target model
-        // In a real scenario, you might create a new model instance here:
-        $item = TempUpload::create([
-            'title' => $request->myInput,
-            'data'  => json_encode($request->all()),
-            // ... other fields
-        ]);
-        
+
         $mediaCollectionName = 'gallery_images';
         $uploadedCount = 0;
 
@@ -398,7 +393,7 @@ public function spatieMultiple(Request $request)
                         $uploadedCount++;
 
                     } catch (\Exception $e) {
-                        Log::error("Failed to upload file {$file->getClientOriginalName()}: " . $e->getMessage());
+                        dd(["Failed to upload file {$file->getClientOriginalName()}: " . $e->getMessage()]);
                         // Handle the error (e.g., skip the file, or return an error response)
                     }
                 }
@@ -409,9 +404,10 @@ public function spatieMultiple(Request $request)
         // If your editor text contains temporary media IDs, this is where you would re-associate them.
         // For simplicity here, we assume the editor images are handled separately or by ID.
         
-        Log::info("Form submitted successfully. Files uploaded: {$uploadedCount}");
+        //dd("Form submitted successfully. Files uploaded: {$uploadedCount}");
+        return true;
 
-        return redirect()->route('item.index')->with('success', "Item saved and {$uploadedCount} files attached.");
+        // return redirect()->route('item.index')->with('success', "Item saved and {$uploadedCount} files attached.");
     }
 
 
