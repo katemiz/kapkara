@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUserstamps;
 use App\Models\Answer;
-
+use App\Models\User;
 
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -29,7 +29,7 @@ class Question extends Model implements HasMedia {
     protected $with = ['media'];
 
     // 2. Automatically include the 'files' attribute in JSON/Inertia responses
-    protected $appends = ['files'];
+    protected $appends = ['files', 'created_user_mail', 'updated_user_mail'];
 
     // 3. Define the accessor for the 'files' attribute
     public function getFilesAttribute()
@@ -45,8 +45,15 @@ class Question extends Model implements HasMedia {
 
 
 
+    public function getCreatedUserMailAttribute()
+    {
+        return User::find($this->created_by)?->email;
+    }
 
-
+    public function getUpdatedUserMailAttribute()
+    {
+        return User::find($this->updated_by)?->email;
+    }
 
 
 
