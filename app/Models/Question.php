@@ -10,8 +10,12 @@ use App\Models\Answer;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory; // 1. For adding factory support
+
 
 class Question extends Model implements HasMedia {
+
+    use HasFactory;    // 2. For using factory support
 
     use HasUserstamps;
     use InteractsWithMedia;

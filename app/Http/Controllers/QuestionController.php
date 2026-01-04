@@ -136,13 +136,12 @@ class QuestionController extends Controller
     {
         $questions = Question::paginate(15);
 
-        //$questions = Question::all();
-
-
         // dd($questions );
         
         return Inertia::render('Question/Index', [
             'questions' => $questions,
+            'links' => $questions->links(),
+            'data' => $questions->items(),
         ]);
     }
 

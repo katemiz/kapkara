@@ -3,12 +3,10 @@
 
     // 1. Receive data from Controller
     let { question } = $props();
-
-    console.log("Media items:", question.files);
 </script>
 
 <Layout>
-    <section class="section">
+    <section class="section min-height-screen">
         <div class="fixed-grid has-3-cols">
             <div class="grid has-background-warning">
                 <div class="cell">
@@ -22,6 +20,9 @@
                 </div>
             </div>
         </div>
+
+        <p class="subtitle">{question.myInput}</p>
+        <p>{@html question.myEditorText}</p>
 
         {#each question.files as item}
             <div class="box">
