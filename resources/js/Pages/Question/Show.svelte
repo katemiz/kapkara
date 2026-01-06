@@ -2,7 +2,7 @@
     import Layout from "../../Shared/Layout.svelte";
     import RecordData from "$lib/components/RecordData.svelte";
     import Title from "$lib/components/Title.svelte";
-    import { Sheet, Pencil, Trash } from "@lucide/svelte";
+    import { Sheet, Pencil, Trash, Paperclip} from "@lucide/svelte";
 
     let { question } = $props();
 
@@ -51,17 +51,26 @@
         <p class="subtitle">{question.myInput}</p>
         <p>{@html question.myEditorText}</p>
 
-        {#each question.files as item}
-            <div class="box">
-                {item.id}
-                {item.name}
-                {item.mime}
-                {item.size}
-                {item.uuid}
 
-                {console.log(item)}
+        <!-- 
+        FILES 
+        -->
+        <label class="label" for="names">Files</label>
+
+        <div class="mt-4" name="files">
+        {#each question.files as item}
+            <div class="tags has-addons my-2">
+                <span class="tag"><Paperclip size="16" /></span>
+                <span class="tag ">{item.name}  </span>
+                <span class="tag ">{item.mime}</span>
+                <span class="tag ">{item.size}</span>
+                <span class="tag ">{item.id}</span>
+                <span class="tag "><Trash size="16" color="red"/></span>
             </div>
         {/each}
+        </div>
+
+
 
         {console.log("QUESTION", question)}
 
