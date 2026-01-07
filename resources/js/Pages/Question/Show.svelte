@@ -2,6 +2,8 @@
     import Layout from "../../Shared/Layout.svelte";
     import RecordData from "$lib/components/RecordData.svelte";
     import Title from "$lib/components/Title.svelte";
+    import DeleteButton from "$lib/components/DeleteButton.svelte";
+
     import { Sheet, Pencil, Trash, Paperclip} from "@lucide/svelte";
 
     let { question } = $props();
@@ -39,11 +41,7 @@
             <!-- Right side -->
             <div class="level-right">
                 <p class="buttons">
-                    <button class="button is-danger">
-                        <span class="icon">
-                            <Trash size="16" />
-                        </span>
-                    </button>
+                    <DeleteButton url="/question/{question.id}" />
                 </p>
             </div>
         </nav>

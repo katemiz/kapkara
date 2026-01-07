@@ -254,7 +254,7 @@
                 {/if}
             </div>
 
-            <div class="control">
+            <div class="column has-text-right">
                 <button
                     type="submit"
                     class="button is-link"
