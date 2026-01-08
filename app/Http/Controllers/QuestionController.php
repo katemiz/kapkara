@@ -132,17 +132,45 @@ class QuestionController extends Controller
     /**
      * Display a listing of questions.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+/*         
         $questions = Question::paginate(15);
 
         // dd($questions );
         
         return Inertia::render('Question/Index', [
             'questions' => $questions,
-            'links' => $questions->links(),
-            'data' => $questions->items(),
+            // 'links' => $questions->links(),
+            // 'data' => $questions->items(),
         ]);
+
+
+ */
+
+        return Inertia::render('Question/Index', [
+                // 'filters' sends the search term back to Svelte so the input stays filled
+                'filters' => $request->only(['search']),
+                'questions' => Question::query()
+                    ->when($request->input('search'), function ($query, $search) {
+                        $query->where('myInput', 'like', "%{$search}%")
+                            ->orWhere('myEditorText', 'like', "%{$search}%");
+                    })
+                    ->latest()
+                    ->paginate(15)
+                    ->withQueryString(), // VERY IMPORTANT: keeps search param during pagination
+            ]);
+
+
+
+
+
+
+
+
+
+
     }
 
     /**

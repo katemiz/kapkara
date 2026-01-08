@@ -4,19 +4,19 @@
     import Paginate from "$lib/components/Paginate.svelte";
 
     import { Search, Plus, X, Eye } from "@lucide/svelte";
+    import { router } from "@inertiajs/svelte";
 
-    import { router } from '@inertiajs/svelte';
-    import { getContext } from 'svelte';
+    let { questions, filters } = $props();
 
-    let { questions } = $props();
+    // Initialize search term from server filters (keeps text after reload)
+    let searchTerm = $state(filters.search || "");
 
-    let query;
+    // Logic to show/hide icons reactively
+    let showClear = $derived(searchTerm.length > 0);
 
-    function doSearch(event) {
+    function doSearch() {
         console.log("doSearch called");
-        const inputValue = event.target.value;
-
-        if (inputValue.length >=  3){
+        /*         const inputValue = event.target.value;
 
         if (inputValue.length > 0) {
             console.log("Input value:", inputValue);
@@ -28,36 +28,58 @@
             document
                 .getElementById("search-icon")
                 .classList.remove("is-hidden");
-        }
+        } */
 
-        router.get(
+        /*         router.get(
             // Use the current page URL, or a specific route name/path
-            '/question', 
+            "/question",
             // The data payload for the GET request (will become URL query parameters)
-            { search: inputValue }, 
+            { search: inputValue },
             // Optional Inertia options
-            { 
+            {
                 preserveState: true, // Keep component state (e.g., scroll position)
-                replace: true,       // Replace the current history entry
-            }
+                replace: true, // Replace the current history entry
+            },
         );
-        } 
-
-
+ */
+        router.get(
+            "/question",
+            { search: searchTerm },
+            {
+                preserveState: true,
+                replace: true,
+                // If the user is on page 5 and searches, we should go back to page 1
+                query: { page: 1 },
+            },
+        );
     }
 
     function clearSearch() {
-        query = "";
-        console.log("clearSearch called");
-        const searchInput = document.querySelector(
-            'input[placeholder="Search"]',
-        );
-        searchInput.value = "";
-        searchInput.focus();
+        // query = "";
+        // console.log("clearSearch called");
+        // const searchInput = document.querySelector(
+        //     'input[placeholder="Search"]',
+        // );
+        // searchInput.value = "";
+        // searchInput.focus();
 
-        document.getElementById("clear-icon").classList.add("is-hidden");
-        document.getElementById("search-icon").classList.remove("is-hidden");
+        // document.getElementById("clear-icon").classList.add("is-hidden");
+        // document.getElementById("search-icon").classList.remove("is-hidden");
+
+        searchTerm = "";
+        doSearch();
     }
+
+    // Optional: Simple debounce to prevent server overload
+    let timer;
+    const handleInput = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            if (searchTerm.length >= 3 || searchTerm.length === 0) {
+                doSearch();
+            }
+        }, 300); // Wait 300ms after user stops typing
+    };
 </script>
 
 <Layout>
@@ -80,24 +102,25 @@
             <div class="level-right">
                 <div class="control has-icons-right">
                     <input
-                        bind:this={query}
+                        bind:value={searchTerm}
+                        oninput={handleInput}
                         class="input"
-                        type="email"
-                        placeholder="Search"
-                        oninput={doSearch}
+                        type="text"
+                        placeholder="Search..."
                     />
-                    <button
-                        class="icon is-small is-right is-hidden"
-                        id="clear-icon"
-                        onclick={() => {
-                            clearSearch();
-                        }}
-                    >
-                        <X size="16" />
-                    </button>
-                    <span class="icon is-small is-right" id="search-icon">
-                        <Search size="16" />
-                    </span>
+                    {#if showClear}
+                        <button
+                            class="icon is-small is-right is-clickable"
+                            onclick={clearSearch}
+                            style="border:none; background:none;"
+                        >
+                            <X size="16" />
+                        </button>
+                    {:else}
+                        <span class="icon is-small is-right">
+                            <Search size="16" />
+                        </span>
+                    {/if}
                 </div>
             </div>
         </nav>
