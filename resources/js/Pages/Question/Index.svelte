@@ -4,7 +4,9 @@
     import Paginate from "$lib/components/Paginate.svelte";
 
     import { Search, Plus, X, Eye } from "@lucide/svelte";
-    import { clear } from "plotly.js-dist";
+
+    import { router } from '@inertiajs/svelte';
+    import { getContext } from 'svelte';
 
     let { questions } = $props();
 
@@ -13,6 +15,8 @@
     function doSearch(event) {
         console.log("doSearch called");
         const inputValue = event.target.value;
+
+        if (inputValue.length >=  3){
 
         if (inputValue.length > 0) {
             console.log("Input value:", inputValue);
@@ -25,6 +29,21 @@
                 .getElementById("search-icon")
                 .classList.remove("is-hidden");
         }
+
+        router.get(
+            // Use the current page URL, or a specific route name/path
+            '/question', 
+            // The data payload for the GET request (will become URL query parameters)
+            { search: inputValue }, 
+            // Optional Inertia options
+            { 
+                preserveState: true, // Keep component state (e.g., scroll position)
+                replace: true,       // Replace the current history entry
+            }
+        );
+        } 
+
+
     }
 
     function clearSearch() {
@@ -67,7 +86,7 @@
                         placeholder="Search"
                         oninput={doSearch}
                     />
-                    <span
+                    <button
                         class="icon is-small is-right is-hidden"
                         id="clear-icon"
                         onclick={() => {
@@ -75,7 +94,7 @@
                         }}
                     >
                         <X size="16" />
-                    </span>
+                    </button>
                     <span class="icon is-small is-right" id="search-icon">
                         <Search size="16" />
                     </span>
