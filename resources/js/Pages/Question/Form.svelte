@@ -13,9 +13,7 @@
 
     import Title from "$lib/components/Title.svelte";
 
-    import { Save, Pencil, Trash, X} from "@lucide/svelte";
-
-
+    import { Save, Pencil, Trash, X } from "@lucide/svelte";
 
     let edContent = $state("<em>Your content will appear here...</em>");
 
@@ -83,10 +81,12 @@
 
 <Layout>
     <section class="section">
-
-        <Title title="Question {question.id}" subtitle={isEdit & (question != null)
-                                ? "Edit Question" + question.id
-                                : "Create Question"} />
+        <Title
+            title="Question"
+            subtitle={isEdit & (question != null)
+                ? "Edit Question" + question.id
+                : "Create Question"}
+        />
 
         <nav class="level is-mobile">
             <!-- Left side -->
@@ -106,11 +106,19 @@
             <!-- Right side -->
             <div class="level-right">
                 <p class="buttons">
-                    <button class="button ">
-                        <span class="icon">
-                            <X size="16" />
-                        </span>
-                    </button>
+                    {#if isEdit & (question != null)}
+                        <a href="/question/{question.id}" class="button">
+                            <span class="icon">
+                                <X size="16" />
+                            </span>
+                        </a>
+                    {:else}
+                        <a href="/question" class="button">
+                            <span class="icon">
+                                <X size="16" />
+                            </span>
+                        </a>
+                    {/if}
                 </p>
             </div>
         </nav>
@@ -194,10 +202,7 @@
                                 $form.myStepLevel2 = ""; // Manually clear
                                 $form.myStepLevel3 = "";
 
-                                console.log(
-                                    "ON CHANGE",
-                                    $form.myStepLevel1,
-                                );
+                                console.log("ON CHANGE", $form.myStepLevel1);
                             }}
                         />
                     </div>
@@ -242,9 +247,7 @@
                 <div class="control" id="ed">
                     <Editor
                         onUpdate={(html) => ($form.myEditorText = html)}
-                        value={question != null
-                            ? question.myEditorText
-                            : ""}
+                        value={question != null ? question.myEditorText : ""}
                     />
                 </div>
                 {#if $form.errors.myEditorText}
@@ -268,6 +271,5 @@
                 </button>
             </div>
         </form>
-
     </section>
 </Layout>

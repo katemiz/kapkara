@@ -173,37 +173,7 @@ class QuestionController extends Controller
      */
     public function store(Request $request)
     {
-
-        //dd('here');
-
-        //dd($request->all() );
-
-
-        // $validated = $request->validate([
-        //     'myEditorText' => 'required|max:255',
-        //     'myInput' => 'required',
-        //         'myCheckboxMultiple' => 'nullable|array',
-
-        // ]);
-
-
-        // Add unvalidated parameters
-        // $validated['myInput'] = $request->input('myInput');
-        // $validated['mySelect'] = $request->input('mySelect');
-        // $validated['myRadio'] = $request->input('myRadio');
-        // $validated['myCheckboxSingle'] = $request->input('myCheckboxSingle');
-        // $validated['myCheckboxMultiple'] = json_encode($request->input('myCheckboxMultiple'));
-        // $validated['myDate'] = $request->input('myDate');
-        // $validated['myDateTime'] = $request->input('myDateTime');
-        // $validated['myStepLevel1'] = $request->input('myStepLevel1');
-        // $validated['myStepLevel2'] = $request->input('myStepLevel2');
-        // $validated['myStepLevel3'] = $request->input('myStepLevel3');
-        // $validated['myEditorText'] = $request->input('myEditorText');
-
         $theData = $this->readInput($request);  
-
-
-        //dd($validated );
 
         $question = Question::create($theData);
 
@@ -230,9 +200,9 @@ class QuestionController extends Controller
      */
     public function edit($idQuestion)
     {
-        $question = Question::findOrFail($idQuestion);
+        $question = Question::findOrFail($idQuestion)->toArray();
 
-        $question["myCheckboxMultiple"] =$this->convertArrayParamsToString($question["myCheckboxMultiple"]);
+        $question["myCheckboxMultiple"] = $this->convertJsonToArray($question["myCheckboxMultiple"]);
 
         $this->prepareProps(); 
 
@@ -250,24 +220,11 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($idQuestion);
 
-        // $validated = $request->validate([
-        //     // 'title' => 'required|max:255',
-        //     'text' => 'required',
-        // ]);
+        $theData = $this->readInput($request);  
 
-                $theData = $this->readInput($request);  
-
-                $this->spatieMultiple($request,$question);
-
-
-        //dd($validated );
-
-        //dd($_FILES );
+        $this->spatieMultiple($request,$question);
 
         $question->update($theData);
-
-
-       $this->addFiles($idQuestion,$_FILES);
 
         return redirect()->route('question.show', $question->id)
             ->with('success', 'Question updated successfully.');
@@ -299,59 +256,76 @@ class QuestionController extends Controller
 
 
 
-    public function readInput ($request) {
 
 
 
-        if ($request->myUpload )
 
 
 
-        $validated['myInput'] = $request->input('myInput');
-        $validated['mySelect'] = $request->input('mySelect');
-        $validated['myRadio'] = $request->input('myRadio');
-        $validated['myCheckboxSingle'] = $request->input('myCheckboxSingle');
-        $validated['myCheckboxMultiple'] = json_encode($request->input('myCheckboxMultiple'));
-        $validated['myDate'] = $request->input('myDate');
-        $validated['myDateTime'] = $request->input('myDateTime');
-        $validated['myStepLevel1'] = $request->input('myStepLevel1');
-        $validated['myStepLevel2'] = $request->input('myStepLevel2');
-        $validated['myStepLevel3'] = $request->input('myStepLevel3');
-        $validated['myEditorText'] = $request->input('myEditorText');
 
+
+
+
+
+    public function readInput($request) 
+    {
+        $validated = $request->validate([
+            'myInput' => 'required|string|max:255',
+            'mySelect' => 'required|string',
+            'myRadio' => 'required|integer',
+            'myCheckboxSingle' => 'nullable|boolean',
+            'myCheckboxMultiple' => 'nullable|array',
+            'myDate' => 'nullable|date',
+            'myDateTime' => 'nullable|date',
+            'myStepLevel1' => 'nullable|string',
+            'myStepLevel2' => 'nullable|string',
+            'myStepLevel3' => 'nullable|string',
+            'myEditorText' => 'required|string|max:10000',
+        ]);
+
+        // Only modify myCheckboxMultiple if it exists (since you have $casts in model, this might not be needed)
+        if (isset($validated['myCheckboxMultiple'])) {
+            $validated['myCheckboxMultiple'] = json_encode($validated['myCheckboxMultiple']);
+        }
 
         return $validated;
+    }
 
 
 
 
 
-    } 
 
 
 
 
 
-    public function convertArrayParamsToString ($arr) {
-
-        if ( !is_array($arr) ) {
-
-            // Multiple CheckBox Selection is stored in database like [3,4] for json formatted rows
-            // values to be converted to string
-
-            $arr =  json_decode($arr);
-        } 
-
-        $stringArr = array_combine(
-            array_map('strval', array_keys($arr)),  // Convert keys
-            array_map('strval', array_values($arr)) // Convert values
-        );
-
-        return $stringArr;
-    } 
 
 
-    public function addFiles($idModel,$files,) {
+
+
+
+
+
+    public function convertJsonToArray($data) {
+        // If already an array, return as-is
+        if (is_array($data)) {
+            return array_map('strval', $data);
+        }
+        
+        // If it's a JSON string, decode it
+        if (is_string($data)) {
+            $decoded = json_decode($data, true); // true = return as array
+            
+            // Return array of strings, or empty array if null
+            return $decoded ? array_map('strval', $decoded) : [];
+        }
+        
+        // Default to empty array
+        return [];
+    }
+
+    public function SILaddFiles($idModel,$files,) {
 
         $model = Question::find($idModel);
 
