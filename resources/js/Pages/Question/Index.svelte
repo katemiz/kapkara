@@ -7,7 +7,7 @@
     import { Search, Plus, X, Eye } from "@lucide/svelte";
     import { router } from "@inertiajs/svelte";
 
-    let { questions, filters } = $props();
+    let { questions, filters, per_page } = $props();
 
     // Initialize from filters, but allow independent updates
     let searchTerm = $state("");
@@ -95,7 +95,7 @@
             </div>
         </nav>
 
-        <TableRecordsInfo results={questions} />
+        <TableRecordsInfo results={questions} {per_page} />
 
         {#if questions.data.length > 0}
             <table class="table is-fullwidth">

@@ -142,6 +142,7 @@ class QuestionController extends Controller
 
         return Inertia::render('Question/Index', [
                 // 'filters' sends the search term back to Svelte so the input stays filled
+                'per_page' => config('pagination.per_page'),
                 'filters' => $request->only(['search']),
                 'questions' => Question::query()
                     ->when($request->input('search'), function ($query, $search) {

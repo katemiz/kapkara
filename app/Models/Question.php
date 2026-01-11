@@ -23,6 +23,14 @@ class Question extends Model implements HasMedia {
 
     protected $guarded = [];
 
+    protected $casts = [
+    'myRadio' => 'integer',
+    'myCheckboxSingle' => 'boolean',
+    'myCheckboxMultiple' => 'array',
+    'myDate' => 'date',
+    'myDateTime' => 'datetime',
+];
+
 
 
     // 1. Eager load the media relationship automatically

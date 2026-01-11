@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         $user = User::findOrFail(1);
 
         // 2. Create 50 fake questions
-        Question::factory()->count(150)->create([
+        Question::factory()->count(8)->create([
             'created_by' => $user->id,
             'updated_by' => $user->id,
         ]);

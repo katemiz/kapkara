@@ -1,5 +1,5 @@
 <script>
-    let { results } = $props();
+    let { results, per_page } = $props();
 
     /*     
     $results should contain
@@ -11,19 +11,33 @@
     let from = $derived(results.from);
     let to = $derived(results.to);
     let total = $derived(results.total);
+
+    let lastPage = $derived(results.last_page);
 </script>
 
-<div class="table-records-info">
-    <p>
-        Showing
-        <strong>{from}</strong>
-        to
-        <strong>{to}</strong>
-        of
-        <strong>{total}</strong>
-        records
-    </p>
-</div>
+{#if lastPage > 1}
+    <div class="table-records-info">
+        <p>
+            Showing
+            <strong>{from}</strong>
+            to
+            <strong>{to}</strong>
+            of
+            <strong>{total}</strong>
+            records
+        </p>
+    </div>
+{/if}
+
+{#if total <= per_page}
+    <div class="table-records-info">
+        <p>
+            Total
+            <strong>{total}</strong>
+            records
+        </p>
+    </div>
+{/if}
 
 <style>
     .table-records-info {

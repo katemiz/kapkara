@@ -18,7 +18,15 @@ class QuestionFactory extends Factory
     public function definition(): array
     {
         return [
-            'myInput' => $this->faker->sentence(12) . '?',
+            'myInput' => $this->faker->sentence(20) . '?',
+            'mySelect' => $this->faker->randomElement(['1', '2', '3','4']),
+            'myRadio' => $this->faker->randomElement(['1', '2', '3','4']),
+            'myCheckboxSingle' => $this->faker->boolean(),
+            'myCheckboxMultiple' => $this->faker->randomElements(['1', '2', '3','4'], 2),
+            'myDate' => $this->faker->date(),
+            'myStepLevel1' => $this->faker->randomElement(['electronics']),
+            'myStepLevel2' => $this->faker->randomElement(['phones']),
+            'myStepLevel3' => $this->faker->randomElement(['iphone', 'samsung']),
             'myEditorText' => $this->faker->paragraphs(3, true),
             // Assuming you have Userstamps:
             'created_by' => User::first()?->id ?? User::factory(),
