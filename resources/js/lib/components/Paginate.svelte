@@ -17,7 +17,12 @@
 
 <nav class="pagination is-centered">
     {#if prevLink?.url}
-        <Link href={prevLink.url} class="pagination-previous" preserveScroll>
+        <Link
+            href={prevLink.url}
+            class="pagination-previous"
+            preserveScroll
+            preserveState
+        >
             <ChevronLeft size="18" />
         </Link>
     {:else}
@@ -30,7 +35,12 @@
     {/if}
 
     {#if nextLink?.url}
-        <Link href={nextLink.url} class="pagination-next" preserveScroll>
+        <Link
+            href={nextLink.url}
+            class="pagination-next"
+            preserveScroll
+            preserveState
+        >
             <ChevronRight size="18" />
         </Link>
     {:else}
@@ -51,6 +61,7 @@
                             ? 'is-current'
                             : ''}"
                         preserveScroll
+                        preserveState
                     >
                         {@html link.label}
                     </Link>

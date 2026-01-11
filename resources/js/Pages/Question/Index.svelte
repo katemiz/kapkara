@@ -2,70 +2,40 @@
     import Layout from "../../Shared/Layout.svelte";
     import Title from "$lib/components/Title.svelte";
     import Paginate from "$lib/components/Paginate.svelte";
+    import TableRecordsInfo from "$lib/components/TableRecordsInfo.svelte";
 
     import { Search, Plus, X, Eye } from "@lucide/svelte";
     import { router } from "@inertiajs/svelte";
 
     let { questions, filters } = $props();
 
-    // Initialize search term from server filters (keeps text after reload)
-    let searchTerm = $state(filters.search || "");
+    // Initialize from filters, but allow independent updates
+    let searchTerm = $state("");
+
+    // Sync with filters when component mounts or filters change
+    $effect(() => {
+        searchTerm = filters.search || "";
+    });
 
     // Logic to show/hide icons reactively
     let showClear = $derived(searchTerm.length > 0);
 
     function doSearch() {
-        console.log("doSearch called");
-        /*         const inputValue = event.target.value;
-
-        if (inputValue.length > 0) {
-            console.log("Input value:", inputValue);
-            document.getElementById("clear-icon").classList.remove("is-hidden");
-            document.getElementById("search-icon").classList.add("is-hidden");
-        } else {
-            console.log("Input is empty");
-            document.getElementById("clear-icon").classList.add("is-hidden");
-            document
-                .getElementById("search-icon")
-                .classList.remove("is-hidden");
-        } */
-
-        /*         router.get(
-            // Use the current page URL, or a specific route name/path
-            "/question",
-            // The data payload for the GET request (will become URL query parameters)
-            { search: inputValue },
-            // Optional Inertia options
-            {
-                preserveState: true, // Keep component state (e.g., scroll position)
-                replace: true, // Replace the current history entry
-            },
-        );
- */
         router.get(
             "/question",
-            { search: searchTerm },
             {
-                preserveState: true,
-                replace: true,
-                // If the user is on page 5 and searches, we should go back to page 1
-                query: { page: 1 },
+                search: searchTerm,
+                page: 1, // Explicitly reset to page 1 on every new search
+            },
+            {
+                preserveState: false,
+                replace: false,
+                preserveScroll: true,
             },
         );
     }
 
     function clearSearch() {
-        // query = "";
-        // console.log("clearSearch called");
-        // const searchInput = document.querySelector(
-        //     'input[placeholder="Search"]',
-        // );
-        // searchInput.value = "";
-        // searchInput.focus();
-
-        // document.getElementById("clear-icon").classList.add("is-hidden");
-        // document.getElementById("search-icon").classList.remove("is-hidden");
-
         searchTerm = "";
         doSearch();
     }
@@ -125,8 +95,19 @@
             </div>
         </nav>
 
+        <TableRecordsInfo results={questions} />
+
         {#if questions.data.length > 0}
             <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>My Input</th>
+                        <th>My Editor Text</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
                 <tbody>
                     {#each questions.data as question}
                         <tr>

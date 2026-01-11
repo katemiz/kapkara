@@ -135,19 +135,10 @@ class QuestionController extends Controller
     public function index(Request $request)
     {
 
-/*         
-        $questions = Question::paginate(15);
+    // Add this temporarily to see what's being received
+    \Log::info('Request params:', $request->all());
+    \Log::info('Search param:', ['search' => $request->input('search')]);
 
-        // dd($questions );
-        
-        return Inertia::render('Question/Index', [
-            'questions' => $questions,
-            // 'links' => $questions->links(),
-            // 'data' => $questions->items(),
-        ]);
-
-
- */
 
         return Inertia::render('Question/Index', [
                 // 'filters' sends the search term back to Svelte so the input stays filled
@@ -158,19 +149,9 @@ class QuestionController extends Controller
                             ->orWhere('myEditorText', 'like', "%{$search}%");
                     })
                     ->latest()
-                    ->paginate(15)
+                    ->paginate(config('pagination.per_page'))
                     ->withQueryString(), // VERY IMPORTANT: keeps search param during pagination
             ]);
-
-
-
-
-
-
-
-
-
-
     }
 
     /**
