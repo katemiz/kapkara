@@ -3,112 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
+use App\Models\Answer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class QuestionController extends Controller
+class AnswerController extends Controller
 {
-    public $dpOptions = [
-
-        [ "value" => "1","label" => "Option1"],
-        [ "value" => "2","label" => "Option2"],
-        [ "value" => "3","label" => "Option3"],
-        [ "value" => "4","label" => "Option4"] 
-    ];
-
-
-
-    public $radioOptions = [
-
-        [ "value" => 1,"label" => "Radio Option 1"],
-        [ "value" => 2,"label" => "Radio Option 2"],
-        [ "value" => 3,"label" => "Radio Option 3"],
-        [ "value" => 4,"label" => "Radio Option 4"] 
-    ];
-
-    public $checkboxOptions =  [       
-        [ "value" => "1","label" => "Checkbox Option 1"],
-        [ "value" => "2","label" => "Checkbox Option 2"],
-        [ "value" => "3","label" => "Checkbox Option 3"],
-        [ "value" => "4","label" => "Checkbox Option 4"] 
-    ];
-
-    public $veri = [
-        // Level 1 options
-        'level1' => [
-            ['value' => 'electronics', 'label' => 'Electronics'],
-            ['value' => 'clothing', 'label' => 'Clothing'],
-            ['value' => 'books', 'label' => 'Books']
-        ],
-        
-        // Level 2 options by parent
-        'level2' => [
-            'electronics' => [
-                ['value' => 'phones', 'label' => 'Phones'],
-                ['value' => 'laptops', 'label' => 'Laptops'],
-                ['value' => 'accessories', 'label' => 'Accessories']
-            ],
-            'clothing' => [
-                ['value' => 'mens', 'label' => "Men's Clothing"],
-                ['value' => 'womens', 'label' => "Women's Clothing"],
-                ['value' => 'kids', 'label' => "Kids' Clothing"]
-            ],
-            'books' => [
-                ['value' => 'fiction', 'label' => 'Fiction'],
-                ['value' => 'nonfiction', 'label' => 'Non-Fiction'],
-                ['value' => 'textbooks', 'label' => 'Textbooks']
-            ]
-        ],
-        
-        // Level 3 options by parent
-        'level3' => [
-            'phones' => [
-                ['value' => 'iphone', 'label' => 'iPhone'],
-                ['value' => 'samsung', 'label' => 'Samsung'],
-                ['value' => 'google', 'label' => 'Google Pixel']
-            ],
-            'laptops' => [
-                ['value' => 'macbook', 'label' => 'MacBook'],
-                ['value' => 'dell', 'label' => 'Dell'],
-                ['value' => 'hp', 'label' => 'HP']
-            ],
-            'accessories' => [
-                ['value' => 'chargers', 'label' => 'Chargers'],
-                ['value' => 'cases', 'label' => 'Cases'],
-                ['value' => 'headphones', 'label' => 'Headphones']
-            ],
-            'mens' => [
-                ['value' => 'shirts', 'label' => 'Shirts'],
-                ['value' => 'pants', 'label' => 'Pants'],
-                ['value' => 'shoes', 'label' => 'Shoes']
-            ],
-            'womens' => [
-                ['value' => 'dresses', 'label' => 'Dresses'],
-                ['value' => 'tops', 'label' => 'Tops'],
-                ['value' => 'bottoms', 'label' => 'Bottoms']
-            ],
-            'kids' => [
-                ['value' => 'toddler', 'label' => 'Toddler'],
-                ['value' => 'children', 'label' => 'Children'],
-                ['value' => 'teen', 'label' => 'Teen']
-            ],
-            'fiction' => [
-                ['value' => 'mystery', 'label' => 'Mystery'],
-                ['value' => 'scifi', 'label' => 'Science Fiction'],
-                ['value' => 'romance', 'label' => 'Romance']
-            ],
-            'nonfiction' => [
-                ['value' => 'biography', 'label' => 'Biography'],
-                ['value' => 'history', 'label' => 'History'],
-                ['value' => 'science', 'label' => 'Science']
-            ],
-            'textbooks' => [
-                ['value' => 'math', 'label' => 'Mathematics'],
-                ['value' => 'english', 'label' => 'English'],
-                ['value' => 'science-text', 'label' => 'Science']
-            ]
-        ]
-    ];
 
 
 
@@ -122,7 +22,10 @@ class QuestionController extends Controller
 
 
 
-
+    public $isCorrect  = [
+        ['value' => 0, 'label' => 'Not Correct'],
+        ['value' => 1, 'label' => 'Correct'],
+    ];
 
 
 
@@ -135,16 +38,14 @@ class QuestionController extends Controller
     public function index(Request $request)
     {
 
-        // Add this temporarily to see what's being received
-        \Log::info('Request params:', $request->all());
-        \Log::info('Search param:', ['search' => $request->input('search')]);
 
 
-        return Inertia::render('Question/Index', [
+
+        return Inertia::render('Question/AnswerIndex', [
                 // 'filters' sends the search term back to Svelte so the input stays filled
                 'per_page' => config('pagination.per_page'),
                 'filters' => $request->only(['search']),
-                'questions' => Question::query()
+                'answers' => Question::query()
                     ->when($request->input('search'), function ($query, $search) {
                         $query->where('myInput', 'like', "%{$search}%")
                             ->orWhere('myEditorText', 'like', "%{$search}%");
@@ -158,12 +59,13 @@ class QuestionController extends Controller
     /**
      * Show the form for creating a new question.
      */
-    public function create()
+    public function create(Request $request)
     {
         $this->prepareProps(); 
 
-        return Inertia::render('Question/Form', [
-            'question' => null, // or new Question()
+        return Inertia::render('Question/AnswerForm', [
+            'question' => Question::findOrFail($request->get('question_id')),
+            'answer' => null,
             'isEdit' => false,
             'fixedData' =>$this->modelData  
         ]);
@@ -248,10 +150,10 @@ class QuestionController extends Controller
 
         $this->modelData =[];  
 
-        $this->modelData["dpOptions"] =$this->dpOptions; 
-        $this->modelData["radioOptions"] =$this->radioOptions;   
-        $this->modelData["cascadedData"] =$this->veri;   
-        $this->modelData["checkboxOptions"] = $this->checkboxOptions;   
+        // $this->modelData["dpOptions"] =$this->dpOptions; 
+        $this->modelData["radioOptions"] =$this->isCorrect;   
+        // $this->modelData["cascadedData"] =$this->veri;   
+        // $this->modelData["checkboxOptions"] = $this->checkboxOptions;   
     } 
 
 

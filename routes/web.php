@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\AnswerController;  
 use App\Http\Controllers\MediaController;
 
 use Inertia\Inertia;
@@ -142,7 +143,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::resource('question', QuestionController::class);
-
+    Route::resource('answer', AnswerController::class); 
 
     // // Your other grouped routes from before
     // Route::prefix('other')->group(function () {

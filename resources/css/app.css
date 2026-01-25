@@ -3,3 +3,67 @@
 .min-height-screen {
     min-height: 80vh;
 }
+
+
+
+
+/* TOOLTIP STYLES */
+/* Basic tooltip setup */
+[data-tooltip] {
+    position: relative;
+
+}
+
+/* Tooltip content */
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+
+    /* Styling */
+    padding: 8px 12px;
+    background-color: #91c99f;
+    color: rgb(4, 48, 11);
+    font-size: 14px;
+    /* border-radius: 4px; */
+    white-space: nowrap;
+
+    /* Hide by default */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+
+    /* Z-index to appear above other elements */
+    z-index: 1000;
+}
+
+/* Tooltip arrow */
+[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2px;
+
+    /* Triangle shape */
+    border: 6px solid transparent;
+    border-top-color: #333;
+
+    /* Hide by default */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+
+    z-index: 1000;
+}
+
+/* Show on hover */
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
