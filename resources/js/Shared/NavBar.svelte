@@ -11,6 +11,7 @@
         LogOut,
         Database,
         Bird,
+        Box,
     } from "@lucide/svelte";
 
     import { router } from "@inertiajs/svelte";
@@ -145,6 +146,13 @@
                                 <span>Question 2</span>
                             </a>
 
+                            <a class="navbar-item" href="/material">
+                                <span class="icon">
+                                    <Box size={18} />
+                                </span>
+                                <span>Material</span>
+                            </a>
+
                             <button onclick={logout} class="navbar-item">
                                 <span class="icon">
                                     <LogOut size={18} />
@@ -156,7 +164,7 @@
                 {:else}
                     <a href={"/login"} class="navbar-item">
                         <span class="icon has-text-warning">
-                            <User size={18} color="#3e9392"/>
+                            <User size={18} color="#3e9392" />
                         </span>
                     </a>
                 {/if}
