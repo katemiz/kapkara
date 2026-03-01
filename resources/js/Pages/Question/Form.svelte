@@ -13,7 +13,7 @@
 
     import Title from "$lib/components/Title.svelte";
 
-    import { Save, Pencil, Trash, X } from "@lucide/svelte";
+    import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 
     let edContent = $state("<em>Your content will appear here...</em>");
 
@@ -257,17 +257,35 @@
                 {/if}
             </div>
 
-            <div class="column has-text-right">
+            <div class="column buttons has-text-right">
+                <!-- Cancel Button -->
+                {#if isEdit & (question != null)}
+                    <a href="/question/{question.id}" class="button">
+                        <span class="icon"><X size="16" /></span>
+                        <span>Cancel</span>
+                    </a>
+                {:else}
+                    <a href="/question" class="button">
+                        <span class="icon"><X size="16" /></span>
+                        <span>Cancel</span>
+                    </a>
+                {/if}
+
+                <!-- Form Submit Button -->
+
                 <button
                     type="submit"
                     class="button is-link"
                     disabled={$form.processing}
                 >
-                    {#if $form.processing}
-                        "Submitting ..."
-                    {:else}
-                        {isEdit ? "Update" : "Create"} Question
-                    {/if}
+                    <span class="icon"><ChevronRight size="16" /></span>
+                    <span>
+                        {#if $form.processing}
+                            "Submitting ..."
+                        {:else}
+                            {isEdit ? "Update" : "Create"} Question
+                        {/if}
+                    </span>
                 </button>
             </div>
         </form>

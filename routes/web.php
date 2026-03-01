@@ -3,10 +3,14 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AnswerController;  
 use App\Http\Controllers\MediaController;
 
 use Inertia\Inertia;
+
+
+
 
 // Route::get('/', function () {
 //     return Inertia::render('Home', [
@@ -129,8 +133,40 @@ Route::prefix('funstuff')->group(function () {
 
 
 
-// 5. Image Upload Route
-Route::post('/upload-image', [MediaController::class, 'uploadImg'])->name('image.upload');
+
+
+
+
+
+Route::middleware(['auth'])->group(function () {
+
+    // Image Upload Route for WYSIWYG Editor
+    Route::post('/upload-image', [MediaController::class, 'uploadImg'])->name('image.upload');
+
+    // Delete media
+    Route::delete('/media-delete/{mediaId}', [MediaController::class, 'destroy'])
+        ->name('media.destroy');
+
+
+
+
+    
+    // Get media for a model
+    // Route::get('/media/{modelType}/{modelId}', [MediaController::class, 'index'])
+    //     ->name('media.index');
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -144,6 +180,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('question', QuestionController::class);
     Route::resource('answer', AnswerController::class); 
+    Route::resource('material', MaterialController::class);
+
 
     // // Your other grouped routes from before
     // Route::prefix('other')->group(function () {

@@ -2,34 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUserstamps;
-use App\Models\Answer;
-use App\Models\User;
-
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // 1. For adding factory support
+use Illuminate\Database\Eloquent\Model;
 
-
-class Question extends Model implements HasMedia {
-
-    use HasFactory;    // 2. For using factory support
+class Material extends Model implements HasMedia{
+    protected $guarded = [];
 
     use HasUserstamps;
     use InteractsWithMedia;
 
-
-    protected $guarded = [];
-
-    protected $casts = [
-        'myRadio' => 'integer',
-        'myCheckboxSingle' => 'boolean',
-        'myCheckboxMultiple' => 'array',
-        'myDate' => 'date',
-        'myDateTime' => 'datetime',
-    ];
 
 
 
@@ -51,12 +35,10 @@ class Question extends Model implements HasMedia {
         ]);
     }
 
-
-
     public function getCreatedUserMailAttribute()
     {
         return User::find($this->created_by)?->email;
-    }
+    }   
 
     public function getUpdatedUserMailAttribute()
     {
@@ -68,28 +50,4 @@ class Question extends Model implements HasMedia {
 
 
 
-
-
-
-    public function answers() {
-        return $this->belongsToMany(Answer::class)
-                    ->withPivot('is_correct')
-                    ->withTimestamps();
-    }
-
-
-    // Userstamp relationships
-    public function creator() {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function editor() {
-        return $this->belongsTo(User::class, 'updated_by');
-    }
-
-
-
 }
-
-
-

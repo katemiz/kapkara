@@ -15,6 +15,8 @@
      * />
      */
 
+    import { page } from "@inertiajs/svelte";
+
     let {
         form, // Inertia form object (required)
         name, // Field name (required). Is to be used for id also
@@ -26,6 +28,13 @@
         placeholder = "Select an option", // Placeholder text
         class: customClass = "", // Additional CSS classes
     } = $props();
+
+    // Determine if there is an error for this specific field
+    // Check the form-specific errors first, fallback to global page errors
+    //let errorMessage = $derived($form.errors[name] || $page.props.errors[name]);
+    let errorMessage = $derived($page.props.errors[name]);
+
+    let hasError = $derived(!!errorMessage);
 </script>
 
 <div class="field">
@@ -40,10 +49,16 @@
 
     <div class="control">
         <div
-            class="select {customClass} {$form.errors[name] ? 'is-danger' : ''}"
+            class="select {customClass} {hasError ? 'is-danger' : ''}"
             autocomplete="off"
         >
-            <select {id} {required} {disabled} bind:value={$form[name]}>
+            <select
+                {id}
+                {required}
+                {disabled}
+                bind:value={$form[name]}
+                class={hasError ? "is-danger" : ""}
+            >
                 {#if placeholder}
                     <option value="" disabled selected={!$form[name]}>
                         {placeholder}
@@ -59,7 +74,7 @@
         </div>
     </div>
 
-    {#if $form.errors[name]}
-        <p class="help is-danger">{$form.errors[name]}</p>
+    {#if hasError}
+        <p class="help is-danger">{errorMessage}</p>
     {/if}
 </div>

@@ -5,10 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 class MediaController extends Controller
 {
     public function uploadImg(Request $request)
     {
+        /*
+        For WYSWYG Editor . Upload IMAGE and return URL to editor.
+        Limited to images and max 2MB for security and performance reasons.
+        */
         $request->validate([
             'image' => 'required|image|max:2048', // 2MB max
         ]);
@@ -33,6 +39,27 @@ class MediaController extends Controller
             'Content-Type' => 'application/json'
         ]);
     }
+
+
+    /**
+     * Delete a media file
+     */
+    public function destroy(Request $request, $mediaId)
+    {
+        try {
+            $media = Media::findOrFail($mediaId);
+            $media->delete();
+
+            // 1. Always use back() or a route redirect for Inertia
+            // 2. Use 'with' to pass temporary "flash" messages
+            return back()->with('success', 'File deleted successfully');
+
+        } catch (\Exception $e) {
+            // If it fails, redirect back with an error flash message
+            return back()->with('error', 'Failed to delete file: ' . $e->getMessage());
+        }
+    }
+
 }
 
 

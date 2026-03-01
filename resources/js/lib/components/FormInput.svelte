@@ -13,6 +13,8 @@
      * />
      */
 
+    import { page } from "@inertiajs/svelte";
+
     let {
         form, // Inertia form object (required)
         name, // Field name (required)
@@ -25,6 +27,11 @@
         autocomplete = "", // Autocomplete attribute
         class: customClass = "", // Additional CSS classes
     } = $props();
+
+    //let errorMessage = $derived($form.errors[name] || $page.props.errors[name]);
+    let errorMessage = $derived($page.props.errors[name]);
+
+    let hasError = $derived(!!errorMessage);
 </script>
 
 <div class="field">
@@ -40,7 +47,7 @@
     <div class="control">
         <input
             {id}
-            class="input {customClass} {$form.errors[name] ? 'is-danger' : ''}"
+            class="input {customClass} {hasError ? 'is-danger' : ''}"
             {type}
             {placeholder}
             {required}
@@ -50,11 +57,7 @@
         />
     </div>
 
-    {#if $form.errors[name]}
-        <p class="help is-danger">{$form.errors[name]}</p>
+    {#if hasError}
+        <p class="help is-danger">{errorMessage}</p>
     {/if}
 </div>
-
-<style>
-    /* Optional: Add any custom styles here */
-</style>
