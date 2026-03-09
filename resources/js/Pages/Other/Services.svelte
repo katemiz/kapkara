@@ -1,5 +1,5 @@
 <script>
-    import Layout from "../../Shared/Layout.svelte";
+    import Layout from "$shared/Layout.svelte";
 
     let activeTab = 1;
 

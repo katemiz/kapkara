@@ -33,8 +33,10 @@ export default defineConfig({
         alias: {
             // Map $lib to the resources/js/lib directory
             '$lib': path.resolve(__dirname, './resources/js/lib'),
+            '$shared': path.resolve(__dirname, 'resources/js/Shared'),
+
             // Optional: you can also map $components
-            '$components': path.resolve(__dirname, './resources/js/Components'),
+            '$components': path.resolve(__dirname, './resources/js/lib/components'),
         },
     },
 

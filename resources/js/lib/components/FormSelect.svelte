@@ -32,8 +32,8 @@
     // Determine if there is an error for this specific field
     // Check the form-specific errors first, fallback to global page errors
     //let errorMessage = $derived($form.errors[name] || $page.props.errors[name]);
-    let errorMessage = $derived($page.props.errors[name]);
 
+    let errorMessage = $derived($page.props.errors[name]);
     let hasError = $derived(!!errorMessage);
 </script>
 

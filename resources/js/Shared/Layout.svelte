@@ -1,6 +1,6 @@
 <script>
-    import NavBar from "../Shared/NavBar.svelte";
-    import Footer from "../Shared/Footer.svelte";
+    import NavBar from "$shared/NavBar.svelte";
+    import Footer from "$shared/Footer.svelte";
 </script>
 
 <NavBar />

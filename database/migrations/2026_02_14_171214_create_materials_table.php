@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
-            $table->text('material_category');
-            $table->text(column: 'material_form');
-            $table->text('material_name');
-            $table->text('material_specification');
-            $table->text('material_notes')->nullable();
-            $table->boolean(column: 'material_is_active')->default(true);
+            $table->text('category');
+            $table->text(column: 'form');
+            $table->text('description');
+            $table->text('specification');
+            $table->text('remarks')->nullable();
+            $table->boolean(column: 'is_active')->default(true);
             $table->userstamps();   // provided by App\Providers\AppServiceProvider
             $table->timestamps();
         });

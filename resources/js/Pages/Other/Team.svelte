@@ -1,7 +1,7 @@
 <script>
-    import MemberCard from "$lib/components/MemberCard.svelte";
+    import MemberCard from "$components/MemberCard.svelte";
     import { MEMBERS } from "$lib/config";
-    import Layout from "../../Shared/Layout.svelte";
+    import Layout from "$shared/Layout.svelte";
 </script>
 
 <Layout>

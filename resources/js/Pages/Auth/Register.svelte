@@ -7,6 +7,7 @@
 
     let form = useForm({
         name: "",
+        lastname: "",
         email: "",
         password: "",
         password_confirmation: "",
@@ -47,14 +48,21 @@
                 {form}
                 name="name"
                 label="Name"
-                placeholder="Enter your name"
+                placeholder="Enter name"
+            />
+
+            <FormInput
+                {form}
+                name="lastname"
+                label="Last Name"
+                placeholder="Enter last name"
             />
 
             <FormInput
                 {form}
                 name="email"
                 label="E-Mail"
-                placeholder="Enter your e-mail"
+                placeholder="Enter e-mail"
             />
 
             <FormInput

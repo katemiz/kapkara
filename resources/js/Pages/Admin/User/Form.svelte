@@ -9,41 +9,41 @@
     import FilesList from "$lib/components/FilesList.svelte";
     import ActionButtons from "$components/ActionButtons.svelte";
 
-    import FormRadio from "$components/FormRadio.svelte";
-    import FormCheckBoxSingle from "$components/FormCheckBoxSingle.svelte";
-    import FormCheckBoxMultiple from "$components/FormCheckBoxMultiple.svelte";
-    import FormDate from "$components/FormDate.svelte";
-    import FormUpload from "$components/FormUpload.svelte";
+    import FormRadio from "$lib/components/FormRadio.svelte";
+    import FormCheckBoxSingle from "$lib/components/FormCheckBoxSingle.svelte";
+    import FormCheckBoxMultiple from "$lib/components/FormCheckBoxMultiple.svelte";
+    import FormDate from "$lib/components/FormDate.svelte";
+    import FormUpload from "$lib/components/FormUpload.svelte";
 
-    import Title from "$components/Title.svelte";
+    import Title from "$lib/components/Title.svelte";
 
     import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 
-    let { material = null, isEdit = false, supportFixedData } = $props();
+    let { user = null, isEdit = false, supportFixedData } = $props();
 
     // 1. Initialize the Inertia Form
     let form = useForm({
-        materialCategory: material?.category ?? "",
-        materialForm: material?.form ?? "",
-        materialName: material?.description ?? "",
-        materialSpecification: material?.specification ?? "",
-        materialFiles: material?.materialFiles ?? null,
-        materialNotes: material?.remarks ?? "",
-        materialIsActive: material?.is_active ?? 1,
+        userName: user?.name ?? "",
+        userEmail: user?.email ?? "",
+        userLastname: user?.lastname ?? "",
+        userNotes: user?.notes ?? "",
+        userIsActive: user?.is_active ?? 1,
+        userFiles: user?.files ?? null,
+        userType: user?.type ?? "",
     });
 
-    // If you need the form to update when the 'material' prop changes
+    console.log("Initial form data:", $form.data());
+    // If you need the form to update when the 'user' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (material && isEdit) {
+        if (user && isEdit) {
             $form.defaults({
-                materialCategory: material.category,
-                materialForm: material.form,
-                materialName: material.description,
-                materialSpecification: material.specification,
-                materialFiles: material.files,
-                materialNotes: material.remarks,
-                materialIsActive: material.is_active,
+                userName: user.name,
+                userEmail: user.email,
+                userLastname: user.lastname,
+                userNotes: user.notes,
+                userIsActive: user.is_active,
+                userType: user.type,
             });
         }
     });
@@ -57,7 +57,7 @@
         if (isEdit) {
             console.log("trying to edit");
 
-            $form.put(`/material/${material.id}`, {
+            $form.put(`/user/${user.id}`, {
                 onSuccess: () => {
                     console.log("Updated successfully!");
                 },
@@ -69,7 +69,7 @@
         } else {
             console.log("trying to new");
 
-            $form.post("/material", {
+            $form.post("/user", {
                 onSuccess: () => {
                     console.log("Saved successfully!");
                     $form.reset();
@@ -87,44 +87,43 @@
     <section class="section container min-height-screen">
         <!-- <pre class="has-background-warning">
         Errors: {JSON.stringify($page.props.errors, null, 2)}
-        All Page Props: {JSON.stringify($page.props.material, null, 2)}
+        All Page Props: {JSON.stringify($page.props.user, null, 2)}
         </pre> -->
 
         <Title
-            title="Materials"
-            subtitle={isEdit & (material != null)
-                ? "Edit Material Definition" + material.id
-                : "Create a Material Definition"}
+            title="Users"
+            subtitle={isEdit & (user != null)
+                ? "Edit User" + user.id
+                : "Create a User"}
         />
 
         <ActionButtons
             {form}
             {isEdit}
-            item={material}
+            item={user}
             form_type="form"
-            route_name="material"
+            route_name="user"
         />
 
         <form onsubmit={submit} novalidate id="genericForm">
             <div class="fixed-grid has-2-cols">
                 <div class="grid">
                     <div class="cell">
-                        <FormSelect
+                        <FormInput
                             {form}
-                            name="materialCategory"
-                            label="Material Category"
-                            placeholder="Select a category"
-                            options={supportFixedData.materialCategories}
+                            name="userName"
+                            label="Name of the User"
+                            placeholder="Enter user name"
                             required={true}
                         />
                     </div>
+
                     <div class="cell">
-                        <FormSelect
+                        <FormInput
                             {form}
-                            name="materialForm"
-                            label="Material Form"
-                            placeholder="Select a form"
-                            options={supportFixedData.materialForms}
+                            name="userLastname"
+                            label="Last Name of the User"
+                            placeholder="Enter user last name"
                             required={true}
                         />
                     </div>
@@ -133,42 +132,35 @@
 
             <FormInput
                 {form}
-                name="materialName"
-                label="Material Name/Description"
-                placeholder="Enter material Name/Description"
+                name="userEmail"
+                label="User Email"
+                placeholder="Enter user email"
                 required={true}
-            />
-
-            <FormInput
-                {form}
-                name="materialSpecification"
-                label="Material Specification"
-                placeholder="Enter material specification"
             />
 
             <div class="field">
                 <label class="label" for="ed">Notes/Comments/Remarks</label>
                 <div class="control" id="ed">
                     <Editor
-                        onUpdate={(html) => ($form.materialNotes = html)}
-                        value={material != null ? material.remarks : ""}
-                        placeholder="Enter any notes, comments, or remarks about the material here..."
+                        onUpdate={(html) => ($form.userNotes = html)}
+                        value={user != null ? user.notes : ""}
+                        placeholder="Enter any notes, comments, or remarks about the user here..."
                     />
                 </div>
-                {#if $form.errors.materialNotes}
+                {#if $form.errors.userNotes}
                     <p class="help is-danger">
-                        {$form.errors.materialNotes}
+                        {$form.errors.userNotes}
                     </p>
                 {/if}
             </div>
 
-            {#if isEdit && material.files.length > 0}
-                <FilesList media={material.files} />
+            {#if isEdit && user.files.length > 0}
+                <FilesList media={user.files} />
             {/if}
 
             <FormUpload
                 {form}
-                name="materialFiles"
+                name="userFiles"
                 label="File Attachments"
                 accept=".pdf,.docx,.doc,.txt,.png"
                 multiple={true}
@@ -178,22 +170,22 @@
 
             <FormSelect
                 {form}
-                name="materialIsActive"
-                label="Material Status (Active/Inactive)"
+                name="userIsActive"
+                label="User Status (Active/Inactive)"
                 placeholder="Select status"
-                options={supportFixedData.materialIsActive}
+                options={supportFixedData.userIsActive}
                 required={true}
             />
 
             <div class="column buttons has-text-right">
                 <!-- Cancel Button -->
-                {#if isEdit & (material != null)}
-                    <a href="/material/{material.id}" class="button">
+                {#if isEdit & (user != null)}
+                    <a href="/user/{user.id}" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
                 {:else}
-                    <a href="/material" class="button">
+                    <a href="/user" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
@@ -209,7 +201,7 @@
                         {#if $form.processing}
                             "Submitting ..."
                         {:else}
-                            {isEdit ? "Update" : "Create"} Material
+                            {isEdit ? "Update" : "Create"} User
                         {/if}
                     </span>
                     <span class="icon"><ChevronRight size="16" /></span>

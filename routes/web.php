@@ -7,6 +7,9 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AnswerController;  
 use App\Http\Controllers\MediaController;
 
+use App\Http\Controllers\UserController;
+
+
 use Inertia\Inertia;
 
 
@@ -173,20 +176,11 @@ Route::middleware(['auth'])->group(function () {
 // Protected Application Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    // Route::get('/dashboard', function () {
-    //     return Inertia::render('Dashboard');
-    // })->name('dashboard');
-
-
     Route::resource('question', QuestionController::class);
     Route::resource('answer', AnswerController::class); 
     Route::resource('material', MaterialController::class);
+    Route::resource('user', UserController::class);
 
-
-    // // Your other grouped routes from before
-    // Route::prefix('other')->group(function () {
-    //     Route::get('/apps', fn() => Inertia::render('Other/Apps'))->name('apps');
-    // });
 });
 
 
