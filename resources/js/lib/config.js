@@ -41,7 +41,7 @@ export const MYAPPS = [
         logo: "rm.svg",
         app_hero: "AppHero-RM.svg",
         img: "requirements-stack.svg",
-        url: "https://requirements.kapkara.one",
+        url: "/requirements",
         desc: `
         <p>Private and/or enterprise level Minutes of Meeting (MoM) application with centeralize repository for all data</p>
         <ul>

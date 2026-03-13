@@ -197,3 +197,20 @@ Route::get('/register', function () {
 Route::get('/forgot-password', function () {
     return Inertia::render('Auth/ForgotPassword');
 })->name('password.request');
+
+
+
+
+
+
+
+
+
+
+
+
+// REQURIREMENTS
+Route::get('/requirements', fn() => Inertia::render('HomeReq', [
+    'message' => 'Welcome to Laravel + Inertia + Svelte 5!'
+]));
+
