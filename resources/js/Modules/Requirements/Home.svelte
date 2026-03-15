@@ -1,8 +1,7 @@
 <script>
-    import Layout from "../Shared/Layout.svelte";
+    import Layout from "$modules/Requirements/Shared/Layout.svelte";
 
     import { KAPKARA } from "$lib/config";
-
 </script>
 
 <svelte:head>
@@ -26,7 +25,7 @@
                         <h2
                             class="title has-text-weight-light is-size-1 has-text-grey"
                         >
-                            productivity
+                            Requirements engineering and software development
                             <br />
                             with web technologies
                         </h2>

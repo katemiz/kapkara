@@ -1,5 +1,5 @@
 <script>
-    import Layout from "$shared/Layout.svelte";
+    import Layout from "$modules/Base/Shared/Layout.svelte";
 </script>
 
 <Layout>

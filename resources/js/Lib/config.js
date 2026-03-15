@@ -38,7 +38,7 @@ export const MYAPPS = [
     {
         name: "Requirements Management",
         label: "Requirements Management",
-        logo: "rm.svg",
+        logo: "tree-view.svg",
         app_hero: "AppHero-RM.svg",
         img: "requirements-stack.svg",
         url: "/requirements",
@@ -183,3 +183,11 @@ export const PATHS = {
     path_images_prefix: "/images/",
     path_images_apps_prefix: "/images/Apps/"
 };
+
+
+export const ADMACTIONS = {
+    "user": {
+        "label": "Users",
+        "link": "/admin/users",
+    }
+}

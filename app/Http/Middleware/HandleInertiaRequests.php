@@ -53,6 +53,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
+                    'lastname' => $request->user()->lastname, // Shared for your UI 
                     'email' => $request->user()->email,
                     // Add any custom fields you need here
                 ] : null,
@@ -64,17 +65,4 @@ class HandleInertiaRequests extends Middleware
             ],
         ]);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

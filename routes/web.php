@@ -108,17 +108,17 @@ use Inertia\Inertia;
 
 // 1. Root Route
 // Public Routes
-Route::get('/', fn() => Inertia::render('Home', [
+Route::get('/', fn() => Inertia::render('Modules/Base/Pages/Home', [
     'message' => 'Welcome to Laravel + Inertia + Svelte 5!'
 ]));
 
 
 // 2. Main Site Routes
 Route::name('pages.')->group(function () {
-    Route::get('/team', fn() => Inertia::render('Other/Team'))->name('team');
-    Route::get('/contact', fn() => Inertia::render('Other/Contact'))->name('contact');
-    Route::get('/services', fn() => Inertia::render('Other/Services'))->name('services');
-    Route::get('/apps', fn() => Inertia::render('Other/Apps'))->name('apps');
+    Route::get('/team', fn() => Inertia::render('Modules/Base/Pages/Other/Team'))->name('team');
+    Route::get('/contact', fn() => Inertia::render('Modules/Base/Pages/Other/Contact'))->name('contact');
+    Route::get('/services', fn() => Inertia::render('Modules/Base/Pages/Other/Services'))->name('services');
+    Route::get('/apps', fn() => Inertia::render('Modules/Base/Pages/Other/Apps'))->name('apps');
 });
 // Access in Svelte via: route('pages.team') route('pages.contact') route('pages.services') route('pages.dashboard') route('pages.apps')
 
@@ -187,15 +187,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // 1. Define the GET routes for Fortify views and NAME them
 Route::get('/login', function () {
-    return Inertia::render('Auth/Login');
+    return Inertia::render('Modules/Auth/Login');
 })->name('login');
 
 Route::get('/register', function () {
-    return Inertia::render('Auth/Register');
+    return Inertia::render('Modules/Auth/Register');
 })->name('register');
 
 Route::get('/forgot-password', function () {
-    return Inertia::render('Auth/ForgotPassword');
+    return Inertia::render('Modules/Auth/ForgotPassword');
 })->name('password.request');
 
 
@@ -210,7 +210,7 @@ Route::get('/forgot-password', function () {
 
 
 // REQURIREMENTS
-Route::get('/requirements', fn() => Inertia::render('HomeReq', [
+Route::get('/requirements', fn() => Inertia::render('Modules/Requirements/Home', [
     'message' => 'Welcome to Laravel + Inertia + Svelte 5!'
 ]));
 

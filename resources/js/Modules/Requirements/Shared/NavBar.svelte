@@ -1,5 +1,7 @@
 <script>
-    import { page } from "@inertiajs/svelte";
+    import { auth } from "$modules/Auth/auth.svelte.js";
+
+    // import { page } from "@inertiajs/svelte";
 
     import { KAPKARA, ADMACTIONS, PATHS } from "$lib/config";
     import {
@@ -20,7 +22,7 @@
 
     import { router } from "@inertiajs/svelte";
 
-    let user = $derived($page.props.auth.user);
+    // let user = $derived($page.props.auth.user);
 
     // console.log("Navbar user:", user);
 
@@ -51,15 +53,10 @@
 </script>
 
 <nav class="navbar is-dark">
-
     <div class="navbar-brand">
-
         <a href="/" class="navbar-item has-text-white logo-bg">
             <span class="icon has-text-dark">
-                <img
-                    src="/images/tree-view.svg"
-                    alt="baykus logo"
-                />
+                <img src="/images/tree-view.svg" alt="baykus logo" />
             </span>
             <span class="has-text-weight-light">Requirements Management</span>
         </a>
@@ -78,144 +75,110 @@
         </button>
     </div>
 
+    {#if auth.isAuthenticated && auth.canAccessPDM}
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a href="/apps" class="navbar-item navbar-link">Admin</a>
 
-
-
-
-    <div id="navbarMenu" class="navbar-menu">
-        <div class="navbar-start">
-
-
-            <div class="navbar-item has-dropdown is-hoverable">
-                <a href="/apps" class="navbar-item navbar-link">Admin</a>
-
-                <div class="navbar-dropdown">
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <UsersRound size={18} />
-                        </span>
-                        <span>Users</span>
-                    </a>
+                            </span>
+                            <span>Users</span>
+                        </a>
 
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <HatGlasses size={18} />
-                        </span>
-                        <span>Roles</span>
-                    </a>
+                            </span>
+                            <span>Roles</span>
+                        </a>
 
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <Key size={18} />
-                        </span>
-                        <span>Permissions</span>
-                    </a>
+                            </span>
+                            <span>Permissions</span>
+                        </a>
 
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <Factory size={18} />
-                        </span>
-                        <span>Companies</span>
-                    </a>
-
+                            </span>
+                            <span>Companies</span>
+                        </a>
+                    </div>
                 </div>
 
-            </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a href="/projects" class="navbar-item navbar-link"
+                        >Projects</a
+                    >
 
-
-
-
-
-
-            <div class="navbar-item has-dropdown is-hoverable">
-                <a href="/projects" class="navbar-item navbar-link">Projects</a>
-
-                <div class="navbar-dropdown">
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-link">
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-link">
                                 <UsersRound size={18} />
-                        </span>
-                        <span>Work Packages</span>
-                    </a>
+                            </span>
+                            <span>Work Packages</span>
+                        </a>
 
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <HatGlasses size={18} />
-                        </span>
-                        <span>Project Milestones</span>
-                    </a>
+                            </span>
+                            <span>Project Milestones</span>
+                        </a>
 
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <Key size={18} />
-                        </span>
-                        <span>Project Phases</span>
-                    </a>
+                            </span>
+                            <span>Project Phases</span>
+                        </a>
 
-                    <a class="navbar-item" href="/admin/users">
-                        <span class="icon has-text-warning">
+                        <a class="navbar-item" href="/admin/users">
+                            <span class="icon has-text-warning">
                                 <Factory size={18} />
-                        </span>
-                        <span>Witnesses</span>
-                    </a>
-
+                            </span>
+                            <span>Witnesses</span>
+                        </a>
+                    </div>
                 </div>
 
+                <a href="/services" class="navbar-item">
+                    <span class="icon has-text-warning">
+                        <HandHelping size={18} />
+                    </span>
+                    <span>MoCs</span>
+                </a>
+                <a href="/team" class="navbar-item">
+                    <span class="icon has-text-warning">
+                        <Users size={18} />
+                    </span>
+                    <span>PoCs</span>
+                </a>
+                <a href="/contact" class="navbar-item">
+                    <span class="icon has-text-warning">
+                        <ContactRound size={18} />
+                    </span>
+                    <span>Tests</span>
+                </a>
+
+                <a href="/contact" class="navbar-item">
+                    <span class="icon has-text-warning">
+                        <ContactRound size={18} />
+                    </span>
+                    <span>Chapters</span>
+                </a>
             </div>
-
-
-
-
-
-
-
-
-
-            <a href="/services" class="navbar-item">
-                <span class="icon has-text-warning">
-                    <HandHelping size={18} />
-                </span>
-                <span>MoCs</span>
-            </a>
-            <a href="/team" class="navbar-item">
-                <span class="icon has-text-warning">
-                    <Users size={18} />
-                </span>
-                <span>PoCs</span>
-            </a>
-            <a href="/contact" class="navbar-item">
-                <span class="icon has-text-warning">
-                    <ContactRound size={18} />
-                </span>
-                <span>Tests</span>
-            </a>
-
-
-            <a href="/contact" class="navbar-item">
-                <span class="icon has-text-warning">
-                    <ContactRound size={18} />
-                </span>
-                <span>Chapters</span>
-            </a>
-
-
         </div>
-    </div>
-
-
-
-
-
-
-
-
-
-
+    {/if}
 
     <div id="navbarMenu" class="navbar-menu">
         <div class="navbar-end">
-
-
             <div class="navbar-item has-dropdown is-hoverable">
                 <a href="/apps" class="navbar-item navbar-link">Export</a>
 
@@ -234,14 +197,12 @@
                 </div>
             </div>
 
-
-
-            {#if user}
+            {#if auth.isAuthenticated}
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a
                         href="/apps"
                         class="navbar-item navbar-link has-text-info"
-                        >{user.name}</a
+                        >{auth.user.name} {auth.user.lastname}</a
                     >
 
                     <div class="navbar-dropdown">
@@ -284,9 +245,8 @@
     </div>
 </nav>
 
-
 <style>
-    .logo-bg     {
+    .logo-bg {
         background-color: #cc0f35;
     }
 </style>

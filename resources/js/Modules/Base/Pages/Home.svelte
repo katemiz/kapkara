@@ -1,15 +1,14 @@
 <script>
-    import Layout from "../Shared/LayoutReq.svelte";
+    import Layout from "$modules/Base/Shared/Layout.svelte";
 
     import { KAPKARA } from "$lib/config";
-
 </script>
 
 <svelte:head>
     <title>{KAPKARA.name}, {KAPKARA.description}</title>
 </svelte:head>
 
-<LayoutReq>
+<Layout>
     <section class="hero is-medium is-bold">
         <div class="hero-body has-background-grey-lighter">
             <div class="container has-text-right">
@@ -46,4 +45,4 @@
             </div>
         </div>
     </section>
-</LayoutReq>
+</Layout>

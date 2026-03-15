@@ -12,31 +12,29 @@ export default defineConfig({
             refresh: true,
         }),
 
-
         svelte({
-            compilerOptions: {
-                hydratable: true,
-            },
+            // Vite will now automatically find svelte.config.js
         }),
-
 
     ],
     server: {
         watch: {
-            ignored: ['**/storage/framework/views/**'],
+            // Add '**/vendor/**' to the ignored list
+            ignored: [
+                '**/storage/framework/views/**',
+                '**/vendor/**',
+                '**/node_modules/**'
+            ],
         },
     },
 
 
-
     resolve: {
         alias: {
-            // Map $lib to the resources/js/lib directory
-            '$lib': path.resolve(__dirname, './resources/js/lib'),
-            '$shared': path.resolve(__dirname, 'resources/js/Shared'),
-
-            // Optional: you can also map $components
-            '$components': path.resolve(__dirname, './resources/js/lib/components'),
+            '$lib': path.resolve(__dirname, './resources/js/Lib'),
+            // '$shared': path.resolve(__dirname, './resources/js/Shared'),
+            '$components': path.resolve(__dirname, './resources/js/Components'),
+            '$modules': path.resolve(__dirname, './resources/js/Modules')
         },
     },
 

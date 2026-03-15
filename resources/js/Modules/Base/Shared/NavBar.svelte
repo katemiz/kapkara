@@ -1,7 +1,9 @@
 <script>
-    import { page } from "@inertiajs/svelte";
+    // import { page } from "@inertiajs/svelte";
+    import { auth } from "$modules/Auth/auth.svelte.js";
 
     import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
+
     import {
         House,
         HandHelping,
@@ -16,7 +18,7 @@
 
     import { router } from "@inertiajs/svelte";
 
-    let user = $derived($page.props.auth.user);
+    // let user = $derived($page.props.auth.user);
 
     document.addEventListener("DOMContentLoaded", () => {
         // Get all "navbar-burger" elements
@@ -121,12 +123,12 @@
                 <span>Contact</span>
             </a>
 
-            {#if user}
+            {#if auth.isAuthenticated}
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a
                         href="/apps"
                         class="navbar-item navbar-link has-text-info"
-                        >{user.name}</a
+                        >{auth.user.name} {auth.user.lastname}</a
                     >
 
                     <div class="navbar-dropdown">
