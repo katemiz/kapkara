@@ -1,10 +1,10 @@
 export const KAPKARA = {
     name: "kapkara",
-    link: "https://kapkara.one",
+    link: "/",
     logo: "Apps/baykus_orange.svg",
     motto: "simplicity in action",
     title: "kapkara web technologies | design house",
-    url: "kapkara.one",
+    url: "/",
     description: "web technologies",
     app_header_logo: "app_header_logo.svg",
     app_footer_logo: "app_footer_logo.svg",

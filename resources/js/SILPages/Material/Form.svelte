@@ -3,10 +3,10 @@
     import { page } from "@inertiajs/svelte";
 
     import Layout from "$shared/Layout.svelte";
-    import Editor from "$lib/components/Editor.svelte";
-    import FormInput from "$lib/components/FormInput.svelte";
-    import FormSelect from "$lib/components/FormSelect.svelte";
-    import FilesList from "$lib/components/FilesList.svelte";
+    import Editor from "$components/Editor.svelte";
+    import FormInput from "$components/FormInput.svelte";
+    import FormSelect from "$components/FormSelect.svelte";
+    import FilesList from "$components/FilesList.svelte";
     import ActionButtons from "$components/ActionButtons.svelte";
 
     import FormRadio from "$components/FormRadio.svelte";

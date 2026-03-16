@@ -1,9 +1,9 @@
 <script>
     import { useForm } from "@inertiajs/svelte";
 
-    import Title from "$lib/components/Title.svelte";
-    import FormInput from "$lib/components/FormInput.svelte";
-    import LangSwitch from "$lib/components/LangSwitch.svelte";
+    import Title from "$components/Title.svelte";
+    import FormInput from "$components/FormInput.svelte";
+    import LangSwitch from "$components/LangSwitch.svelte";
 
     let form = useForm({
         name: "",

@@ -3,19 +3,19 @@
     import { page } from "@inertiajs/svelte";
 
     import Layout from "$shared/Layout.svelte";
-    import Editor from "$lib/components/Editor.svelte";
-    import FormInput from "$lib/components/FormInput.svelte";
-    import FormSelect from "$lib/components/FormSelect.svelte";
-    import FilesList from "$lib/components/FilesList.svelte";
+    import Editor from "$components/Editor.svelte";
+    import FormInput from "$components/FormInput.svelte";
+    import FormSelect from "$components/FormSelect.svelte";
+    import FilesList from "$components/FilesList.svelte";
     import ActionButtons from "$components/ActionButtons.svelte";
 
-    import FormRadio from "$lib/components/FormRadio.svelte";
-    import FormCheckBoxSingle from "$lib/components/FormCheckBoxSingle.svelte";
-    import FormCheckBoxMultiple from "$lib/components/FormCheckBoxMultiple.svelte";
-    import FormDate from "$lib/components/FormDate.svelte";
-    import FormUpload from "$lib/components/FormUpload.svelte";
+    import FormRadio from "$components/FormRadio.svelte";
+    import FormCheckBoxSingle from "$components/FormCheckBoxSingle.svelte";
+    import FormCheckBoxMultiple from "$components/FormCheckBoxMultiple.svelte";
+    import FormDate from "$components/FormDate.svelte";
+    import FormUpload from "$components/FormUpload.svelte";
 
-    import Title from "$lib/components/Title.svelte";
+    import Title from "$components/Title.svelte";
 
     import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 

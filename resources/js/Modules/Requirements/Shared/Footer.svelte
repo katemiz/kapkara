@@ -1,61 +1,14 @@
 <script>
-    import { KAPKARA, PATHS } from "$lib/config";
+    import { KAPKARA, PATHS, MYAPPS } from "$lib/config";
 </script>
 
-<footer class="footer has-background-dark" id="footer">
-    <div class="columns has-text-white">
-        <div class="column has-text-centered-mobile">
-            <img
-                src="{PATHS.path_images_prefix}{KAPKARA.logo}"
-                width="28px"
-                alt="Company Icon"
-            />
-            <br />
-            <a href={KAPKARA.url} class="has-text-weight-light has-text-white">
-                {KAPKARA.name}
-            </a>
-        </div>
 
-        <div class="column">
-            <p
-                class="has-text-weight-light has-text-centered has-text-centered-mobile"
-            >
-                {KAPKARA.title}
-            </p>
-            <p
-                class="has-text-weight-light has-text-centered has-text-centered-mobile is-size-7"
-            >
-                {KAPKARA.version}
-            </p>
-
-            <p
-                class="has-text-centered has-text-centered-mobile has-text-grey is-size-6"
-            >
-                Laravel-Inertia-Svelte
-            </p>
-        </div>
-
-        <div class="column">
-            <p
-                class="has-text-weight-light has-text-right has-text-centered-mobile"
-            >
-                {KAPKARA.copyright}
-            </p>
-            <p
-                class="has-text-weight-light has-text-right has-text-centered-mobile
-          is-size-7"
-            >
-                {KAPKARA.motto}
-            </p>
-        </div>
-    </div>
-</footer>
 
 <footer class="footer has-background-dark">
     <div class="columns has-text-white">
         <div class="column has-text-centered-mobile">
             <a href={KAPKARA.url} class="icon-text has-color-warning">
-                <span class="icon has-text-grey-light">
+                <span class="icon has-text-grey-light mb-2">
                     <img
                         src="{PATHS.path_images_prefix}{KAPKARA.logo}"
                         alt="kapkara logo"
@@ -64,33 +17,17 @@
                 </span>
             </a>
             <br />
-            <span class="ml-1 block">{KAPKARA.name}</span>
+            <a href={KAPKARA.url} class="mt-6 has-text-white">
+                {KAPKARA.name}
+            </a>
         </div>
         <div class="column">
-            <p
-                class="has-text-weight-light has-text-centered has-text-centered-mobile"
-            >
-                <span class="icon has-text-link has-text-centered is-block">
-                    <img
-                        src="/images/Apps/tree-view.svg"
-                        alt="Requirements Management Logo"
-                    />
-                </span>
 
-                <span class="ml-1 block">Requirements Stack</span>
-                <span class="ml-1 block is-size-7 has-text-warning">
-                    Manage Requirements in a Database
-                </span>
-
-                by
-
-                <span class="ml-1 block">{KAPKARA.title}</span>
-            </p>
 
             <p
-                class="has-text-weight-light has-text-centered has-text-centered-mobile"
+                class="has-text-weight-light has-text-info has-text-centered has-text-centered-mobile"
             >
-                <span class="icon has-text-info has-text-centered">
+                <span class="icon has-text-centered">
                     <img
                         src="/images/Apps/tree-view.svg"
                         alt="Requirements Management Logo"
@@ -101,16 +38,16 @@
             <p
                 class="has-text-weight-light has-text-centered has-text-centered-mobile"
             >
-                Requirements Stack
+                {MYAPPS[1].name}
             </p>
 
             <p
                 class="has-text-weight-light has-text-centered has-text-centered-mobile is-size-7 has-text-warning"
             >
-                Manage Requirements in a Database
+                {MYAPPS[1].label}
             </p>
 
-            by
+            <p class="has-text-weight-light has-text-centered has-text-centered-mobile is-size-7 has-text-grey">by</p>
 
             <p
                 class="has-text-weight-light has-text-centered has-text-centered-mobile"
@@ -122,7 +59,7 @@
             <p
                 class="has-text-weight-light has-text-right has-text-centered-mobile"
             >
-                23.02
+                {KAPKARA.version}
             </p>
             <p
                 class="has-text-weight-light has-text-right has-text-centered-mobile is-size-7"
