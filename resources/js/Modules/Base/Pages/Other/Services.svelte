@@ -58,7 +58,10 @@
             {#if activeTab == 1}
                 <div class="columns">
                     <div class="column is-half">
-                        <img src="/images/service_web.svg" alt="Web Services" />
+                        <img
+                            src="/images/Base/service_web.svg"
+                            alt="Web Services"
+                        />
                     </div>
 
                     <div class="column content">

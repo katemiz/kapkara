@@ -54,7 +54,7 @@
 
             <div class="column">
                 <figure class="image">
-                    <img src="/images/contact_us.svg" alt="Contact Us" />
+                    <img src="/images/Base/contact_us.svg" alt="Contact Us" />
                 </figure>
             </div>
         </div>

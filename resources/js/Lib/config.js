@@ -1,7 +1,7 @@
 export const KAPKARA = {
     name: "kapkara",
     link: "https://kapkara.one",
-    logo: "baykus_orange.svg",
+    logo: "Apps/baykus_orange.svg",
     motto: "simplicity in action",
     title: "kapkara web technologies | design house",
     url: "kapkara.one",
@@ -9,7 +9,7 @@ export const KAPKARA = {
     app_header_logo: "app_header_logo.svg",
     app_footer_logo: "app_footer_logo.svg",
     version: "1.0",
-    copyright: "© 2022",
+    copyright: "© All Rights Reserved 2022",
 };
 
 export const MYAPPS = [
@@ -19,7 +19,7 @@ export const MYAPPS = [
         logo: "pdm.svg",
         app_hero: "AppHero-PDM.svg",
         img: "pdm.svg",
-        url: "https://pdm.kapkara.one",
+        url: "/pdm",
         desc: `<p>a Product Data Management (PDM) program designed for small businesses without the budget to purchase large PDM programs with CAD integration.
               This online application manages product data for small businesses at a very low cost.
 

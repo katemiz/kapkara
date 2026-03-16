@@ -56,7 +56,10 @@
     <div class="navbar-brand">
         <a href="/" class="navbar-item has-text-white logo-bg">
             <span class="icon has-text-dark">
-                <img src="/images/tree-view.svg" alt="baykus logo" />
+                <img
+                    src="/images/Apps/tree-view.svg"
+                    alt="Requirements Management Logo"
+                />
             </span>
             <span class="has-text-weight-light">Requirements Management</span>
         </a>

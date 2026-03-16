@@ -14,7 +14,7 @@
             <div class="container has-text-right">
                 <div class="columns">
                     <div class="column is-half">
-                        <img src="/images/hero.svg" alt="Logo" />
+                        <img src="/images/Base/hero.svg" alt="Logo" />
                     </div>
                     <div class="column">
                         <h1 class="title has-text-weight-light is-size-1">
