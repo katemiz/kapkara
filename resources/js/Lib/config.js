@@ -13,6 +13,7 @@ export const KAPKARA = {
 };
 
 export const MYAPPS = [
+
     {
         name: "PDM",
         label: "Product Data Management",
@@ -37,7 +38,7 @@ export const MYAPPS = [
 
     {
         name: "Requirements Management",
-        label: "Requirements Management",
+        label: "Manage Requirements Online",
         logo: "tree-view.svg",
         app_hero: "AppHero-RM.svg",
         img: "requirements-stack.svg",

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MaterialController;
-use App\Http\Controllers\AnswerController;  
+use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\MediaController;
 
 use App\Http\Controllers\UserController;
@@ -69,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    
+
     // Get media for a model
     // Route::get('/media/{modelType}/{modelId}', [MediaController::class, 'index'])
     //     ->name('media.index');
@@ -91,9 +91,9 @@ Route::middleware(['auth'])->group(function () {
 
 // Protected Application Routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     Route::resource('question', QuestionController::class);
-    Route::resource('answer', AnswerController::class); 
+    Route::resource('answer', AnswerController::class);
     Route::resource('material', MaterialController::class);
     Route::resource('user', UserController::class);
 
@@ -102,8 +102,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 // 1. Define the GET routes for Fortify views and NAME them
-Route::get('/login', function () {
-    return Inertia::render('Modules/Auth/Login');
+Route::get('/login/{sayfa?}', function ($sayfa = null) {
+    return Inertia::render('Modules/Auth/Login', compact('sayfa'));
 })->name('login');
 
 Route::get('/register', function () {
@@ -125,8 +125,28 @@ Route::get('/forgot-password', function () {
 
 
 
-// REQURIREMENTS
+// REQUIREMENTS
 Route::get('/requirements', fn() => Inertia::render('Modules/Requirements/Home', [
     'message' => 'Welcome to Laravel + Inertia + Svelte 5!'
 ]));
+
+Route::get('/pdm', fn() => Inertia::render('Modules/PDM/Home', [
+    'message' => 'Welcome to Laravel + Inertia + Svelte 5!'
+]));
+
+
+
+
+// PDM
+Route::middleware(['auth', 'verified'])->group(function () {
+
+
+
+    Route::resource('/pdm/material', MaterialController::class);
+
+
+    Route::resource('question', QuestionController::class);
+    Route::resource('answer', AnswerController::class);
+    Route::resource('user', UserController::class);
+});
 

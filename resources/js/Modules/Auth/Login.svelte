@@ -1,11 +1,20 @@
 <script>
-    import { useForm } from "@inertiajs/svelte";
+    import { useForm,router } from "@inertiajs/svelte";
 
     import Title from "$components/Title.svelte";
     import FormInput from "$components/FormInput.svelte";
     import LangSwitch from "$components/LangSwitch.svelte";
 
-    let { status } = $props(); // Laravel often sends a status message (e.g., password reset success)
+
+
+    import { page } from '@inertiajs/svelte';
+
+
+
+
+
+
+    let { status,sayfa } = $props(); // Laravel often sends a status message (e.g., password reset success)
 
     let form = useForm({
         email: "",
@@ -13,15 +22,41 @@
         remember: false,
     });
 
-    function submit(e) {
+/*     function submit(e) {
         e.preventDefault();
         $form.post("/login", {
+
+            onSuccess: () => {
+                // 1. Fallback to 'dashboard' or 'home' if sayfa is null/undefined
+                const destination = sayfa ? `/${sayfa}` : '/';
+
+                console.log("Redirecting to:", destination);
+
+                // 2. Use the destination variable
+                router.visit(destination);
+            },
+
+            onFinish: () => $form.reset("password"),
+        });
+    } */
+
+    function submit(e) {
+        e.preventDefault();
+        // Include the redirect target in the POST data
+        $form.transform((data) => ({
+            ...data,
+            redirect_to: sayfa ? `/${sayfa}` : '/'
+        })).post("/login", {
             onFinish: () => $form.reset("password"),
         });
     }
+
+
+
 </script>
 
 <section class="section container is-max-desktop">
+
     <div class="kutu column is-offset-3 is-half p-5 has-background-white-ter">
         <nav class="level is-mobile mb-6">
             <!-- Left side -->

@@ -3,6 +3,10 @@
     import { auth } from "$modules/Auth/auth.svelte.js";
 
     import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
+    import { logout } from "$lib/common_functions.js";
+
+    import { Link } from '@inertiajs/svelte'
+    import { router } from '@inertiajs/svelte';
 
     import {
         House,
@@ -14,36 +18,14 @@
         Database,
         Bird,
         Box,
+        ShieldUser
     } from "@lucide/svelte";
 
-    import { router } from "@inertiajs/svelte";
+    // import { router } from "@inertiajs/svelte";
 
     // let user = $derived($page.props.auth.user);
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // Get all "navbar-burger" elements
-        const navbarBurgers = Array.prototype.slice.call(
-            document.querySelectorAll(".navbar-burger"),
-            0,
-        );
 
-        // Add a click event on each of them
-        navbarBurgers.forEach((el) => {
-            el.addEventListener("click", () => {
-                // Get the target from the "data-target" attribute
-                const target = el.dataset.target;
-                const target2 = document.getElementById(target);
-
-                // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-                el.classList.toggle("is-active");
-                target2.classList.toggle("is-active");
-            });
-        });
-    });
-
-    function logout() {
-        router.post("/logout");
-    }
 </script>
 
 <nav class="navbar is-dark">
@@ -90,6 +72,16 @@
                 <a href="/apps" class="navbar-item navbar-link">Apps</a>
 
                 <div class="navbar-dropdown">
+
+                    {#if auth.isAuthenticated && auth.hasRole('admin')}
+                    <a class="navbar-item" href='/admin'>
+                        <span class="icon">
+                            <ShieldUser size={18} />
+                        </span>
+                        <span>Admin Panel</span>
+                    </a>
+                    {/if}
+
                     {#each MYAPPS as app}
                         <a class="navbar-item" href={app.url}>
                             <span class="icon has-text-warning">
@@ -123,6 +115,8 @@
                 <span>Contact</span>
             </a>
 
+
+
             {#if auth.isAuthenticated}
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a
@@ -145,19 +139,31 @@
                             <span>Question 2</span>
                         </a>
 
-                        <a class="navbar-item" href="/material">
+                        <a class="navbar-item" href="/pdm/material">
                             <span class="icon">
                                 <Box size={18} />
                             </span>
                             <span>Material</span>
                         </a>
 
-                        <button onclick={logout} class="navbar-item">
+
+
+                        <button
+                            type="button"
+                            class="navbar-item"
+                            onclick={() => router.post('/logout', {}, {
+                                onSuccess: () => router.visit('/')
+                            })}
+                        >
                             <span class="icon">
                                 <LogOut size={18} />
                             </span>
                             <span>Logout</span>
                         </button>
+
+
+
+
                     </div>
                 </div>
             {:else}

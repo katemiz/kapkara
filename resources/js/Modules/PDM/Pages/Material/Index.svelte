@@ -1,8 +1,8 @@
 <script>
-    import Layout from "../../Shared/Layout.svelte";
-    import Title from "$lib/components/Title.svelte";
-    import Paginate from "$lib/components/Paginate.svelte";
-    import TableRecordsInfo from "$lib/components/TableRecordsInfo.svelte";
+    import Layout from "$modules/PDM/Shared/Layout.svelte";
+    import Title from "$components/Title.svelte";
+    import Paginate from "$components/Paginate.svelte";
+    import TableRecordsInfo from "$components/TableRecordsInfo.svelte";
 
     import { Search, Plus, X, Eye, Pencil } from "@lucide/svelte";
     import { router } from "@inertiajs/svelte";

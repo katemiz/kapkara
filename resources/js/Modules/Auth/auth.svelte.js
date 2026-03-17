@@ -1,19 +1,27 @@
 import { page } from '@inertiajs/svelte';
-import { get } from 'svelte/store'; // 1. Import the get helper
 
 class AuthState {
-    // 2. Use a getter or a function to track the store value
-    // This tells the $derived rune to track the store's current value
-    user = $derived(get(page)?.props?.auth?.user ?? null);
 
-    get isAuthenticated() {
-        return this.user !== null;
+    // 1. Declare private reactive state using Svelte 5 runes
+    #user = $state(null);
+
+    constructor() {
+        // 2. Subscribe to the Inertia store.
+        // Whenever Laravel sends new data (like after logout), this fires.
+        page.subscribe(($page) => {
+            //console.log("Updating AuthState:", $page?.props?.auth?.user?.name);
+            this.#user = $page?.props?.auth?.user ?? null;
+        });
     }
 
+    // 3. GETTERS are mandatory for Svelte 5 to track reactivity in components
+    get user() {
+        return this.#user;
+    }
 
-
-
-
+    get isAuthenticated() {
+        return this.#user !== null;
+    }
 
     // Check for a specific role
     hasRole(role) {
@@ -30,9 +38,9 @@ class AuthState {
         return this.hasRole('admin') || this.can('view_pdm');
     }
 
-
-
-
+    get canAccessReqs() {
+        return this.hasRole('admin') || this.can('view_reqs');
+    }
 }
 
 export const auth = new AuthState();

@@ -25,7 +25,3 @@ createInertiaApp({
         mount(App, { target: el, props });
     },
 });
-
-
-
-

@@ -27,7 +27,7 @@
                 <div class="level-item">
                     <a href="/">
                         <img
-                            src="/images/baykus_orange.svg"
+                            src="/images/Apps/baykus_orange.svg"
                             width="24px"
                             alt="Logo"
                         />

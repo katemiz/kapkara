@@ -18,7 +18,7 @@ class MaterialController extends Controller
             [ "value" => "1","label" => "Aluminium"],
             [ "value" => "2","label" => "Steel"],
             [ "value" => "3","label" => "Copper"],
-            [ "value" => "4","label" => "Plastic"] 
+            [ "value" => "4","label" => "Plastic"]
         ],
 
         "materialForms" => [
@@ -33,7 +33,7 @@ class MaterialController extends Controller
 
             [ "value" => 0,"label" => "Inactive"],
             [ "value" => 1,"label" => "Active"]
-        ]   
+        ]
     ];
 
 
@@ -63,10 +63,7 @@ class MaterialController extends Controller
      */
     public function index(Request $request)
     {
-
-
-
-        return Inertia::render('Material/Index', [
+        return Inertia::render('Modules/PDM/Material/Index', [
                 // 'filters' sends the search term back to Svelte so the input stays filled
                 'per_page' => config('pagination.per_page'),
                 'filters' => $request->only(['search']),
@@ -82,24 +79,28 @@ class MaterialController extends Controller
             ]);
     }
 
+
+
     /**
      * Show the form for creating a new question.
      */
     public function create()
     {
-        return Inertia::render('Material/Form', [
+        return Inertia::render('Modules/PDM/Material/Form', [
             'material' => $this->material,
             'isEdit' => false,
             'supportFixedData' =>$this->supportFixedData,
         ]);
     }
 
+
+
     /**
      * Store a newly created question in storage.
      */
     public function store(Request $request)
     {
-        $theData = $this->readInput($request);  
+        $theData = $this->readInput($request);
 
         $material = Material::create($theData);
 
@@ -109,14 +110,15 @@ class MaterialController extends Controller
             ->with('success', 'Material created successfully.');
     }
 
+
     /**
      * Display the specified question.
      */
     public function show($idMaterial)
     {
         $material = Material::findOrFail($idMaterial);
-        
-        return Inertia::render('Material/Show', [
+
+        return Inertia::render('Modules/PDM/Material/Show', [
             'material' => $material
         ]);
     }
@@ -133,10 +135,10 @@ class MaterialController extends Controller
         //$material["myCheckboxMultiple"] = $this->convertJsonToArray($material["myCheckboxMultiple"]);
 
 
-        return Inertia::render('Material/Form', [
+        return Inertia::render('Modules/PDM/Material/Form', [
             'material' => $material,
             'isEdit' => true,
-            'supportFixedData' =>$this->supportFixedData  
+            'supportFixedData' =>$this->supportFixedData
         ]);
     }
 
@@ -147,7 +149,7 @@ class MaterialController extends Controller
     {
         $material = Material::findOrFail($idMaterial);
 
-        $theData = $this->readInput($request);  
+        $theData = $this->readInput($request);
 
         $this->spatieMultiple($request,$material);
 
@@ -186,7 +188,7 @@ class MaterialController extends Controller
 
 
 
-    public function readInput($request) 
+    public function readInput($request)
     {
 
         // This will stop execution and show all data sent from the form
@@ -237,15 +239,15 @@ class MaterialController extends Controller
         if (is_array($data)) {
             return array_map('strval', $data);
         }
-        
+
         // If it's a JSON string, decode it
         if (is_string($data)) {
             $decoded = json_decode($data, true); // true = return as array
-            
+
             // Return array of strings, or empty array if null
             return $decoded ? array_map('strval', $decoded) : [];
         }
-        
+
         // Default to empty array
         return [];
     }
@@ -275,10 +277,10 @@ class MaterialController extends Controller
 
         // 3. Check and process multiple files
         if ($request->hasFile('materialFiles')) {
-            
+
             // The request->file('myUpload') returns an array of UploadedFile objects
-            $files = $request->file('materialFiles'); 
-            
+            $files = $request->file('materialFiles');
+
             foreach ($files as $file) {
                 if ($file->isValid()) {
                     try {
@@ -300,7 +302,7 @@ class MaterialController extends Controller
         // 4. Handle files uploaded via the editor (if any)
         // If your editor text contains temporary media IDs, this is where you would re-associate them.
         // For simplicity here, we assume the editor images are handled separately or by ID.
-        
+
         //dd("Form submitted successfully. Files uploaded: {$uploadedCount}");
         return true;
 

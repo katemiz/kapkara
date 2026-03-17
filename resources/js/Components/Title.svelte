@@ -8,11 +8,19 @@
      * <Title
      *   title={form}
      *   subtitle="interests"
+     *   css1="class1 class 2"
+     *   css1="class1 class 2"
      * />
      */
 
-    let { title, subtitle } = $props();
+    let { title, subtitle, css1,css2 } = $props();
 </script>
 
-<h1 class="title">{title}</h1>
-<h2 class="subtitle">{subtitle}</h2>
+{#if title}
+<h1 class="title {css1 ? css1: ''}">{title}</h1>
+{/if}
+
+{#if subtitle}
+<h2 class="subtitle {css2 ? css2: ''}" >{subtitle}</h2>
+{/if}
+

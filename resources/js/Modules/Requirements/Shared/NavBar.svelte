@@ -1,8 +1,6 @@
 <script>
     import { auth } from "$modules/Auth/auth.svelte.js";
 
-    // import { page } from "@inertiajs/svelte";
-
     import { KAPKARA, ADMACTIONS, PATHS } from "$lib/config";
     import {
         House,
@@ -22,9 +20,7 @@
 
     import { router } from "@inertiajs/svelte";
 
-    // let user = $derived($page.props.auth.user);
 
-    // console.log("Navbar user:", user);
 
     document.addEventListener("DOMContentLoaded", () => {
         // Get all "navbar-burger" elements
@@ -47,9 +43,7 @@
         });
     });
 
-    function logout() {
-        router.post("/logout");
-    }
+
 </script>
 
 <nav class="navbar is-dark">
@@ -78,7 +72,7 @@
         </button>
     </div>
 
-    {#if auth.isAuthenticated && auth.canAccessPDM}
+    {#if auth.isAuthenticated && auth.canAccessReqs}
         <div id="navbarMenu" class="navbar-menu">
             <div class="navbar-start">
                 <div class="navbar-item has-dropdown is-hoverable">
@@ -182,6 +176,8 @@
 
     <div id="navbarMenu" class="navbar-menu">
         <div class="navbar-end">
+
+            {#if auth.isAuthenticated && auth.canAccessReqs}
             <div class="navbar-item has-dropdown is-hoverable">
                 <a href="/apps" class="navbar-item navbar-link">Export</a>
 
@@ -199,6 +195,7 @@
                     {/each}
                 </div>
             </div>
+            {/if}
 
             {#if auth.isAuthenticated}
                 <div class="navbar-item has-dropdown is-hoverable">
@@ -229,16 +226,35 @@
                             <span>Material</span>
                         </a>
 
-                        <button onclick={logout} class="navbar-item">
+
+
+
+
+
+
+
+                        <button
+                            type="button"
+                            class="navbar-item"
+                            onclick={() => router.post('/logout', { sayfa: 'requirements' })}
+                        >
                             <span class="icon">
                                 <LogOut size={18} />
                             </span>
                             <span>Logout</span>
                         </button>
+
+
+
+
+
+
+
+
                     </div>
                 </div>
             {:else}
-                <a href={"/login"} class="navbar-item">
+                <a href={"/login/requirements"} class="navbar-item">
                     <span class="icon has-text-warning">
                         <User size={18} color="#3e9392" />
                     </span>
