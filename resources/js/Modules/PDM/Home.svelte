@@ -60,7 +60,7 @@
                 <Title title="{content.title}" css1="is-size-4 has-text-weight-light mb-6 has-text-right"/>
 
                 <figure class="image ">
-                    <img src="images/PDM/hero.png" alt="PDM Hero">
+                    <img src="images/PDM/hero2.png" alt="PDM Hero">
                 </figure>
             </div>
         </div>

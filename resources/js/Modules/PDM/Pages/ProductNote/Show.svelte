@@ -8,21 +8,21 @@
 
     import { Sheet, Pencil, ClipboardPlus } from "@lucide/svelte";
 
-    let { material } = $props();
+    let { product_note } = $props();
 
-    let url = $derived(window.location.origin + "/material/" + material.id);
+    let url = $derived(window.location.origin + "/product-note/" + product_note.id);
 </script>
 
 <Layout>
     <section class="section min-height-screen">
-        <Title title="Material {material.id}" subtitle="Show Properties" />
+        <Title title="Product Note {product_note.id}" subtitle="Show Properties" />
 
-        <ActionButtons item={material} form_type="show" route_name="material" />
+        <ActionButtons item={product_note} form_type="show" route_name="pdm/product-note" />
 
-        <p class="subtitle">{material.description}</p>
-        <p>{@html material.remarks}</p>
+        <p class="subtitle">{product_note.description_tr}</p>
+        <p>{@html product_note.remarks}</p>
 
-        <FilesList media={material.files} />
-        <RecordData item={material} {url} />
+        <FilesList media={product_note.files} />
+        <RecordData item={product_note} {url} />
     </section>
 </Layout>

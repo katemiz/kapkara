@@ -7,7 +7,7 @@
     import { Search, Plus, X, Eye, Pencil } from "@lucide/svelte";
     import { router } from "@inertiajs/svelte";
 
-    let { materials, filters, per_page } = $props();
+    let { product_notes, filters, per_page, supportFixedData } = $props();
 
     // Initialize from filters, but allow independent updates
     let searchTerm = $state("");
@@ -22,7 +22,7 @@
 
     function doSearch() {
         router.get(
-            "/pdm/material",
+            "/pdm/product-note",
             {
                 search: searchTerm,
                 page: 1, // Explicitly reset to page 1 on every new search
@@ -50,17 +50,37 @@
             }
         }, 300); // Wait 300ms after user stops typing
     };
+
+
+    function findInArray(value, inWhat) {
+
+        if (inWhat === "status") {
+            var arr = supportFixedData.productNoteIsActive;
+            const found = arr.find(item => item.value === value);
+            return found ? found.label : value;
+        }
+
+        if (inWhat === "category") {
+            var arr = supportFixedData.productNoteCategories;
+
+            const found = arr.find(item => item.value === value);
+            return found ? found.description_en+' / '+found.description_tr : value;
+        }
+    }
+
+
 </script>
 
 <Layout>
     <section class="section min-height-screen">
-        <Title title="Material" subtitle="List of All Materials" />
+
+        <Title title="Product Notes" subtitle="List of All Product Notes" />
 
         <nav class="level is-mobile">
             <!-- Left side -->
             <div class="level-left">
                 <p class="buttons">
-                    <a href="/pdm/material/create" class="button is-link">
+                    <a href="/pdm/product-note/create" class="button is-link">
                         <span class="icon is-small">
                             <Plus size="16" />
                         </span>
@@ -95,35 +115,40 @@
             </div>
         </nav>
 
-        <TableRecordsInfo results={materials} {per_page} />
+        <TableRecordsInfo results={product_notes} {per_page} />
 
-        {#if materials.data.length > 0}
+        {#if product_notes.data.length > 0}
             <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name/Description</th>
-                        <th>Specification</th>
+                        <th>Product Note Category</th>
+                        <th>Description [Türkçe]</th>
+                        <th>Description [English]</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {#each materials.data as material}
+                    {#each product_notes.data as product_note}
                         <tr>
-                            <td>{material.id}</td>
-                            <td>{material.description}</td>
+                            <td>{product_note.id}</td>
+                            <td>{findInArray(product_note.category, "category")}</td>
+                            <td>{@html product_note.description_tr}</td>
+                            <td>{@html product_note.description_en}</td>
 
-                            <td>{@html material.specification}</td>
+                            <td>{findInArray(product_note.is_active, "status")}</td>
+
                             <td>
-                                <a href="/pdm/material/{material.id}"
-                                    ><Eye size="24" /></a
-                                >
+                                <a href="/pdm/product-note/{product_note.id}">
+                                    <Eye size="24" />
+                                </a>
 
                                 <a
-                                    href="/pdm/material/{material.id}/edit"
-                                    class="ml-2"><Pencil size="20" /></a
-                                >
+                                    href="/pdm/product-note/{product_note.id}/edit"
+                                    class="ml-2"><Pencil size="20" />
+                                </a>
                             </td>
                         </tr>
                     {/each}
@@ -131,11 +156,11 @@
             </table>
         {:else}
             <div class="notification is-warning is-light">
-                No materials exist
+                No product notes exist
             </div>
         {/if}
 
         <!-- Pagination component here -->
-        <Paginate items={materials} />
+        <Paginate items={product_notes} />
     </section>
 </Layout>

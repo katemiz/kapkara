@@ -7,7 +7,7 @@
     import { Search, Plus, X, Eye, Pencil } from "@lucide/svelte";
     import { router } from "@inertiajs/svelte";
 
-    let { materials, filters, per_page } = $props();
+    let { standards, filters, per_page, supportFixedData } = $props();
 
     // Initialize from filters, but allow independent updates
     let searchTerm = $state("");
@@ -22,7 +22,7 @@
 
     function doSearch() {
         router.get(
-            "/pdm/material",
+            "/pdm/standard",
             {
                 search: searchTerm,
                 page: 1, // Explicitly reset to page 1 on every new search
@@ -50,17 +50,38 @@
             }
         }, 300); // Wait 300ms after user stops typing
     };
+
+
+    function findInArray(value, inWhat) {
+
+        if (inWhat === "status") {
+            var arr = supportFixedData.is_active;
+            const found = arr.find(item => item.value === value);
+            return found ? found.label : value;
+        }
+
+        if (inWhat === "organisation") {
+            var arr = supportFixedData.organisation;
+            const found = arr.find(item => item.value === value);
+
+            console.log(found)
+            return found ? found.value+' / '+found.description : value;
+        }
+    }
+
+
 </script>
 
 <Layout>
     <section class="section min-height-screen">
-        <Title title="Material" subtitle="List of All Materials" />
+
+        <Title title="Standards" subtitle="List of All Standards" />
 
         <nav class="level is-mobile">
             <!-- Left side -->
             <div class="level-left">
                 <p class="buttons">
-                    <a href="/pdm/material/create" class="button is-link">
+                    <a href="/pdm/standard/create" class="button is-link">
                         <span class="icon is-small">
                             <Plus size="16" />
                         </span>
@@ -95,35 +116,40 @@
             </div>
         </nav>
 
-        <TableRecordsInfo results={materials} {per_page} />
+        <TableRecordsInfo results={standards} {per_page} />
 
-        {#if materials.data.length > 0}
+        {#if standards.data.length > 0}
             <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name/Description</th>
-                        <th>Specification</th>
+                        <th>Organisation</th>
+                        <th>Standard Number</th>
+                        <th>Description</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {#each materials.data as material}
+                    {#each standards.data as standard}
                         <tr>
-                            <td>{material.id}</td>
-                            <td>{material.description}</td>
+                            <td>{standard.id}</td>
+                            <td>{findInArray(standard.organisation, "organisation")}</td>
+                            <td>{@html standard.standard_number}</td>
+                            <td>{@html standard.description}</td>
 
-                            <td>{@html material.specification}</td>
+                            <td>{findInArray(standard.is_active, "status")}</td>
+
                             <td>
-                                <a href="/pdm/material/{material.id}"
-                                    ><Eye size="24" /></a
-                                >
+                                <a href="/pdm/standars/{standard.id}">
+                                    <Eye size="24" />
+                                </a>
 
                                 <a
-                                    href="/pdm/material/{material.id}/edit"
-                                    class="ml-2"><Pencil size="20" /></a
-                                >
+                                    href="/pdm/standard/{standard.id}/edit"
+                                    class="ml-2"><Pencil size="20" />
+                                </a>
                             </td>
                         </tr>
                     {/each}
@@ -131,11 +157,11 @@
             </table>
         {:else}
             <div class="notification is-warning is-light">
-                No materials exist
+                No standards exist
             </div>
         {/if}
 
         <!-- Pagination component here -->
-        <Paginate items={materials} />
+        <Paginate items={standards} />
     </section>
 </Layout>

@@ -19,34 +19,39 @@
 
     import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 
-    let { material = null, isEdit = false, supportFixedData } = $props();
+    let { product_note = null, isEdit = false, supportFixedData } = $props();
 
     // 1. Initialize the Inertia Form
     let form = useForm({
-        materialCategory: material?.category ?? "",
-        materialForm: material?.form ?? "",
-        materialName: material?.description ?? "",
-        materialSpecification: material?.specification ?? "",
-        materialFiles: material?.materialFiles ?? null,
-        materialNotes: material?.remarks ?? "",
-        materialIsActive: material?.is_active ?? 1,
+        pnCategory: product_note?.category ?? "",
+        description_tr: product_note?.description_tr ?? "",
+        description_en: product_note?.description_en ?? "",
+        pnFiles: product_note?.materialFiles ?? null,
+        pnNotes: product_note?.remarks ?? "",
+        productNoteIsActive: product_note?.is_active ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (material && isEdit) {
+        if (product_note && isEdit) {
             $form.defaults({
-                materialCategory: material.category,
-                materialForm: material.form,
-                materialName: material.description,
-                materialSpecification: material.specification,
-                materialFiles: material.files,
-                materialNotes: material.remarks,
-                materialIsActive: material.is_active,
+                pnCategory: product_note.category,
+                description_tr: product_note.description_tr,
+                description_en: product_note.description_en,
+                pnFiles: product_note.materialFiles,
+                pnNotes: product_note.remarks,
+                productNoteIsActive: product_note.is_active,
             });
         }
     });
+
+    let pnCategories = $derived(
+        supportFixedData.productNoteCategories.map((cat) => ({
+            value: cat.value,
+            label: cat["description_en"] + ' / ' + cat["description_tr"],
+        }))
+    );
 
     function submit(e) {
         // console.log("The form object is:", $form);
@@ -57,7 +62,7 @@
         if (isEdit) {
             console.log("trying to edit");
 
-            $form.put(`/material/${material.id}`, {
+            $form.put(`/pdm/product-note/${product_note.id}`, {
                 onSuccess: () => {
                     console.log("Updated successfully!");
                 },
@@ -69,7 +74,7 @@
         } else {
             console.log("trying to new");
 
-            $form.post("/material", {
+            $form.post("/pdm/product-note", {
                 onSuccess: () => {
                     console.log("Saved successfully!");
                     $form.reset();
@@ -91,84 +96,72 @@
         </pre> -->
 
         <Title
-            title="Materials"
-            subtitle={isEdit & (material != null)
-                ? "Edit Material Definition" + material.id
-                : "Create a Material Definition"}
+            title="Product Notes"
+            subtitle={isEdit & (product_note != null)
+                ? "Edit Product Note" + product_note.id
+                : "Create a Product Note"}
         />
 
         <ActionButtons
             {form}
             {isEdit}
-            item={material}
+            item={product_note}
             form_type="form"
-            route_name="material"
+            route_name="pdm/product-note"
         />
 
-        <form onsubmit={submit} novalidate id="genericForm">
-            <div class="fixed-grid has-2-cols">
-                <div class="grid">
-                    <div class="cell">
-                        <FormSelect
-                            {form}
-                            name="materialCategory"
-                            label="Material Category"
-                            placeholder="Select a category"
-                            options={supportFixedData.materialCategories}
-                            required={true}
-                        />
-                    </div>
-                    <div class="cell">
-                        <FormSelect
-                            {form}
-                            name="materialForm"
-                            label="Material Form"
-                            placeholder="Select a form"
-                            options={supportFixedData.materialForms}
-                            required={true}
-                        />
-                    </div>
-                </div>
-            </div>
 
-            <FormInput
+
+        <form onsubmit={submit} novalidate id="genericForm">
+
+            <FormSelect
                 {form}
-                name="materialName"
-                label="Material Name/Description"
-                placeholder="Enter material Name/Description"
+                name="pnCategory"
+                label="Product Note Category"
+                placeholder="Select a category"
+                options={pnCategories}
                 required={true}
             />
 
             <FormInput
                 {form}
-                name="materialSpecification"
-                label="Material Specification"
-                placeholder="Enter material specification"
+                name="description_tr"
+                label="Product and Process Note (Türkçe)"
+                placeholder="Enter Product and Process Note (Türkçe)"
+                required={true}
+            />
+
+            <FormInput
+                {form}
+                name="description_en"
+                label="Product and Process Note (English)"
+                placeholder="Enter Product and Process Note (English)"
+                required={true}
             />
 
             <div class="field">
                 <label class="label" for="ed">Notes/Comments/Remarks</label>
                 <div class="control" id="ed">
                     <Editor
-                        onUpdate={(html) => ($form.materialNotes = html)}
-                        value={material != null ? material.remarks : ""}
-                        placeholder="Enter any notes, comments, or remarks about the material here..."
+                        onUpdate={(html) => ($form.pnNotes = html)}
+                        value={product_note != null ? product_note.remarks : ""}
+                        placeholder="Enter any notes, comments, or remarks about the product note here..."
                     />
                 </div>
-                {#if $form.errors.materialNotes}
+                {#if $form.errors.pnNotes}
                     <p class="help is-danger">
-                        {$form.errors.materialNotes}
+                        {$form.errors.pnNotes}
                     </p>
                 {/if}
             </div>
 
-            {#if isEdit && material.files.length > 0}
-                <FilesList media={material.files} />
+            {#if isEdit && product_note.files.length > 0}
+                <FilesList media={product_note.files} />
             {/if}
 
             <FormUpload
                 {form}
-                name="materialFiles"
+                name="pnFiles"
                 label="File Attachments"
                 accept=".pdf,.docx,.doc,.txt,.png"
                 multiple={true}
@@ -178,22 +171,22 @@
 
             <FormSelect
                 {form}
-                name="materialIsActive"
-                label="Material Status (Active/Inactive)"
+                name="productNoteIsActive"
+                label="Product Note Status (Active/Inactive)"
                 placeholder="Select status"
-                options={supportFixedData.materialIsActive}
+                options={supportFixedData.productNoteIsActive}
                 required={true}
             />
 
             <div class="column buttons has-text-right">
                 <!-- Cancel Button -->
-                {#if isEdit & (material != null)}
-                    <a href="/material/{material.id}" class="button">
+                {#if isEdit & (product_note != null)}
+                    <a href="/pdm/product-note/{product_note.id}" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
                 {:else}
-                    <a href="/material" class="button">
+                    <a href="/pdm/product-note" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
@@ -209,7 +202,7 @@
                         {#if $form.processing}
                             "Submitting ..."
                         {:else}
-                            {isEdit ? "Update" : "Create"} Material
+                            {isEdit ? "Update" : "Create"} Product Note
                         {/if}
                     </span>
                     <span class="icon"><ChevronRight size="16" /></span>

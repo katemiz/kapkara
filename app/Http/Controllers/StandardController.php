@@ -2,34 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Material;
+use App\Models\Standard;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MaterialController extends Controller
+class StandardController extends Controller
 {
 
     // This will hold any support data needed for the form (e.g., dropdown options)
 
     public $supportFixedData = [
 
-        "materialCategories" => [
-
-            [ "value" => "1","label" => "Aluminium"],
-            [ "value" => "2","label" => "Steel"],
-            [ "value" => "3","label" => "Copper"],
-            [ "value" => "4","label" => "Plastic"]
+        "organisation" => [
+            [ "value" => "ISO", "description" => "International Standardisation Organisation"],
+            [ "value" => "ASTM", "description" => "American Society of Testing and Materials"],
+            [ "value" => "ANSI", "description" => "American National Standards Institute"],
+            [ "value" => "IEC", "description" => "International Electrotechnical Commission"],
+            [ "value" => "DIN", "description" => "Deutsches Institut für Normung"],
+            [ "value" => "JIS", "description" => "Japanese Industrial Standards"]
         ],
 
-        "materialForms" => [
-
-            [ "value" => "1","label" => "Sheet/Plate"],
-            [ "value" => "2","label" => "Round/Bar"],
-            [ "value" => "3","label" => "Tube/Profile"],
-            [ "value" => "4","label" => "Casting"]
-        ],
-
-        "materialIsActive" => [
+        "is_active" => [
 
             [ "value" => 0,"label" => "Inactive"],
             [ "value" => 1,"label" => "Active"]
@@ -39,10 +32,13 @@ class MaterialController extends Controller
 
     // This is the default structure for a new MODEL, used when creating a new one
 
-    public $material = [
-        "materialCategory" => null,
-        "materialForm" => null,
-        "materialIsActive" => 1
+    public $standard = [
+        "organisation" => null,
+        "standard_number" => null,
+        "description" => null,
+        "designation" => null,
+        "remarks" => null,
+        "isActive" => 1
     ];
 
 
@@ -63,11 +59,12 @@ class MaterialController extends Controller
      */
     public function index(Request $request)
     {
-        return Inertia::render('Modules/PDM/Pages/Material/Index', [
+        return Inertia::render('Modules/PDM/Pages/Standard/Index', [
                 // 'filters' sends the search term back to Svelte so the input stays filled
                 'per_page' => config('pagination.per_page'),
                 'filters' => $request->only(['search']),
-                'materials' => Material::query()
+                'supportFixedData' =>$this->supportFixedData,
+                'standards' => Standard::query()
                     ->when($request->input('search'), function ($query, $search) {
                         $query->where('description', 'like', "%{$search}%")
                             ->orWhere('specification', 'like', "%{$search}%")
@@ -86,8 +83,8 @@ class MaterialController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Modules/PDM/Pages/Material/Form', [
-            'material' => $this->material,
+        return Inertia::render('Modules/PDM/Pages/Standard/Form', [
+            'standard' => $this->standard,
             'isEdit' => false,
             'supportFixedData' =>$this->supportFixedData,
         ]);
@@ -102,41 +99,36 @@ class MaterialController extends Controller
     {
         $theData = $this->readInput($request);
 
-        $material = Material::create($theData);
+        $std = Standard::create($theData);
 
-        $this->spatieMultiple($request,$material);
+        $this->spatieMultiple($request,$std);
 
-        return redirect()->route('material.show', $material->id)
-            ->with('success', 'Material created successfully.');
+        return redirect()->route('standard.show', $std->id)
+            ->with('success', 'Standard created successfully.');
     }
 
 
     /**
      * Display the specified question.
      */
-    public function show($idMaterial)
+    public function show($idStandard)
     {
-        $material = Material::findOrFail($idMaterial);
+        $std = Standard::findOrFail($idStandard);
 
-        return Inertia::render('Modules/PDM/Pages/Material/Show', [
-            'material' => $material
+        return Inertia::render('Modules/PDM/Pages/Standard/Show', [
+            'standard' => $std
         ]);
     }
 
     /**
      * Show the form for editing the specified question.
      */
-    public function edit($idMaterial)
+    public function edit($idStandard)
     {
-        $material = Material::findOrFail($idMaterial)->toArray();
+        $std = Standard::findOrFail($idStandard)->toArray();
 
-        //dd($material);
-
-        //$material["myCheckboxMultiple"] = $this->convertJsonToArray($material["myCheckboxMultiple"]);
-
-
-        return Inertia::render('Modules/PDM/Pages/Material/Form', [
-            'material' => $material,
+        return Inertia::render('Modules/PDM/Pages/Standard/Form', [
+            'standard' => $std,
             'isEdit' => true,
             'supportFixedData' =>$this->supportFixedData
         ]);
@@ -145,30 +137,30 @@ class MaterialController extends Controller
     /**
      * Update the specified material in storage.
      */
-    public function update(Request $request, $idMaterial)
+    public function update(Request $request, $idStandard)
     {
-        $material = Material::findOrFail($idMaterial);
+        $std = Standard::findOrFail($idStandard);
 
         $theData = $this->readInput($request);
 
-        $this->spatieMultiple($request,$material);
+        $this->spatieMultiple($request,$std);
 
-        $material->update($theData);
+        $std->update($theData);
 
-        return redirect()->route('material.show', $material->id)
-            ->with('success', 'Material updated successfully.');
+        return redirect()->route('standard.show', $std->id)
+            ->with('success', 'Standard updated successfully.');
     }
 
     /**
      * Remove the specified material from storage.
      */
-    public function destroy($idMaterial)
+    public function destroy($idStandard)
     {
-        $material = Material::findOrFail($idMaterial);
-        $material->delete();
+        $std = Standard::findOrFail($idStandard);
+        $std->delete();
 
-        return redirect()->route('material.index')
-            ->with('success', 'Material deleted successfully.');
+        return redirect()->route('standard.index')
+            ->with('success', 'Standard deleted successfully.');
     }
 
 
@@ -190,30 +182,19 @@ class MaterialController extends Controller
 
     public function readInput($request)
     {
-
-        // This will stop execution and show all data sent from the form
-        //dd($request->all());
-
-
         $validated = $request->validate([
-            'materialCategory' => 'required|string|min:1|max:64',
-            'materialForm' => 'required|string',
-            'materialName' => 'required|string|max:64',
-            'materialSpecification' => 'required|string|max:256',
-            'materialNotes' => 'nullable|string|max:500',
-            'materialIsActive' => 'required|boolean',
+            'organisation' => 'required|string|min:1|max:64',
+            'standard_number' => 'required|string|max:64',
+            'description' => 'required|string|max:256',
+            'remarks' => 'nullable|string|max:500',
+            'isActive' => 'required|boolean',
         ]);
 
-
-
-        $values["category"] = $validated["materialCategory"];
-        $values["form"] = $validated["materialForm"];
-        $values["description"] = $validated["materialName"];
-        $values["specification"] = $validated["materialSpecification"];
-        $values["remarks"] = $validated["materialNotes"];
-        $values["is_active"] = $validated["materialIsActive"];
-
-        //dd($values);
+        $values["organisation"] = $validated["organisation"];
+        $values["standard_number"] = $validated["standard_number"];
+        $values["description"] = $validated["description"];
+        $values["remarks"] = $validated["remarks"];
+        $values["is_active"] = $validated["isActive"];
 
         return $values;
     }

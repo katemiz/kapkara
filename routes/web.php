@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\ProductNoteController;
+use App\Http\Controllers\StandardController;
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\MediaController;
 
@@ -143,6 +145,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::resource('/pdm/material', MaterialController::class);
+    Route::resource('/pdm/product-note', ProductNoteController::class);
+    Route::resource('/pdm/standard', StandardController::class);
+
+
 
 
     Route::resource('question', QuestionController::class);

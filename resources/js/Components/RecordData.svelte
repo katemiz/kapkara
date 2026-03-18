@@ -9,7 +9,7 @@
      *   url="https://example.com/record/1"
      * />
      */
-    import QRCode from "$lib/components/QRCode.svelte";
+    import QRCode from "$components/QRCode.svelte";
 
     let { item, url } = $props();
 
@@ -29,7 +29,7 @@
     );
 </script>
 
-<div class="fixed-grid has-3-cols has-3-cols-tablet has-1-cols-mobile mt-4">
+<div class="fixed-grid box has-3-cols has-3-cols-tablet has-1-cols-mobile mt-4">
     <div class="grid">
         <div class="cell has-text-left has-text-centered-mobile">
             <p class="is-size-7 has-text-grey">Added</p>
@@ -42,9 +42,14 @@
         </div>
 
         <div class="cell has-text-right has-text-centered-mobile">
+
+            {#if updatedOn !== createdOn}
             <p class="is-size-7 has-text-grey">Modified</p>
             <p>{item.updated_user_mail}</p>
             <p class="is-size-7 has-text-grey">{updatedOn}</p>
+            {:else}
+            <p class="is-size-7 has-text-grey">No modifications</p>
+            {/if}
         </div>
     </div>
 </div>

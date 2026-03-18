@@ -19,45 +19,50 @@
 
     import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 
-    let { material = null, isEdit = false, supportFixedData } = $props();
+    let { standard = null, isEdit = false, supportFixedData } = $props();
 
     // 1. Initialize the Inertia Form
     let form = useForm({
-        materialCategory: material?.category ?? "",
-        materialForm: material?.form ?? "",
-        materialName: material?.description ?? "",
-        materialSpecification: material?.specification ?? "",
-        materialFiles: material?.materialFiles ?? null,
-        materialNotes: material?.remarks ?? "",
-        materialIsActive: material?.is_active ?? 1,
+        organisation: standard?.organisation ?? "",
+        standard_number: standard?.standard_number ?? "",
+        description: standard?.description ?? "",
+        stdFiles: standard?.stdFiles ?? null,
+        remarks: standard?.remarks ?? "",
+        isActive: standard?.is_active ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (material && isEdit) {
+        if (standard && isEdit) {
             $form.defaults({
-                materialCategory: material.category,
-                materialForm: material.form,
-                materialName: material.description,
-                materialSpecification: material.specification,
-                materialFiles: material.files,
-                materialNotes: material.remarks,
-                materialIsActive: material.is_active,
+                organisation: standard.organisation,
+                standard_number: standard.standard_number,
+                description: standard.description,
+                stdFiles: standard.stdFiles,
+                remarks: standard.remarks,
+                isActive: standard.is_active,
             });
         }
     });
 
+    let organisations = $derived(
+        supportFixedData.organisation.map((cat) => ({
+            value: cat.value,
+            label: cat["value"] + ' - ' + cat["description"],
+        }))
+    );
+
     function submit(e) {
         // console.log("The form object is:", $form);
-        console.log("Form data submitted:", $form.data());
+        // console.log("Form data submitted:", $form.data());
 
         e.preventDefault();
 
         if (isEdit) {
             console.log("trying to edit");
 
-            $form.put(`/material/${material.id}`, {
+            $form.put(`/pdm/standard/${standard.id}`, {
                 onSuccess: () => {
                     console.log("Updated successfully!");
                 },
@@ -69,7 +74,7 @@
         } else {
             console.log("trying to new");
 
-            $form.post("/material", {
+            $form.post("/pdm/standard", {
                 onSuccess: () => {
                     console.log("Saved successfully!");
                     $form.reset();
@@ -91,27 +96,58 @@
         </pre> -->
 
         <Title
-            title="Materials"
-            subtitle={isEdit & (material != null)
-                ? "Edit Material Definition" + material.id
-                : "Create a Material Definition"}
+            title="Standards"
+            subtitle={isEdit & (standard != null)
+                ? "Edit Standards" + standard.id
+                : "Create a Standard"}
         />
 
         <ActionButtons
             {form}
             {isEdit}
-            item={material}
+            item={standard}
             form_type="form"
-            route_name="material"
+            route_name="pdm/standard"
         />
 
+
+
         <form onsubmit={submit} novalidate id="genericForm">
+
+            <FormSelect
+                {form}
+                name="organisation"
+                label="Product Organisation"
+                placeholder="Select a Organisation"
+                options={organisations}
+                required={true}
+            />
+
+            <FormInput
+                {form}
+                name="standard_number"
+                label="Standard Number"
+                placeholder="Enter Standard Number"
+                required={true}
+            />
+
+            <FormInput
+                {form}
+                name="description"
+                label="Standard Description"
+                placeholder="Enter Standard Description"
+                required={true}
+            />
+
+
+
+
             <div class="fixed-grid has-2-cols">
                 <div class="grid">
                     <div class="cell">
                         <FormSelect
                             {form}
-                            name="materialCategory"
+                            name="parameterIndicates"
                             label="Material Category"
                             placeholder="Select a category"
                             options={supportFixedData.materialCategories}
@@ -131,44 +167,42 @@
                 </div>
             </div>
 
-            <FormInput
-                {form}
-                name="materialName"
-                label="Material Name/Description"
-                placeholder="Enter material Name/Description"
-                required={true}
-            />
 
-            <FormInput
-                {form}
-                name="materialSpecification"
-                label="Material Specification"
-                placeholder="Enter material specification"
-            />
+
+
+
+
+
+
+
+
+
+
+
 
             <div class="field">
                 <label class="label" for="ed">Notes/Comments/Remarks</label>
                 <div class="control" id="ed">
                     <Editor
-                        onUpdate={(html) => ($form.materialNotes = html)}
-                        value={material != null ? material.remarks : ""}
-                        placeholder="Enter any notes, comments, or remarks about the material here..."
+                        onUpdate={(html) => ($form.remarks = html)}
+                        value={standard != null ? standard.remarks : ""}
+                        placeholder="Enter any notes, comments, or remarks about the standard here..."
                     />
                 </div>
-                {#if $form.errors.materialNotes}
+                {#if $form.errors.remarks}
                     <p class="help is-danger">
-                        {$form.errors.materialNotes}
+                        {$form.errors.remarks}
                     </p>
                 {/if}
             </div>
 
-            {#if isEdit && material.files.length > 0}
-                <FilesList media={material.files} />
+            {#if isEdit && standard.files.length > 0}
+                <FilesList media={standard.files} />
             {/if}
 
             <FormUpload
                 {form}
-                name="materialFiles"
+                name="stdFiles"
                 label="File Attachments"
                 accept=".pdf,.docx,.doc,.txt,.png"
                 multiple={true}
@@ -178,22 +212,22 @@
 
             <FormSelect
                 {form}
-                name="materialIsActive"
-                label="Material Status (Active/Inactive)"
+                name="isActive"
+                label="Standard Status (Active/Inactive)"
                 placeholder="Select status"
-                options={supportFixedData.materialIsActive}
+                options={supportFixedData.is_active}
                 required={true}
             />
 
             <div class="column buttons has-text-right">
                 <!-- Cancel Button -->
-                {#if isEdit & (material != null)}
-                    <a href="/material/{material.id}" class="button">
+                {#if isEdit & (standard != null)}
+                    <a href="/pdm/standard/{standard.id}" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
                 {:else}
-                    <a href="/material" class="button">
+                    <a href="/pdm/standard" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
@@ -209,7 +243,7 @@
                         {#if $form.processing}
                             "Submitting ..."
                         {:else}
-                            {isEdit ? "Update" : "Create"} Material
+                            {isEdit ? "Update" : "Create"} Standard
                         {/if}
                     </span>
                     <span class="icon"><ChevronRight size="16" /></span>

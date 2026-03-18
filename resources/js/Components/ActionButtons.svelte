@@ -1,10 +1,6 @@
 <script>
-    import Layout from "../../Shared/Layout.svelte";
-    import RecordData from "$lib/components/RecordData.svelte";
-    import FilesList from "$lib/components/FilesList.svelte";
-    import Title from "$lib/components/Title.svelte";
-    import DeleteButton from "$lib/components/DeleteButton.svelte";
 
+    import DeleteButton from "$components/DeleteButton.svelte";
     import { Save, X, TableOfContents, Pencil, Plus } from "@lucide/svelte";
 
     let { form_type, item, isEdit, route_name } = $props();

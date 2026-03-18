@@ -8,7 +8,7 @@
         HandHelping,
         Users,
         ContactRound,
-        User,
+        LogIn,
         LogOut,
         SquareFunction,
         Omega,
@@ -350,7 +350,7 @@
 
                         <hr class="navbar-divider">
 
-                        <a href="/material/list" class="navbar-item">
+                        <a href="/pdm/material" class="navbar-item">
                             <span class="icon has-text-link">
                                 <Atom size={18} />
                             </span>
@@ -358,29 +358,18 @@
                         </a>
 
 
-
-                        <a href="/material2/list" class="navbar-item">
-                            <span class="icon has-text-link">
-                                <Atom size={18} />
-                            </span>
-                            <span class="ml-2">Materials2</span>
-                        </a>
-
-
-
-
-                        <a href="/notes/list" class="navbar-item">
+                        <a href="/pdm/product-note" class="navbar-item">
                             <span class="icon has-text-link">
                                 <NotebookPen size={18} />
                             </span>
                             <span class="ml-2">Product Notes</span>
                         </a>
 
-                        <a href="/std-family/list" class="navbar-item">
+                        <a href="/pdm/standard" class="navbar-item">
                             <span class="icon has-text-link">
                                 <Box size={18} />
                             </span>
-                            <span class="ml-2">Standard Families</span>
+                            <span class="ml-2">Standards</span>
                         </a>
 
                     </div>
@@ -431,12 +420,11 @@
 
             {:else}
 
-
-
                 <a href={"/login/pdm"} class="navbar-item">
                     <span class="icon has-text-warning">
-                        <User size={18} color="#3e9392" />
+                        <LogIn size={18} />
                     </span>
+                    <span>Login</span>
                 </a>
 
             {/if}
@@ -448,15 +436,3 @@
 </nav>
 
 
-<!-- @if (session('current_project_id') && session('current_project_name'))
-
-<section class="hero has-background-grey-lighter has-text-right">
-
-    <p class="is-size-7 p-1">
-      Current Project : {{ session('current_project_name') }}
-    </p>
-</section>
-
-@endif
-
- -->
