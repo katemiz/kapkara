@@ -24,8 +24,6 @@
         BookOpenText,
         Barcode,
         Component,
-
-
     } from "@lucide/svelte";
 
     import { router } from "@inertiajs/svelte";
@@ -57,6 +55,7 @@
         router.post("/logout");
     }
 </script>
+
 <!--
 <nav class="navbar is-dark">
     <div class="navbar-brand">
@@ -196,18 +195,13 @@
 
  -->
 
-
-
-
-
-
-
-
 <nav class="navbar is-dark">
-
     <div class="navbar-brand">
-
-        <a href="/pdm" class="navbar-item has-text-white has-background-warning" aria-label="Home">
+        <a
+            href="/pdm"
+            class="navbar-item has-text-white has-background-warning"
+            aria-label="Home"
+        >
             <span class="icon has-text-dark">
                 <img
                     src="{PATHS.path_images_prefix}/PDM/{app_config.icon}"
@@ -216,12 +210,13 @@
             </span>
         </a>
 
-        <a href="/" class="navbar-item has-text-white has-background-link-dark" aria-label="PDM">
+        <a
+            href="/"
+            class="navbar-item has-text-white has-background-link-dark"
+            aria-label="PDM"
+        >
             <span class="ml-2">{app_config.code}</span>
         </a>
-
-
-
 
         <button
             href="#"
@@ -235,39 +230,42 @@
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
         </button>
-
-
-
     </div>
 
     <div id="navbarMenu" class="navbar-menu">
-
         <div class="navbar-start" id="navstart">
-
             {#if auth.isAuthenticated}
+                {#if auth.hasRole("admin")}
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a href="/admin" class="navbar-link">
+                            <span class="icon has-text-warning">
+                                <Users size={18} />
+                            </span>
+                            <span class="ml-2">Admin</span>
+                        </a>
 
-                {#if auth.hasRole('admin')}
-                <div class="navbar-item has-dropdown is-hoverable">
-
-                    <a href="/admin" class="navbar-link">
-                        <span class="icon has-text-warning">
-                            <Users size={18} />
-                        </span>
-                        <span class="ml-2">Admin</span>
-                    </a>
-
-                    <div class="navbar-dropdown">
-                        <a href="/admin-users/list" class="navbar-item">Users</a>
-                        <a href="/admin-roles/list" class="navbar-item">Roles</a>
-                        <a href="/admin-permissions/list" class="navbar-item">Permissions</a>
-                        <a href="/admin-companies/list" class="navbar-item">Companies</a>
-                        <a href="/admin-projects/list" class="navbar-item">Projects</a>
+                        <div class="navbar-dropdown">
+                            <a href="/admin-users/list" class="navbar-item"
+                                >Users</a
+                            >
+                            <a href="/admin-roles/list" class="navbar-item"
+                                >Roles</a
+                            >
+                            <a
+                                href="/admin-permissions/list"
+                                class="navbar-item">Permissions</a
+                            >
+                            <a href="/admin-companies/list" class="navbar-item"
+                                >Companies</a
+                            >
+                            <a href="/admin-projects/list" class="navbar-item"
+                                >Projects</a
+                            >
+                        </div>
                     </div>
-                </div>
                 {/if}
 
                 <div class="navbar-item has-dropdown is-hoverable">
-
                     <a href="/requests" class="navbar-link">
                         <span class="icon has-text-warning">
                             <Repeat size={18} />
@@ -276,7 +274,6 @@
                     </a>
 
                     <div class="navbar-dropdown">
-
                         <a href="/cr/list" class="navbar-item">
                             <span class="icon has-text-link">
                                 <FileInput size={18} />
@@ -290,12 +287,10 @@
                             </span>
                             <span class="ml-2">ECNs</span>
                         </a>
-
                     </div>
                 </div>
 
                 <div class="navbar-item has-dropdown is-hoverable">
-
                     <a href="/" class="navbar-link">
                         <span class="icon has-text-warning">
                             <Factory size={18} />
@@ -311,19 +306,16 @@
                             <span class="ml-2">Sellable Parts</span>
                         </a>
 
-
-
                         <a href="/parts/list" class="navbar-item">
                             <span class="icon has-text-link">
                                 <Component size={18} />
                             </span>
                             <span class="ml-2">Components</span>
                         </a>
-
                     </div>
                 </div>
 
-                <a href="/documents/list" class="navbar-item">
+                <a href="/pdm/document" class="navbar-item">
                     <span class="icon has-text-warning">
                         <BookOpenText size={18} />
                     </span>
@@ -331,7 +323,6 @@
                 </a>
 
                 <div class="navbar-item has-dropdown is-hoverable">
-
                     <a href="/engineering" class="navbar-link">
                         <span class="icon has-text-warning">
                             <SquareFunction size={18} />
@@ -340,7 +331,6 @@
                     </a>
 
                     <div class="navbar-dropdown">
-
                         <a href="/engineering/home" class="navbar-item">
                             <span class="icon has-text-link">
                                 <Omega size={18} />
@@ -348,7 +338,7 @@
                             <span class="ml-2">Engineering Utilities</span>
                         </a>
 
-                        <hr class="navbar-divider">
+                        <hr class="navbar-divider" />
 
                         <a href="/pdm/material" class="navbar-item">
                             <span class="icon has-text-link">
@@ -356,7 +346,6 @@
                             </span>
                             <span class="ml-2">Materials</span>
                         </a>
-
 
                         <a href="/pdm/product-note" class="navbar-item">
                             <span class="icon has-text-link">
@@ -371,21 +360,13 @@
                             </span>
                             <span class="ml-2">Standards</span>
                         </a>
-
                     </div>
                 </div>
-
-
-
             {/if}
-
         </div>
 
-
         <div class="navbar-end">
-
             {#if auth.isAuthenticated}
-
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a
                         href="/apps"
@@ -401,38 +382,27 @@
                             <span>Settings</span>
                         </a>
 
-
-
                         <button
                             type="button"
                             class="navbar-item"
-                            onclick={() => router.post('/logout', { sayfa: 'pdm' })}
+                            onclick={() =>
+                                router.post("/logout", { sayfa: "pdm" })}
                         >
                             <span class="icon">
                                 <LogOut size={18} />
                             </span>
                             <span>Logout</span>
                         </button>
-
-
                     </div>
                 </div>
-
             {:else}
-
                 <a href={"/login/pdm"} class="navbar-item">
                     <span class="icon has-text-warning">
                         <LogIn size={18} />
                     </span>
                     <span>Login</span>
                 </a>
-
             {/if}
-
         </div>
-
     </div>
-
 </nav>
-
-
