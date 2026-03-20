@@ -52,31 +52,23 @@
     };
 
     function findInArray(value, inWhat) {
-        if (inWhat === "status") {
-            var arr = supportFixedData.is_active;
-            const found = arr.find((item) => item.value === value);
-            return found ? found.label : value;
-        }
+        var arr = supportFixedData.doc_types;
+        const found = arr.find((item) => item.value === value);
 
-        if (inWhat === "organisation") {
-            var arr = supportFixedData.organisation;
-            const found = arr.find((item) => item.value === value);
-
-            console.log(found);
-            return found ? found.value + " / " + found.description : value;
-        }
+        console.log(found);
+        return found ? found.value + " / " + found.description : value;
     }
 </script>
 
 <Layout>
     <section class="section min-height-screen">
-        <Title title="Documents" subtitle="List of All Standards" />
+        <Title title="Documents" subtitle="List of All Documents" />
 
         <nav class="level is-mobile">
             <!-- Left side -->
             <div class="level-left">
                 <p class="buttons">
-                    <a href="/pdm/standard/create" class="button is-link">
+                    <a href="/pdm/document/create" class="button is-link">
                         <span class="icon is-small">
                             <Plus size="16" />
                         </span>
@@ -113,41 +105,31 @@
 
         <TableRecordsInfo results={documents} {per_page} />
 
-        {#if standards.data.length > 0}
+        {#if documents.data.length > 0}
             <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Organisation</th>
-                        <th>Standard Number</th>
+                        <th>Dcument Number</th>
                         <th>Description</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {#each standards.data as standard}
+                    {#each documents.data as document}
                         <tr>
-                            <td>{standard.id}</td>
-                            <td
-                                >{findInArray(
-                                    standard.organisation,
-                                    "organisation",
-                                )}</td
-                            >
-                            <td>{@html standard.standard_number}</td>
-                            <td>{@html standard.description}</td>
-
-                            <td>{findInArray(standard.is_active, "status")}</td>
+                            <td>{document.id}</td>
+                            <td>{@html document.document_no}</td>
+                            <td>{@html document.description}</td>
 
                             <td>
-                                <a href="/pdm/standars/{standard.id}">
+                                <a href="/pdm/document/{document.id}">
                                     <Eye size="24" />
                                 </a>
 
                                 <a
-                                    href="/pdm/standard/{standard.id}/edit"
+                                    href="/pdm/document/{document.id}/edit"
                                     class="ml-2"
                                     ><Pencil size="20" />
                                 </a>
@@ -158,11 +140,11 @@
             </table>
         {:else}
             <div class="notification is-warning is-light">
-                No standards exist
+                No documents exist
             </div>
         {/if}
 
         <!-- Pagination component here -->
-        <Paginate items={standards} />
+        <Paginate items={documents} />
     </section>
 </Layout>

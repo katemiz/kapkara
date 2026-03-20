@@ -10,14 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create("documents", function (Blueprint $table) {
+        Schema::create("counters", function (Blueprint $table) {
             $table->id();
-            $table->string("doc_type");
-            $table->integer("document_no");
-            $table->integer("revision")->default(1);
-            $table->text("description");
-            $table->text("remarks")->nullable();
-            $table->userstamps(); // provided by App\Providers\AppServiceProvider
+            $table->string("counter_type")->unique();
+            $table->integer("counter_value");
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists("documents");
+        Schema::dropIfExists("counters");
     }
 };

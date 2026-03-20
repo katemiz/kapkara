@@ -9,48 +9,44 @@
     import FilesList from "$components/FilesList.svelte";
     import ActionButtons from "$components/ActionButtons.svelte";
 
-    import FormRadio from "$components/FormRadio.svelte";
-    import FormCheckBoxSingle from "$components/FormCheckBoxSingle.svelte";
-    import FormCheckBoxMultiple from "$components/FormCheckBoxMultiple.svelte";
-    import FormDate from "$components/FormDate.svelte";
     import FormUpload from "$components/FormUpload.svelte";
 
     import Title from "$components/Title.svelte";
 
     import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 
-    let { standard = null, isEdit = false, supportFixedData } = $props();
+    let { document = null, isEdit = false, supportFixedData } = $props();
 
     // 1. Initialize the Inertia Form
     let form = useForm({
-        organisation: standard?.organisation ?? "",
-        standard_number: standard?.standard_number ?? "",
-        description: standard?.description ?? "",
-        stdFiles: standard?.stdFiles ?? null,
-        remarks: standard?.remarks ?? "",
-        isActive: standard?.is_active ?? 1,
+        doc_type: document?.doc_type ?? "",
+        document_no: document?.document_no ?? "",
+        description: document?.description ?? "",
+        docFiles: document?.docFiles ?? null,
+        remarks: document?.remarks ?? "",
+        status: document?.status ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (standard && isEdit) {
+        if (document && isEdit) {
             $form.defaults({
-                organisation: standard.organisation,
-                standard_number: standard.standard_number,
-                description: standard.description,
-                stdFiles: standard.stdFiles,
-                remarks: standard.remarks,
-                isActive: standard.is_active,
+                doc_type: document.doc_type,
+                document_no: document.document_no,
+                description: document.description,
+                docFiles: document.docFiles,
+                remarks: document.remarks,
+                status: document.status,
             });
         }
     });
 
-    let organisations = $derived(
-        supportFixedData.organisation.map((cat) => ({
+    let doc_types = $derived(
+        supportFixedData.doc_types.map((cat) => ({
             value: cat.value,
-            label: cat["value"] + ' - ' + cat["description"],
-        }))
+            label: cat["description"],
+        })),
     );
 
     function submit(e) {
@@ -60,9 +56,7 @@
         e.preventDefault();
 
         if (isEdit) {
-            console.log("trying to edit");
-
-            $form.put(`/pdm/standard/${standard.id}`, {
+            $form.put(`/pdm/document/${document.id}`, {
                 onSuccess: () => {
                     console.log("Updated successfully!");
                 },
@@ -72,9 +66,7 @@
                 },
             });
         } else {
-            console.log("trying to new");
-
-            $form.post("/pdm/standard", {
+            $form.post("/pdm/document", {
                 onSuccess: () => {
                     console.log("Saved successfully!");
                     $form.reset();
@@ -96,97 +88,45 @@
         </pre> -->
 
         <Title
-            title="Standards"
-            subtitle={isEdit & (standard != null)
-                ? "Edit Standards" + standard.id
-                : "Create a Standard"}
+            title="Documents"
+            subtitle={isEdit & (document != null)
+                ? "Edit Document" + document.id
+                : "Create a Document"}
         />
 
         <ActionButtons
             {form}
             {isEdit}
-            item={standard}
+            item={document}
             form_type="form"
-            route_name="pdm/standard"
+            route_name="pdm/document"
         />
 
-
-
         <form onsubmit={submit} novalidate id="genericForm">
-
             <FormSelect
                 {form}
-                name="organisation"
-                label="Product Organisation"
-                placeholder="Select a Organisation"
-                options={organisations}
-                required={true}
-            />
-
-            <FormInput
-                {form}
-                name="standard_number"
-                label="Standard Number"
-                placeholder="Enter Standard Number"
+                name="doc_type"
+                label="Document Type"
+                placeholder="Select a Document Type"
+                options={doc_types}
                 required={true}
             />
 
             <FormInput
                 {form}
                 name="description"
-                label="Standard Description"
-                placeholder="Enter Standard Description"
+                label="Document Description"
+                placeholder="Enter Document Description"
                 required={true}
             />
-
-
-
-
-            <div class="fixed-grid has-2-cols">
-                <div class="grid">
-                    <div class="cell">
-                        <FormSelect
-                            {form}
-                            name="parameterIndicates"
-                            label="Material Category"
-                            placeholder="Select a category"
-                            options={supportFixedData.materialCategories}
-                            required={true}
-                        />
-                    </div>
-                    <div class="cell">
-                        <FormSelect
-                            {form}
-                            name="materialForm"
-                            label="Material Form"
-                            placeholder="Select a form"
-                            options={supportFixedData.materialForms}
-                            required={true}
-                        />
-                    </div>
-                </div>
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             <div class="field">
                 <label class="label" for="ed">Notes/Comments/Remarks</label>
                 <div class="control" id="ed">
                     <Editor
                         onUpdate={(html) => ($form.remarks = html)}
-                        value={standard != null ? standard.remarks : ""}
-                        placeholder="Enter any notes, comments, or remarks about the standard here..."
+                        value={document != null ? document.remarks : ""}
+                        placeholder="Enter any notes, comments, or remarks about the document here..."
                     />
                 </div>
                 {#if $form.errors.remarks}
@@ -196,13 +136,13 @@
                 {/if}
             </div>
 
-            {#if isEdit && standard.files.length > 0}
-                <FilesList media={standard.files} />
+            {#if isEdit && document.files.length > 0}
+                <FilesList media={document.files} />
             {/if}
 
             <FormUpload
                 {form}
-                name="stdFiles"
+                name="docFiles"
                 label="File Attachments"
                 accept=".pdf,.docx,.doc,.txt,.png"
                 multiple={true}
@@ -210,24 +150,15 @@
                 showPreview={false}
             />
 
-            <FormSelect
-                {form}
-                name="isActive"
-                label="Standard Status (Active/Inactive)"
-                placeholder="Select status"
-                options={supportFixedData.is_active}
-                required={true}
-            />
-
             <div class="column buttons has-text-right">
                 <!-- Cancel Button -->
-                {#if isEdit & (standard != null)}
-                    <a href="/pdm/standard/{standard.id}" class="button">
+                {#if isEdit & (document != null)}
+                    <a href="/pdm/document/{document.id}" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
                 {:else}
-                    <a href="/pdm/standard" class="button">
+                    <a href="/pdm/document" class="button">
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
@@ -243,7 +174,7 @@
                         {#if $form.processing}
                             "Submitting ..."
                         {:else}
-                            {isEdit ? "Update" : "Create"} Standard
+                            {isEdit ? "Update" : "Create"} Document
                         {/if}
                     </span>
                     <span class="icon"><ChevronRight size="16" /></span>

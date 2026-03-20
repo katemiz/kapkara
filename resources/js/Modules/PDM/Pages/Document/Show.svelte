@@ -8,22 +8,29 @@
 
     import { Sheet, Pencil, ClipboardPlus } from "@lucide/svelte";
 
-    let { standard } = $props();
+    let { document } = $props();
 
-    let url = $derived(window.location.origin + "/standard/" + standard.id);
+    let url = $derived(window.location.origin + "/document/" + document.id);
 </script>
 
 <Layout>
     <section class="section min-height-screen">
-        <Title title="Standard" subtitle="Show Properties" />
+        <Title title="Documents" subtitle="Show Properties" />
 
-        <ActionButtons item={standard} form_type="show" route_name="pdm/standard" />
+        <ActionButtons
+            item={document}
+            form_type="show"
+            route_name="pdm/document"
+        />
 
-        <p class="subtitle">{standard.organisation} {standard.standard_number}</p>
-        <p>{standard.description}</p>
-        <p>{@html standard.remarks}</p>
+        <p class="subtitle">
+            {document.organisation}
+            {document.standard_number}
+        </p>
+        <p>{document.description}</p>
+        <p>{@html document.remarks}</p>
 
-        <FilesList media={standard.files} />
-        <RecordData item={standard} {url} />
+        <FilesList media={document.files} />
+        <RecordData item={document} {url} />
     </section>
 </Layout>
