@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Counter;
 use App\Models\Document;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -203,7 +202,7 @@ class DocumentController extends Controller
         return $new_no;
     }
 
-    public function uploadFiles(Request $request, Model $doc): bool
+    public function uploadFiles(Request $request, Document $doc): bool
     {
         // For file upload params
         // Request, Model, Input Element Name, Preset Key (For File Types), Collection (Spatie), Max Size (eg 2048)

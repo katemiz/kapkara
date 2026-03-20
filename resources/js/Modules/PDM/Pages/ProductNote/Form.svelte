@@ -26,12 +26,12 @@
         pnCategory: product_note?.category ?? "",
         description_tr: product_note?.description_tr ?? "",
         description_en: product_note?.description_en ?? "",
-        pnFiles: product_note?.materialFiles ?? null,
+        pnFiles: product_note?.pnFiles ?? null,
         pnNotes: product_note?.remarks ?? "",
         productNoteIsActive: product_note?.is_active ?? 1,
     });
 
-    // If you need the form to update when the 'material' prop changes
+    // If you need the form to update when the 'Product Note' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
         if (product_note && isEdit) {
@@ -39,7 +39,7 @@
                 pnCategory: product_note.category,
                 description_tr: product_note.description_tr,
                 description_en: product_note.description_en,
-                pnFiles: product_note.materialFiles,
+                pnFiles: product_note.pnFiles,
                 pnNotes: product_note.remarks,
                 productNoteIsActive: product_note.is_active,
             });
@@ -49,8 +49,8 @@
     let pnCategories = $derived(
         supportFixedData.productNoteCategories.map((cat) => ({
             value: cat.value,
-            label: cat["description_en"] + ' / ' + cat["description_tr"],
-        }))
+            label: cat["description_en"] + " / " + cat["description_tr"],
+        })),
     );
 
     function submit(e) {
@@ -110,10 +110,7 @@
             route_name="pdm/product-note"
         />
 
-
-
         <form onsubmit={submit} novalidate id="genericForm">
-
             <FormSelect
                 {form}
                 name="pnCategory"
@@ -181,7 +178,10 @@
             <div class="column buttons has-text-right">
                 <!-- Cancel Button -->
                 {#if isEdit & (product_note != null)}
-                    <a href="/pdm/product-note/{product_note.id}" class="button">
+                    <a
+                        href="/pdm/product-note/{product_note.id}"
+                        class="button"
+                    >
                         <span class="icon"><X size="16" /></span>
                         <span>Cancel</span>
                     </a>
