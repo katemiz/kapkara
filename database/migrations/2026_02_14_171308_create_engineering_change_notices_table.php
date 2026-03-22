@@ -6,19 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 use App\Models\ChangeRequest;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('engineering_change_notices', function (Blueprint $table) {
+        Schema::create("engineering_change_notices", function (
+            Blueprint $table,
+        ) {
             $table->id()->startingValue(1071);
             $table->foreignIdFor(ChangeRequest::class);
-            $table->text('description')->nullable();
-            $table->string('status')->default('wip');
-            $table->userstamps();   // provided by App\Providers\AppServiceProvider
+            $table->text("title");
+            $table->text("description")->nullable();
+            $table->string("status")->default("WIP");
+            $table->userstamps(); // provided by App\Providers\AppServiceProvider
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('engineering_change_notices');
+        Schema::dropIfExists("engineering_change_notices");
     }
 };

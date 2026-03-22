@@ -37,6 +37,9 @@
             <p class="has-text-weight-light is-size-7 mt-4">
                 V{app_config.version}
             </p>
+
+            <img src="/images/laravel.svg" width="28px" alt="Company Icon" />
+            <img src="/images/svelte.svg" width="28px" alt="Company Icon" />
         </div>
 
         <div class="column has-text-right has-text-centered-mobile">
