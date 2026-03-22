@@ -1,5 +1,8 @@
 <script>
     import { KAPKARA, PATHS } from "$lib/config";
+    import { app_config } from "$modules/PDM/Shared/app_config.js";
+
+    import { Boxes } from "@lucide/svelte";
 </script>
 
 <footer class="footer has-background-dark" id="footer">
@@ -16,35 +19,31 @@
             </a>
         </div>
 
-        <div class="column">
-            <p
-                class="has-text-weight-light has-text-centered has-text-centered-mobile"
-            >
-                {KAPKARA.title}
-            </p>
-            <p
-                class="has-text-weight-light has-text-centered has-text-centered-mobile is-size-7"
-            >
-                {KAPKARA.version}
+        <div class="column has-text-centered has-text-centered-mobile">
+            <Boxes size="32" color="#ffb70f" />
+
+            <p class="has-text-weight-light mt-4">
+                {app_config.code}
             </p>
 
-            <p
-                class="has-text-centered has-text-centered-mobile has-text-grey is-size-6"
-            >
-                Laravel-Inertia-Svelte
+            <p class="has-text-weight-light has-text-warning mb-6">
+                {app_config.title}
+            </p>
+
+            <p class="has-text-weight-light has-text-grey">
+                {app_config.description}
+            </p>
+
+            <p class="has-text-weight-light is-size-7 mt-4">
+                V{app_config.version}
             </p>
         </div>
 
-        <div class="column">
-            <p
-                class="has-text-weight-light has-text-right has-text-centered-mobile"
-            >
+        <div class="column has-text-right has-text-centered-mobile">
+            <p class="">
                 {KAPKARA.copyright}
             </p>
-            <p
-                class="has-text-weight-light has-text-right has-text-centered-mobile
-          is-size-7"
-            >
+            <p class="is-size-7 has-text-warning">
                 {KAPKARA.motto}
             </p>
         </div>

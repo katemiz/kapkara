@@ -6,23 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 use App\Models\User;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('change_requests', function (Blueprint $table) {
-
+        Schema::create("change_requests", function (Blueprint $table) {
             $table->id()->startingValue(1923);
-            $table->string('title');
-            $table->text(column: 'request_description')->nullable();
-            $table->foreignIdFor(User::class, 'request_reviewed_by')->nullable();
-            $table->timestamp('request_reviewed_at')->nullable();
-            $table->text(column: 'review_notes')->nullable();
-            $table->string('status')->default('wip');
-            $table->userstamps();   // provided by App\Providers\AppServiceProvider
+            $table->string("title");
+            $table->text(column: "description")->nullable();
+            $table->foreignIdFor(User::class, "reviewed_by")->nullable();
+            $table->timestamp("reviewed_at")->nullable();
+            $table->text(column: "review_notes")->nullable();
+            $table->string("status")->default("WFR");
+            $table->userstamps(); // provided by App\Providers\AppServiceProvider
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('change_requests');
+        Schema::dropIfExists("change_requests");
     }
 };
