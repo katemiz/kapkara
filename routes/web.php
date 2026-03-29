@@ -9,6 +9,7 @@ use App\Http\Controllers\StandardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\EcnController;
+use App\Http\Controllers\ConfiguratorController;
 
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\MediaController;
@@ -119,6 +120,11 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::inertia("/pdm/requests", "Modules/PDM/HomeRequests");
     Route::resource("/pdm/crequest", ChangeRequestController::class);
     Route::resource("/pdm/ecn", EcnController::class);
+
+    Route::resource(
+        "/pdm/engineering/configurator",
+        ConfiguratorController::class,
+    );
 
     Route::resource("question", QuestionController::class);
     Route::resource("answer", AnswerController::class);

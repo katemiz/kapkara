@@ -184,7 +184,7 @@
                 </a>
 
                 <div class="navbar-item has-dropdown is-hoverable">
-                    <a href="/engineering" class="navbar-link">
+                    <a href="/pdm/engineering" class="navbar-link">
                         <span class="icon has-text-warning">
                             <SquareFunction size={18} />
                         </span>
@@ -192,11 +192,16 @@
                     </a>
 
                     <div class="navbar-dropdown">
-                        <a href="/engineering/home" class="navbar-item">
+                        <a
+                            href="/pdm/engineering/configurator"
+                            class="navbar-item"
+                        >
                             <span class="icon has-text-link">
                                 <Omega size={18} />
                             </span>
-                            <span class="ml-2">Engineering Utilities</span>
+                            <span class="ml-2"
+                                >Engineering Utilities - Configurator</span
+                            >
                         </a>
 
                         <hr class="navbar-divider" />
