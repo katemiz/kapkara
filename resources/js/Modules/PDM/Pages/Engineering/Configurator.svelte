@@ -1,7 +1,6 @@
 <script>
-
     import Layout from "$modules/PDM/Shared/Layout.svelte";
-    import { onMount } from 'svelte';
+    import { onMount } from "svelte";
     import { MastGeometry } from "$modules/PDM/Pages/Engineering/mastGeometry.js";
 
     let mast_parameters = {
@@ -10,7 +9,7 @@
         head_height: 42,
         material: "6063",
         tube_length: 2000,
-        start_tube_no: 13,
+        start_tube_no: 15,
         end_tube_no: 15,
         overlap: 500,
         terrain_category: "II",
@@ -22,33 +21,16 @@
 
     let mast = $derived(new MastGeometry(mast_parameters));
 
-
     // onMount(() => {
     //     // Now the DOM is ready, we can find "myChart"
     //     mast.mastCapacityChart('myChart');
     // });
-
 </script>
 
-
-
-
-
-
-
 <Layout>
-
     <section class="section content">
-
-
-
         <pre>
             {JSON.stringify(mast.mast_parameters, null, 2)}
         </pre>
-
-
-
-
     </section>
-
 </Layout>
