@@ -50,14 +50,14 @@
                 },
                 // Spread the mapped tubes from chartData2 here:
                 ...mast.mast_parameters.tubes.map((tube, index) => ({
-                    label: `Tube ${tube.no} (OD ${tube.od})`,
+                    label: `Section ${tube.no}`,
                     data: Object.entries(tube.M_EI).map(([z, value]) => ({
                         x: parseFloat(z),
                         y: value
                     })).sort((a, b) => a.x - b.x),
                     borderColor: index === 0 ? 'rgba(54, 162, 235, 1)' : 'rgba(54, 162, 235, 1)',
                     backgroundColor: index === 0 ? 'rgba(54, 162, 235, 0.2)' : 'rgba(54, 162, 235, 0.2)',
-                    showLine: true,
+                    showLine: false,
                     fill: true,
                     yAxisID: 'y1', // Assigning to the M/EI axis
                 }))
@@ -140,7 +140,12 @@
                         position: 'right',
                         title: {
                             display: true,
-                            text: 'M/EI'
+                            text: 'M/EI [1/m]',
+                            color: '#666',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         },
 
                         min: -0.0055,
