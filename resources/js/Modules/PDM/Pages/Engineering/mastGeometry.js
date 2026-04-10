@@ -10,8 +10,7 @@ import {
     alum_6063_yield_strength,
     alum_6063_ultimate_strength,
 } from "$modules/PDM/Shared/tube_data.js";
-import ArrowUp_0_1 from "@lucide/svelte/icons/arrow-up-0-1";
-import Dice_2 from "@lucide/svelte/icons/dice-2";
+
 
 import Chart from "chart.js/auto";
 
@@ -35,10 +34,10 @@ export class MastGeometry {
 
         this.allowed_tip_deflection_mm = null;
 
-        this.setAllowedTipDeflection();
         this.setDependentProps();
         this.setMastTubes();
         this.setMastHeights();
+        this.setAllowedTipDeflection();
         this.setZPositions();
         this.windLoadsOnTubes();
         this.windLoadOnPayload();
@@ -68,7 +67,7 @@ export class MastGeometry {
     }
 
     setDependentProps() {
-        switch (this.mast_parametersmaterial) {
+        switch (this.mast_parameters.material) {
             // Aluminum
             default:
                 this.tube_material_density = alum_6063_density; // kg/m³
@@ -77,6 +76,9 @@ export class MastGeometry {
                 this.tube_ultimate_strength = alum_6063_ultimate_strength; // Pa
                 break;
         }
+
+        // Find Z-Offset
+        this.mast_parameters.z_offset = Math.sqrt(this.mast_parameters.sail_area * 1e6) / 2; // mm
     }
 
     setMastTubes() {
@@ -489,7 +491,7 @@ export class MastGeometry {
         });
     }
 
-    findSideAdapterReaction(payload_mass = 10) {
+    findSideAdapterReaction(payload_mass = 100) {
         this.findRootMomentWoSideAdapterReaction(payload_mass);
     }
 
@@ -497,24 +499,23 @@ export class MastGeometry {
         let root_moment = 0; // Initialize root moment for each tube
         let shear_force = 0; // Initialize shear force for each tube
 
+        let moment_b, moment_t,moment_at_wind_load;
+        let z_coordinate_b, z_coordinate_t;
+
         this.mast_parameters.tubes.forEach((tube, i) => {
             // Find root moment caused by each wind load (without side adapter force moment)
             root_moment = (tube.wind_load * tube.wind_load_z) / 1000; // Convert to Nm
             shear_force = (tube.wind_load * tube.wind_load_z) / 1000; // Convert to Nm
 
-            let moment_b, moment_t;
-            let z_coordinate_b, z_coordinate_t;
-
             this.mast_parameters.tubes[i].moments = {};
 
             let a = {};
 
-            let slope = root_moment / tube.wind_load_z; // Slope of the moment diagram
-
             this.mast_parameters.tubes.forEach((t, k) => {
                 // moment formula
-                moment_b = slope * t.extended_zb - root_moment;
-                moment_t = slope * t.extended_zt - root_moment;
+                moment_b = (root_moment / tube.wind_load_z) * t.extended_zb - root_moment;
+                moment_at_wind_load = (root_moment / tube.wind_load_z) * t.wind_load_z - root_moment;
+                moment_t = (root_moment / tube.wind_load_z) * t.extended_zt - root_moment;
 
                 if (moment_t > 0) {
                     moment_t = 0;
@@ -524,13 +525,24 @@ export class MastGeometry {
                     moment_b = 0;
                 }
 
+                if (moment_at_wind_load > 0) {
+                    moment_at_wind_load = 0;
+                }
+
                 z_coordinate_b = "moment_at_" + t.extended_zb;
                 z_coordinate_t = "moment_at_" + t.extended_zt;
 
+                // ie Top Tube
                 if (k === 0) {
+                    a[this.mast_parameters.extendedHeight] = moment_t;
+                }
+
+                // ie Bottom Tube
+                if (k === this.mast_parameters.tubes.length - 1) {
                     a[0] = -root_moment;
                 }
 
+                a[t.wind_load_z] = moment_at_wind_load;
                 a[t.extended_zb] = moment_b;
                 a[t.extended_zt] = moment_t;
             });
@@ -538,21 +550,32 @@ export class MastGeometry {
             this.mast_parameters.tubes[i].moments = a;
         });
 
+        // Z-Offset Moment Calculation
         // Add moment caused by z_offset shift of payload wind load from the top of the mast to the payload center of pressure
-        this.mast_parameters.root_moment_wo_adapter_reaction +=
-            (this.mast_parameters.payload.wind_load *
+        this.mast_parameters.payload.tip_moment_due_z_offset_Nm =
+            -(this.mast_parameters.payload.wind_load *
                 this.mast_parameters.z_offset) /
             1000; // Convert to Nm
 
+        // X-Offset Moment Calculation
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load
-        this.mast_parameters.root_moment_wo_adapter_reaction +=
-            (this.mast_parameters.payload.wind_load *
+        this.mast_parameters.payload.tip_moment_due_x_offset_Nm =
+            -(9.81 * payload_mass *
                 this.mast_parameters.x_offset) /
             1000; // Convert to Nm
 
+        // Moment Caused by Deflection of the Mast under Wind Load
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load, limited to a maximum of tip_deflection_percentage % of the extended height of the mast
-        this.mast_parameters.root_moment_wo_adapter_reaction +=
-            (payload_mass * this.allowed_tip_deflection_mm) / 1000; // Convert to Nm
+        this.mast_parameters.payload.tip_moment_due_deflection_Nm =
+            -(9.81 * payload_mass * this.allowed_tip_deflection_mm) / 1000; // Convert to Nm
+
+        console.log("Buraya mast ağırlığı da eklenecek)");
+
+        // Total Tip Moment - Constant throughout the mast
+        this.mast_parameters.payload.total_tip_moment_Nm =
+            this.mast_parameters.payload.tip_moment_due_z_offset_Nm +
+            this.mast_parameters.payload.tip_moment_due_x_offset_Nm +
+            this.mast_parameters.payload.tip_moment_due_deflection_Nm;
 
         // Find total_moments_and_shear_forces at each tube section by adding the moment caused by the side adapter reaction force to the root moment calculated above for each tube section
         this.mast_parameters.total_moments = {};
@@ -566,54 +589,74 @@ export class MastGeometry {
             total_moments[key] = 0;
         });
 
+
+
+        this.mast_parameters.payload.moments = {};
+
+        let payload_root_moment = this.mast_parameters.payload.wind_load * this.mast_parameters.extendedHeight / 1000; // Nm
+        let slope = payload_root_moment / this.mast_parameters.extendedHeight; // N/mm
+
+        sortedKeys.forEach((key) => {
+            this.mast_parameters.payload.moments[key] = (slope * key - payload_root_moment) + this.mast_parameters.payload.total_tip_moment_Nm;
+        });
+
+
         this.mast_parameters.tubes.forEach((tube, i) => {
             sortedKeys.forEach((key) => {
                 total_moments[key] += tube.moments[key];
             });
         });
 
-        // Add to root moments due to payload wind load transferred to end of mast Extended Z coordinates
-        let root_moment_due_paylaod =
-            (this.mast_parameters.payload.wind_load *
-                this.mast_parameters.extendedHeight) /
-            1000; // Nm
-
-        this.mast_parameters.payload.moments = {};
         sortedKeys.forEach((key) => {
-            this.mast_parameters.payload.moments[key] =
-                (root_moment_due_paylaod /
-                    this.mast_parameters.extendedHeight) *
-                    key -
-                root_moment_due_paylaod;
-
             total_moments[key] += this.mast_parameters.payload.moments[key];
         });
 
-        console.log("Total Moments: ", total_moments);
+
 
         this.mast_parameters.total_moments = total_moments;
 
         // M/EI in 1/m
+
+
+
+
+
+        let z_mei_start, z_mei_end;
+
         this.mast_parameters.tubes.forEach((tube, i) => {
-            this.mast_parameters.tubes[i].M_EI = {
-                [tube.extended_zb]:
-                    total_moments[tube.extended_zb] / tube.EI_Nm2,
-                [tube.extended_zt]:
-                    total_moments[tube.extended_zt] / tube.EI_Nm2,
-            };
+
+            if (i > 0 && i < this.mast_parameters.noOfTubes - 1) {
+                z_mei_start = this.mast_parameters.tubes[i+1].extended_zt;
+                z_mei_end = tube.extended_zt;
+            }
+
+            // When tube is at the top end
+            if (i === 0) {
+                z_mei_end = this.mast_parameters.extendedHeight;
+                z_mei_start = this.mast_parameters.tubes[i+1].extended_zt;
+            }
 
             // When tube is biggest (at the bottom end)
             if (tube.od === this.mast_parameters.tubes.at(-1).od) {
-                this.mast_parameters.tubes[i].M_EI[0] =
-                    total_moments[0] / tube.EI_Nm2;
+                z_mei_end = tube.extended_zt;
+                z_mei_start = 0;
             }
+
+            this.mast_parameters.tubes[i].M_EI = {
+                [z_mei_start]: total_moments[z_mei_start] / tube.EI_Nm2,
+                [z_mei_end]: total_moments[z_mei_end] / tube.EI_Nm2,
+            };
+
+
+
+
         });
 
         // Find deflection at side adapter location
-        // this.mast_parameters.deflection_at_side_adapter =
-        //     this.findDeflectionAtGivenPoint(
-        //         this.mast_parameters.side_adapter_z,
-        //     );
+        this.mast_parameters.deflection_at_side_adapter =
+            this.findDeflectionAtGivenPoint(
+                this.mast_parameters.side_adapter_z,
+            );
 
         // Find deflection at payload location
         this.mast_parameters.deflection_at_mast_tip =
@@ -630,14 +673,14 @@ export class MastGeometry {
                 this.mast_parameters.deflection_at_side_adapter) /
             Math.pow(this.mast_parameters.side_adapter_z / 1000, 3);
 
-        console.log(
-            "ei",
-            this.mast_parameters.tubes.at(-1).EI_Nm2,
-            "def",
-            this.mast_parameters.deflection_at_side_adapter,
-            "height",
-            this.mast_parameters.side_adapter_z,
-        );
+        // console.log(
+        //     "ei",
+        //     this.mast_parameters.tubes.at(-1).EI_Nm2,
+        //     "def",
+        //     this.mast_parameters.deflection_at_side_adapter,
+        //     "height",
+        //     this.mast_parameters.side_adapter_z,
+        // );
     }
 
     findDeflectionAtGivenPoint(height) {
@@ -666,14 +709,18 @@ export class MastGeometry {
             mei_end = tube.M_EI[z_end];
 
             if (height < tube.extended_zt) {
-                console.log(
-                    "buras 2",
-                    i,
-                    "mei_start",
-                    mei_start,
-                    "mei_end",
-                    mei_end,
-                );
+                // console.log(
+                //     "burada",
+                //     i,
+                //     "mei_start",
+                //     mei_start,
+                //     "mei_end",
+                //     mei_end,
+                //     "z_end",
+                //     z_end,
+                //     "z_start",
+                //     z_start,
+                // );
 
                 delta_m = Math.abs(mei_end - mei_start); //
                 delta_z = Math.abs(z_end - z_start) / 1000; // m
@@ -714,7 +761,7 @@ export class MastGeometry {
             }
         });
 
-        console.log("Deflection", deflection);
+        // console.log("Deflection", deflection);
 
         return deflection;
     }

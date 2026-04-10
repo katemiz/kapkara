@@ -50,6 +50,24 @@ class ConfiguratorController extends Controller
      */
     public function index(Request $request): Response
     {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
             // 'filters' sends the search term back to Svelte so the input stays filled
             "per_page" => config("pagination.per_page"),

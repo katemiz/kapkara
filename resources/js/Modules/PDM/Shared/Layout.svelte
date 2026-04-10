@@ -16,7 +16,7 @@
     <link rel="icon" type="image/x-icon" href={favicon}>
 </svelte:head>
 
-{console.log("Current page props:", $page.props)}
+<!-- {console.log("Current page props:", $page.props)} -->
 
 <NavBar />
 
