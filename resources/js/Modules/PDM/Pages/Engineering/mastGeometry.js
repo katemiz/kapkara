@@ -11,7 +11,6 @@ import {
     alum_6063_ultimate_strength,
 } from "$modules/PDM/Shared/tube_data.js";
 
-
 import Chart from "chart.js/auto";
 
 export class MastGeometry {
@@ -78,7 +77,8 @@ export class MastGeometry {
         }
 
         // Find Z-Offset
-        this.mast_parameters.z_offset = Math.sqrt(this.mast_parameters.sail_area * 1e6) / 2; // mm
+        this.mast_parameters.z_offset =
+            Math.sqrt(this.mast_parameters.sail_area * 1e6) / 2; // mm
     }
 
     setMastTubes() {
@@ -499,7 +499,7 @@ export class MastGeometry {
         let root_moment = 0; // Initialize root moment for each tube
         let shear_force = 0; // Initialize shear force for each tube
 
-        let moment_b, moment_t,moment_at_wind_load;
+        let moment_b, moment_t, moment_at_wind_load;
         let z_coordinate_b, z_coordinate_t;
 
         this.mast_parameters.tubes.forEach((tube, i) => {
@@ -513,9 +513,15 @@ export class MastGeometry {
 
             this.mast_parameters.tubes.forEach((t, k) => {
                 // moment formula
-                moment_b = (root_moment / tube.wind_load_z) * t.extended_zb - root_moment;
-                moment_at_wind_load = (root_moment / tube.wind_load_z) * t.wind_load_z - root_moment;
-                moment_t = (root_moment / tube.wind_load_z) * t.extended_zt - root_moment;
+                moment_b =
+                    (root_moment / tube.wind_load_z) * t.extended_zb -
+                    root_moment;
+                moment_at_wind_load =
+                    (root_moment / tube.wind_load_z) * t.wind_load_z -
+                    root_moment;
+                moment_t =
+                    (root_moment / tube.wind_load_z) * t.extended_zt -
+                    root_moment;
 
                 if (moment_t > 0) {
                     moment_t = 0;
@@ -553,16 +559,15 @@ export class MastGeometry {
         // Z-Offset Moment Calculation
         // Add moment caused by z_offset shift of payload wind load from the top of the mast to the payload center of pressure
         this.mast_parameters.payload.tip_moment_due_z_offset_Nm =
-            -(this.mast_parameters.payload.wind_load *
-                this.mast_parameters.z_offset) /
-            1000; // Convert to Nm
+            -(
+                this.mast_parameters.payload.wind_load *
+                this.mast_parameters.z_offset
+            ) / 1000; // Convert to Nm
 
         // X-Offset Moment Calculation
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load
         this.mast_parameters.payload.tip_moment_due_x_offset_Nm =
-            -(9.81 * payload_mass *
-                this.mast_parameters.x_offset) /
-            1000; // Convert to Nm
+            -(9.81 * payload_mass * this.mast_parameters.x_offset) / 1000; // Convert to Nm
 
         // Moment Caused by Deflection of the Mast under Wind Load
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load, limited to a maximum of tip_deflection_percentage % of the extended height of the mast
@@ -589,17 +594,20 @@ export class MastGeometry {
             total_moments[key] = 0;
         });
 
-
-
         this.mast_parameters.payload.moments = {};
 
-        let payload_root_moment = this.mast_parameters.payload.wind_load * this.mast_parameters.extendedHeight / 1000; // Nm
+        let payload_root_moment =
+            (this.mast_parameters.payload.wind_load *
+                this.mast_parameters.extendedHeight) /
+            1000; // Nm
         let slope = payload_root_moment / this.mast_parameters.extendedHeight; // N/mm
 
         sortedKeys.forEach((key) => {
-            this.mast_parameters.payload.moments[key] = (slope * key - payload_root_moment) + this.mast_parameters.payload.total_tip_moment_Nm;
+            this.mast_parameters.payload.moments[key] =
+                slope * key -
+                payload_root_moment +
+                this.mast_parameters.payload.total_tip_moment_Nm;
         });
-
 
         this.mast_parameters.tubes.forEach((tube, i) => {
             sortedKeys.forEach((key) => {
@@ -611,29 +619,24 @@ export class MastGeometry {
             total_moments[key] += this.mast_parameters.payload.moments[key];
         });
 
-
-
         this.mast_parameters.total_moments = total_moments;
 
         // M/EI in 1/m
 
-
-
-
-
         let z_mei_start, z_mei_end;
 
         this.mast_parameters.tubes.forEach((tube, i) => {
-
             if (i > 0 && i < this.mast_parameters.noOfTubes - 1) {
-                z_mei_start = this.mast_parameters.tubes[i+1].extended_zt;
+                z_mei_start = this.mast_parameters.tubes[i + 1].extended_zt;
                 z_mei_end = tube.extended_zt;
             }
 
             // When tube is at the top end
             if (i === 0) {
                 z_mei_end = this.mast_parameters.extendedHeight;
-                z_mei_start = this.mast_parameters.tubes[i+1].extended_zt;
+                if (this.mast_parameters.tubes.length > 1) {
+                    z_mei_start = this.mast_parameters.tubes[i + 1].extended_zt;
+                }
             }
 
             // When tube is biggest (at the bottom end)
@@ -642,24 +645,27 @@ export class MastGeometry {
                 z_mei_start = 0;
             }
 
+            // When there is single tube
+            if (this.mast_parameters.tubes.length === 1) {
+                z_mei_start = 0;
+                z_mei_end = this.mast_parameters.extendedHeight;
+            }
+
             this.mast_parameters.tubes[i].M_EI = {
                 [z_mei_start]: total_moments[z_mei_start] / tube.EI_Nm2,
                 [z_mei_end]: total_moments[z_mei_end] / tube.EI_Nm2,
             };
-
-
-
-
         });
 
+        this.mast_parameters.deflections = {};
         // Find deflection at side adapter location
-        this.mast_parameters.deflection_at_side_adapter =
+        this.mast_parameters.deflections["at_side_adapter"] =
             this.findDeflectionAtGivenPoint(
                 this.mast_parameters.side_adapter_z,
             );
 
         // Find deflection at payload location
-        this.mast_parameters.deflection_at_mast_tip =
+        this.mast_parameters.deflections["at_mast_tip"] =
             this.findDeflectionAtGivenPoint(
                 this.mast_parameters.extendedHeight,
             );
@@ -672,96 +678,117 @@ export class MastGeometry {
                 this.mast_parameters.tubes.at(-1).EI_Nm2 *
                 this.mast_parameters.deflection_at_side_adapter) /
             Math.pow(this.mast_parameters.side_adapter_z / 1000, 3);
-
-        // console.log(
-        //     "ei",
-        //     this.mast_parameters.tubes.at(-1).EI_Nm2,
-        //     "def",
-        //     this.mast_parameters.deflection_at_side_adapter,
-        //     "height",
-        //     this.mast_parameters.side_adapter_z,
-        // );
     }
 
     findDeflectionAtGivenPoint(height) {
         let z_start, z_end;
-        let mei_start, mei_end;
+        let mei_start, mei_end, mei_height;
 
         let moment_area, xbar;
         let delta_z, delta_m;
         let deflection = 0;
-        let slope;
+
+        // Moment-Area Method
+        // M/EI Diagram Area * xbar
 
         this.mast_parameters.tubes.forEach((tube, i) => {
-            z_start = tube.extended_zb;
-            // When tube is biggest (at the bottom end)
-            if (tube.od === this.mast_parameters.tubes.at(-1).od) {
-                z_start = 0;
-            }
+            if (height > tube.extended_zb) {
+                if (height < tube.extended_zt) {
+                    // Use All Area between extended_zb and height
+                    // ------------------------------------------------
+                    z_end = tube.extended_zt;
 
-            if (i === 0) {
-                z_end = this.mast_parameters.extendedHeight;
-            } else {
-                z_end = tube.extended_zt;
-            }
+                    // When tube is biggest (at the bottom end)
+                    if (tube.od === this.mast_parameters.tubes.at(-1).od) {
+                        z_start = 0;
+                    } else {
+                        z_start = this.mast_parameters.tubes[i + 1].extended_zt;
+                    }
 
-            mei_start = tube.M_EI[z_start];
-            mei_end = tube.M_EI[z_end];
+                    if (i === 0) {
+                        z_end = this.mast_parameters.extendedHeight;
+                    }
 
-            if (height < tube.extended_zt) {
+                    mei_end = tube.M_EI[z_end];
+                    mei_start = tube.M_EI[z_start];
+
+                    // Find M/EI corresponding to height
+                    if (mei_end < mei_start) {
+                        mei_height =
+                            mei_start -
+                            ((mei_start - mei_end) * (height - z_start)) /
+                                (z_end - z_start);
+                    } else {
+                        mei_height =
+                            mei_start +
+                            ((mei_end - mei_start) * (height - z_start)) /
+                                (z_end - z_start);
+                    }
+
+                    mei_end = mei_height;
+                    z_end = height;
+                } else {
+                    // Use All Area between extended_zb and extended_zt
+                    // ------------------------------------------------
+                    z_end = tube.extended_zt;
+
+                    // When tube is biggest (at the bottom end)
+                    if (tube.od === this.mast_parameters.tubes.at(-1).od) {
+                        z_start = 0;
+                    } else {
+                        z_start = this.mast_parameters.tubes[i + 1].extended_zt;
+                    }
+
+                    if (i === 0) {
+                        z_end = this.mast_parameters.extendedHeight;
+                    }
+
+                    mei_end = tube.M_EI[z_end];
+                    mei_start = tube.M_EI[z_start];
+                }
+
+                // Find Moment-Area
+                delta_z = z_end - z_start;
+                delta_m = Math.abs(mei_end - mei_start);
+
+                moment_area = ((mei_start + mei_end) * delta_z) / 2;
+
+                // xbar calculation
+                if (mei_end > mei_start) {
+                    xbar =
+                        (delta_z * (mei_start + (2 * delta_m) / 3)) /
+                        (mei_start + mei_end);
+                } else {
+                    xbar =
+                        (delta_z * (mei_start + (1 * delta_m) / 3)) /
+                        (mei_end + mei_start);
+                }
+
                 // console.log(
-                //     "burada",
-                //     i,
                 //     "mei_start",
                 //     mei_start,
                 //     "mei_end",
                 //     mei_end,
-                //     "z_end",
-                //     z_end,
                 //     "z_start",
                 //     z_start,
+                //     "z_end",
+                //     z_end,
+                //     "xbar",
+                //     xbar,
+                //     "moment_area",
+                //     moment_area,
+                //     "i",
+                //     i,
+                //     "height",
+                //     height,
                 // );
 
-                delta_m = Math.abs(mei_end - mei_start); //
-                delta_z = Math.abs(z_end - z_start) / 1000; // m
-
-                moment_area = ((mei_start + mei_end) * delta_z) / 2;
-
-                xbar =
-                    (delta_z * delta_m + (2 * delta_m) / 3) /
-                    (2 * mei_start + mei_end);
-
-                xbar += Math.abs(height - z_end);
-
+                // Deflection calculation
                 deflection += (xbar * moment_area) / 1000;
-
-                //console.log("deflection1", deflection, i);
-            } else if (z_start < height < z_end) {
-                delta_m = Math.abs(tube.M_EI[z_end] - tube.M_EI[z_start]); //
-                delta_z = Math.abs(z_end - z_start) / 1000; // m
-
-                slope = delta_m / delta_z;
-
-                mei_end = mei_start + (slope * (height - z_start)) / 1000;
-
-                delta_m = Math.abs(mei_end - mei_start);
-                delta_z = Math.abs(height - z_start) / 1000; // m
-
-                moment_area = ((mei_start + mei_end) * delta_z) / 2;
-
-                xbar =
-                    (delta_z * delta_m + (2 * delta_m) / 3) /
-                    (2 * mei_start + mei_end);
-
-                xbar += Math.abs(height - z_end);
-
-                deflection += (xbar * moment_area) / 1000;
-
-                //console.log("deflection2", deflection, i);
             }
         });
 
-        // console.log("Deflection", deflection);
+        console.log("Deflection", deflection);
 
         return deflection;
     }
