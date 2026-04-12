@@ -2,6 +2,7 @@
     import Layout from "$modules/PDM/Shared/Layout.svelte";
     import { onMount } from "svelte";
     import { MastGeometry } from "$modules/PDM/Pages/Engineering/mastGeometry.js";
+    import { SvgDraw } from "$modules/PDM/Pages/Engineering/SvgDraw.js";
 
     import Chart from "chart.js/auto";
 
@@ -24,13 +25,12 @@
     };
 
     let mast = $derived(new MastGeometry(mast_parameters));
+    let svgDraw = $derived(new SvgDraw(mast.mast_parameters, "svgDiv"));
 
     onMount(() => {
         const ctx = chartCanvas.getContext("2d");
 
         let min_EI = mast.mast_parameters.tubes.at(-1).M_EI["0"];
-
-        console.log("min_EI", min_EI);
 
         let chartData = {
             labels: Object.keys(mast.mast_parameters.total_moments),
@@ -144,6 +144,9 @@
             },
         });
 
+        // Draw the SVG
+        svgDraw.svgDraw();
+
         // Cleanup when component is destroyed
         return () => {
             if (chartInstance) chartInstance.destroy();
@@ -160,5 +163,7 @@
         <div class="container mx-auto">
             <canvas bind:this={chartCanvas}></canvas>
         </div>
+
+        <div class="container mx-auto has-background-info" id="svgDiv"></div>
     </section>
 </Layout>
