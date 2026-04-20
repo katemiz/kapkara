@@ -39,10 +39,19 @@ class ConfiguratorController extends Controller
 
     // This is the default structure for a new MODEL, used when creating a new one
 
-    public $material = [
-        "materialCategory" => null,
-        "materialForm" => null,
-        "materialIsActive" => 1,
+    public $mast_parameters = [
+        "base_adapter_height" => 50,
+        "payload_adapter_height" => 15,
+        "head_height" => 42,
+        "material" => "6063",
+        "tube_length" => 2000,
+        "start_tube_no" => 10,
+        "end_tube_no" => 15,
+        "overlap" => 500,
+        "terrain_category" => "II",
+        "wind_speed" => 120,
+        "sail_area" => 1.2,
+        "x_offset" => 100,
     ];
 
     /**
@@ -50,24 +59,6 @@ class ConfiguratorController extends Controller
      */
     public function index(Request $request): Response
     {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
             // 'filters' sends the search term back to Svelte so the input stays filled
             "per_page" => config("pagination.per_page"),
