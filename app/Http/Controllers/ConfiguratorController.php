@@ -39,7 +39,7 @@ class ConfiguratorController extends Controller
 
     // This is the default structure for a new MODEL, used when creating a new one
 
-    public $mast_parameters = [
+    public $params = [
         "base_adapter_height" => 50,
         "payload_adapter_height" => 15,
         "head_height" => 42,
@@ -47,11 +47,12 @@ class ConfiguratorController extends Controller
         "tube_length" => 2000,
         "start_tube_no" => 10,
         "end_tube_no" => 15,
-        "overlap" => 500,
+        "overlap" => 502,
         "terrain_category" => "II",
         "wind_speed" => 120,
         "sail_area" => 1.2,
         "x_offset" => 100,
+        "z_offset" => null
     ];
 
     /**
@@ -59,10 +60,14 @@ class ConfiguratorController extends Controller
      */
     public function index(Request $request): Response
     {
+        $this->setZOffset();
+
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
-            // 'filters' sends the search term back to Svelte so the input stays filled
+            
             "per_page" => config("pagination.per_page"),
-            "filters" => $request->only(["search"]),
+            "filters" => $request->only(["search"]),    // 'filters' sends the search term back to Svelte so the input stays filled
+            "params" => $this->params,
+            "supportFixedData" => $this->supportFixedData,
             "materials" => Material::query()
                 ->when($request->input("search"), function ($query, $search) {
                     $query
@@ -75,6 +80,12 @@ class ConfiguratorController extends Controller
                 ->withQueryString(), // VERY IMPORTANT: keeps search param during pagination
         ]);
     }
+
+    public function setZOffset() {
+        $this->params["z_offset"] = round(1000 * sqrt($this->params["sail_area"])/2,0);
+    }
+
+
 
     /**
      * Show the form for creating a new question.

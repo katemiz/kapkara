@@ -21,6 +21,6 @@
 {/if}
 
 {#if subtitle}
-<h2 class="subtitle {css2 ? css2: ''}" >{subtitle}</h2>
+<h2 class="subtitle has-text-weight-light mt-0{css2 ? css2: ''}" >{subtitle}</h2>
 {/if}
 

@@ -8,8 +8,11 @@
      *   form={form}
      *   name="myInput"
      *   label="Title (myInput)"
-     *   type="text"
+     *   type="text/number"
      *   placeholder="Enter a title"
+     *   min
+     *   max
+     *   step
      * />
      */
 
@@ -25,6 +28,9 @@
         required = false, // Required attribute
         disabled = false, // Disabled attribute
         autocomplete = "", // Autocomplete attribute
+        min = undefined,     // Minimum value
+        max = undefined,     // Maximum value
+        step = undefined,     // Increment step
         class: customClass = "", // Additional CSS classes
     } = $props();
 
@@ -53,6 +59,9 @@
             {required}
             {disabled}
             {autocomplete}
+            {min}
+            {max}
+            {step}
             bind:value={$form[name]}
         />
     </div>

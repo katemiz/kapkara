@@ -1,25 +1,15 @@
-import {
-    tubes_geometry,
-    terrain_category,
-    air_density,
-    dynamic_viscosity_mu,
-    drag_coefficient_Cd,
-    tip_deflection_percentage,
-    alum_6063_density,
-    alum_6063_E,
-    alum_6063_yield_strength,
-    alum_6063_ultimate_strength,
-} from "$modules/PDM/Shared/tube_data.js";
 
 import Chart from "chart.js/auto";
 
 export class MastGeometry {
-    constructor(mast_parameters) {
-        this.mast_parameters = mast_parameters;
+    constructor(params, config) {
 
-        this.mast_parameters.noOfTubes =
-            this.mast_parameters.end_tube_no -
-            this.mast_parameters.start_tube_no +
+        this.params = params;
+        this.config = config;
+
+        this.params.noOfTubes =
+            this.params.end_tube_no -
+            this.params.start_tube_no +
             1;
 
         this.payload_mass = null;
@@ -49,7 +39,7 @@ export class MastGeometry {
     setAllowedTipDeflection() {
         // Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
         this.allowed_tip_deflection_mm =
-            (tip_deflection_percentage * this.mast_parameters.extendedHeight) /
+            (this.config.tip_deflection_percentage * this.extendedHeight) /
             100; // mm
     }
 
@@ -66,28 +56,28 @@ export class MastGeometry {
     }
 
     setDependentProps() {
-        switch (this.mast_parameters.material) {
+        switch (this.params.material) {
             // Aluminum
             default:
-                this.tube_material_density = alum_6063_density; // kg/m³
-                this.tube_material_e = alum_6063_E; // Pa
-                this.tube_yield_strength = alum_6063_yield_strength; // Pa
-                this.tube_ultimate_strength = alum_6063_ultimate_strength; // Pa
+                this.tube_material_density = this.config.alum_6063_density; // kg/m³
+                this.tube_material_e = this.config.alum_6063_E; // Pa
+                this.tube_yield_strength = this.config.alum_6063_yield_strength; // Pa
+                this.tube_ultimate_strength = this.config.alum_6063_ultimate_strength; // Pa
                 break;
         }
 
-        // Find Z-Offset
-        this.mast_parameters.z_offset =
-            Math.sqrt(this.mast_parameters.sail_area * 1e6) / 2; // mm
+        // // Find Z-Offset
+        // this.params.z_offset =
+        //     Math.sqrt(this.params.sail_area * 1e6) / 2; // mm
     }
 
     setMastTubes() {
-        this.mast_parameters.tubes = [];
+        this.params.tubes = [];
 
-        tubes_geometry.forEach((tube) => {
+        this.config.tubes.forEach((tube) => {
             if (
-                tube.no >= this.mast_parameters.start_tube_no &&
-                tube.no <= this.mast_parameters.end_tube_no
+                tube.no >= this.params.start_tube_no &&
+                tube.no <= this.params.end_tube_no
             ) {
                 // Set material properties
                 tube.material_density = this.tube_material_density;
@@ -107,7 +97,7 @@ export class MastGeometry {
                 // Calculate eachTubeMass
                 tube.mass = this.calculateMass(
                     tube,
-                    this.mast_parameters.tube_length / 1000,
+                    this.params.tube_length / 1000,
                 ); // kg
 
                 // Calculate Moment Capacity at Yield Strength
@@ -138,7 +128,7 @@ export class MastGeometry {
                 // Calculate EI
                 tube.EI_Nm2 = tube.material_e * tube.inertia_mm4 * 1e-12; // Nm2
 
-                this.mast_parameters.tubes.push(tube);
+                this.params.tubes.push(tube);
             }
         });
     }
@@ -149,58 +139,59 @@ export class MastGeometry {
     }
 
     setMastHeights() {
-        this.mast_parameters.extendedHeight =
-            this.mast_parameters.noOfTubes * this.mast_parameters.tube_length -
-            (this.mast_parameters.noOfTubes - 1) *
-                this.mast_parameters.overlap +
-            this.mast_parameters.payload_adapter_height +
-            this.mast_parameters.base_adapter_height;
-        this.mast_parameters.nestedHeight =
-            this.mast_parameters.tube_length +
-            (this.mast_parameters.noOfTubes - 1) *
-                this.mast_parameters.head_height +
-            this.mast_parameters.payload_adapter_height +
-            this.mast_parameters.base_adapter_height;
+        this.extendedHeight =
+            this.params.noOfTubes * this.params.tube_length -
+            (this.params.noOfTubes - 1) *
+                this.params.overlap +
+            this.params.payload_adapter_height +
+            this.params.base_adapter_height;
+
+        this.nestedHeight =
+            this.params.tube_length +
+            (this.params.noOfTubes - 1) *
+                this.params.head_height +
+            this.params.payload_adapter_height +
+            this.params.base_adapter_height;
     }
 
     setZPositions() {
         let ezb, ezt, nzb, nzt;
 
-        this.mast_parameters.tubes.forEach((tube, index) => {
+        this.params.tubes.forEach((tube, index) => {
             if (index === 0) {
                 // Extended State
                 ezt =
-                    this.mast_parameters.extendedHeight -
-                    this.mast_parameters.payload_adapter_height;
-                ezb = ezt - this.mast_parameters.tube_length;
+                    this.extendedHeight -
+                    this.params.payload_adapter_height;
+                ezb = ezt - this.params.tube_length;
 
                 // Nested State
                 nzt =
-                    this.mast_parameters.nestedHeight -
-                    this.mast_parameters.payload_adapter_height;
-                nzb = nzt - this.mast_parameters.tube_length;
+                    this.nestedHeight -
+                    this.params.payload_adapter_height;
+                nzb = nzt - this.params.tube_length;
             } else {
                 // Extended State
-                ezt = ezb + this.mast_parameters.overlap;
-                ezb = ezt - this.mast_parameters.tube_length;
+                ezt = ezb + this.params.overlap;
+                ezb = ezt - this.params.tube_length;
 
                 // Nested State
-                nzt = nzt - this.mast_parameters.head_height;
-                nzb = nzt - this.mast_parameters.tube_length;
+                nzt = nzt - this.params.head_height;
+                nzb = nzt - this.params.tube_length;
             }
 
-            this.mast_parameters.tubes[index].nested_zb = nzb;
-            this.mast_parameters.tubes[index].nested_zt = nzt;
+            this.params.tubes[index].nested_zb = nzb;
+            this.params.tubes[index].nested_zt = nzt;
 
-            this.mast_parameters.tubes[index].extended_zb = ezb;
-            this.mast_parameters.tubes[index].extended_zt = ezt;
+            this.params.tubes[index].extended_zb = ezb;
+            this.params.tubes[index].extended_zt = ezt;
         });
 
         // Side Adapter
-        const lastTube = this.mast_parameters.tubes.at(-1);
+        const lastTube = this.params.tubes.at(-1);
 
-        this.mast_parameters.side_adapter_z =
-            lastTube.extended_zt - this.mast_parameters.overlap / 2;
+        this.side_adapter_z =
+            lastTube.extended_zt - this.params.overlap / 2;
     }
 
     windLoadsOnTubes() {
@@ -226,92 +217,85 @@ export class MastGeometry {
 
         let exposed_length;
 
-        const terrain = terrain_category.find(
-            (cat) => cat.no === this.mast_parameters.terrain_category,
+        const terrain = this.config.terrain_category.find(
+            (cat) => cat.no === this.params.terrain_category,
         );
 
-        this.mast_parameters.tubes.forEach((tube, i) => {
-            if (i != this.mast_parameters.noOfTubes - 1) {
+        this.params.tubes.forEach((tube, i) => {
+            if (i != this.params.noOfTubes - 1) {
                 exposed_length =
-                    this.mast_parameters.tube_length -
-                    this.mast_parameters.overlap; // mm
+                    this.params.tube_length -
+                    this.params.overlap; // mm
 
-                this.mast_parameters.tubes[i].wind_load_z =
+                this.params.tubes[i].wind_load_z =
                     tube.extended_zt - exposed_length / 2;
             } else {
                 exposed_length = tube.extended_zt; // mm
 
-                this.mast_parameters.tubes[i].wind_load_z =
+                this.params.tubes[i].wind_load_z =
                     tube.extended_zt / 2;
             }
 
-            this.mast_parameters.tubes[i].reference_area =
+            this.params.tubes[i].reference_area =
                 (tube.od * exposed_length) / 1000000; // m2
 
-            this.mast_parameters.tubes[i].wind_exposed_length = exposed_length;
+            this.params.tubes[i].wind_exposed_length = exposed_length;
 
             // Reference Height Ze
-            this.mast_parameters.tubes[i].Ze = tube.extended_zt;
+            this.params.tubes[i].Ze = tube.extended_zt;
 
             // Roughness Length (m)
-            this.mast_parameters.tubes[i].roughness_length_Z0 = terrain.z0;
+            this.params.tubes[i].roughness_length_Z0 = terrain.z0;
 
             // Terrain Factor kr
-            this.mast_parameters.tubes[i].terrain_factor_kr =
+            this.params.tubes[i].terrain_factor_kr =
                 0.19 * Math.pow(terrain.z0 / 0.05, 0.07);
 
             // Roughness factor Cr(ze) at the reference height
-            this.mast_parameters.tubes[i].max_height = Math.max(
+            this.params.tubes[i].max_height = Math.max(
                 tube.extended_zt / 1000,
                 terrain.zmin,
             ); //m
 
-            this.mast_parameters.tubes[i].roughness_factor_Cr_at_Ze =
-                this.mast_parameters.tubes[i].terrain_factor_kr *
-                Math.log(this.mast_parameters.tubes[i].max_height / terrain.z0);
-
-            // console.log(
-            //     this.mast_parameters.tubes[i].max_height,
-            //     terrain.z0,
-            //     this.mast_parameters.tubes[i].terrain_factor_kr,
-            //     this.mast_parameters.tubes[i].roughness_factor_Cr_at_Ze,
-            // );
+            this.params.tubes[i].roughness_factor_Cr_at_Ze =
+                this.params.tubes[i].terrain_factor_kr *
+                Math.log(this.params.tubes[i].max_height / terrain.z0);
 
             // Calculate the mean wind speed at the height of the tube
-            this.mast_parameters.tubes[i].mean_wind_speed_Vm =
-                (this.mast_parameters.tubes[i].roughness_factor_Cr_at_Ze *
-                    this.mast_parameters.wind_speed) /
+            this.params.tubes[i].mean_wind_speed_Vm =
+                (this.params.tubes[i].roughness_factor_Cr_at_Ze *
+                    this.params.wind_speed) /
                 3.6; // Convert to m/s
 
             // Turbulence Intensity
-            this.mast_parameters.tubes[i].turbulence_intensity_TI =
+            this.params.tubes[i].turbulence_intensity_TI =
                 1.0 /
                 (1.0 *
                     Math.log(
-                        this.mast_parameters.tubes[i].max_height / terrain.z0,
+                        this.params.tubes[i].max_height / terrain.z0,
                     ));
 
             // Basic Velocity Pressure
             // Basic Velocity Pressure Formula: q = 0.5 * ρ * V^2
-            this.mast_parameters.tubes[i].basic_velocity_pressure_q =
+            this.params.tubes[i].basic_velocity_pressure_q =
                 0.5 *
-                air_density *
-                Math.pow(this.mast_parameters.wind_speed / 3.6, 2); // Basic velocity pressure in N/m2
+                this.config.air_density *
+                Math.pow(this.params.wind_speed / 3.6, 2); // Basic velocity pressure in N/m2
 
             // Peak Velocity Pressure
             // Peak Velocity Pressure Formula: qp =[ 1+ 7* TI ] * 0.5 *  ρ *  Vm^2
-            this.mast_parameters.tubes[i].peak_velocity_pressure_qp =
+            this.params.tubes[i].peak_velocity_pressure_qp =
                 (1 +
-                    7 * this.mast_parameters.tubes[i].turbulence_intensity_TI) *
+                    7 * this.params.tubes[i].turbulence_intensity_TI) *
                 0.5 *
-                air_density *
-                Math.pow(this.mast_parameters.tubes[i].mean_wind_speed_Vm, 2); // Peak velocity pressure in N/m2
+                this.config.air_density *
+                Math.pow(this.params.tubes[i].mean_wind_speed_Vm, 2); // Peak velocity pressure in N/m2
 
             // Wind velocity corresponding to peak velocity pressure
             // Wind Velocity Formula: Vp = sqrt(2 * qp / ρ)
-            this.mast_parameters.tubes[i].wind_velocity_Vp_at_qp = Math.sqrt(
-                (2 * this.mast_parameters.tubes[i].peak_velocity_pressure_qp) /
-                    air_density,
+            this.params.tubes[i].wind_velocity_Vp_at_qp = Math.sqrt(
+                (2 * this.params.tubes[i].peak_velocity_pressure_qp) /
+                    this.config.air_density,
             ); // Wind velocity in m/s corresponding to peak velocity pressure
 
             // Reynolds Number
@@ -322,91 +306,91 @@ export class MastGeometry {
             // Vp = wind velocity (m/s) corresponding to peak velocity pressure
             // D = characteristic length (m) (outer diameter of the tube)
             // μ = dynamic viscosity of air (kg/(m·s)) (assumed to be 1.81e-5 kg/(m·s) at 20°C)
-            this.mast_parameters.tubes[i].reynolds_number_Re =
-                (this.mast_parameters.tubes[i].wind_velocity_Vp_at_qp *
-                    this.mast_parameters.tubes[i].od) /
+            this.params.tubes[i].reynolds_number_Re =
+                (this.params.tubes[i].wind_velocity_Vp_at_qp *
+                    this.params.tubes[i].od) /
                 1000 /
-                dynamic_viscosity_mu; // Reynolds number (dimensionless)
+                this.config.dynamic_viscosity_mu; // Reynolds number (dimensionless)
 
             // Structural Factor
             // Structural Factor is taken as 1.0 for this calculation
-            this.mast_parameters.tubes[i].structural_factor = 1.0; // Structural Factor (dimensionless)
+            this.params.tubes[i].structural_factor = 1.0; // Structural Factor (dimensionless)
 
             // Surface Roughness
             // Surface Roughness is taken as 0.2 for Aluminum coated tubes
-            this.mast_parameters.tubes[i].surface_roughness = 0.2; // Surface Roughness in mm
+            this.params.tubes[i].surface_roughness = 0.2; // Surface Roughness in mm
 
             // Effective Slenderness
-            this.mast_parameters.tubes[i].slenderness_ratio_l_b =
-                this.mast_parameters.tube_length / tube.od; // Slenderness ratio (dimensionless)
+            this.params.tubes[i].slenderness_ratio_l_b =
+                this.params.tube_length / tube.od; // Slenderness ratio (dimensionless)
 
-            if (this.mast_parameters.tube_length / 1000 <= 15) {
-                this.mast_parameters.tubes[i].effective_slenderness = Math.min(
-                    this.mast_parameters.tubes[i].slenderness_ratio_l_b,
+            if (this.params.tube_length / 1000 <= 15) {
+                this.params.tubes[i].effective_slenderness = Math.min(
+                    this.params.tubes[i].slenderness_ratio_l_b,
                     70,
                 ); // Limit to a maximum of 70
             } else {
-                this.mast_parameters.tubes[i].effective_slenderness = Math.min(
-                    0.7 * this.mast_parameters.tubes[i].slenderness_ratio_l_b,
+                this.params.tubes[i].effective_slenderness = Math.min(
+                    0.7 * this.params.tubes[i].slenderness_ratio_l_b,
                     70,
                 ); // Limit to a maximum of 70
             }
 
             // End Effect Factor : Dimensionless
-            if (this.mast_parameters.tubes[i].effective_slenderness <= 10) {
-                this.mast_parameters.tubes[i].end_effect_factor =
+            if (this.params.tubes[i].effective_slenderness <= 10) {
+                this.params.tubes[i].end_effect_factor =
                     0.6023079 *
                     Math.pow(
-                        this.mast_parameters.tubes[i].effective_slenderness,
+                        this.params.tubes[i].effective_slenderness,
                         0.0657553,
                     ); // For slenderness less than or equal to 10
             } else {
-                this.mast_parameters.tubes[i].end_effect_factor =
+                this.params.tubes[i].end_effect_factor =
                     0.698573 +
                     0.001977401 *
-                        this.mast_parameters.tubes[i].effective_slenderness +
+                        this.params.tubes[i].effective_slenderness +
                     0.00008741341 *
                         Math.pow(
-                            this.mast_parameters.tubes[i].effective_slenderness,
+                            this.params.tubes[i].effective_slenderness,
                             2,
                         ) -
                     0.00000103591 *
                         Math.pow(
-                            this.mast_parameters.tubes[i].effective_slenderness,
+                            this.params.tubes[i].effective_slenderness,
                             3,
                         ); // For slenderness greater than 10
             }
 
             // Force Coefficient without End Effect
-            this.mast_parameters.tubes[i].equivalent_roughness_k_b =
-                this.mast_parameters.tubes[i].surface_roughness / tube.od; // Equivalent Roughness
+            this.params.tubes[i].equivalent_roughness_k_b =
+                this.params.tubes[i].surface_roughness / tube.od; // Equivalent Roughness
 
             let force_coefficent =
                 1.2 +
                 (0.18 *
                     Math.log10(
                         10 *
-                            this.mast_parameters.tubes[i]
+                            this.params.tubes[i]
                                 .equivalent_roughness_k_b,
                     )) /
                     (1 +
                         0.4 *
                             Math.log10(
-                                this.mast_parameters.tubes[i]
+                                this.params.tubes[i]
                                     .reynolds_number_Re / 1e6,
                             ));
 
-            if (this.mast_parameters.tubes[i].reynolds_number_Re < 1.8e5) {
+            if (this.params.tubes[i].reynolds_number_Re < 1.8e5) {
                 // For Reynolds number less than 1.8e5, use a different formula
                 return 1.2;
             } else if (
-                this.mast_parameters.tubes[i].reynolds_number_Re >= 1.85e5 &&
-                this.mast_parameters.tubes[i].reynolds_number_Re < 4e5
+                this.params.tubes[i].reynolds_number_Re >= 1.85e5 &&
+                this.params.tubes[i].reynolds_number_Re < 4e5
             ) {
                 let temp_force_coefficient =
                     0.11 /
                     Math.pow(
-                        this.mast_parameters.tubes[i].reynolds_number_Re / 1e6,
+                        this.params.tubes[i].reynolds_number_Re / 1e6,
                         1.4,
                     );
 
@@ -421,7 +405,7 @@ export class MastGeometry {
                 force_coefficent = 0.4;
             }
 
-            this.mast_parameters.tubes[i].force_coefficient_wo_end_effect =
+            this.params.tubes[i].force_coefficient_wo_end_effect =
                 force_coefficent;
 
             // Force Coefficient
@@ -431,26 +415,20 @@ export class MastGeometry {
             // Cf = Force Coefficient (dimensionless)
             // Cfw = Force Coefficient without End Effect (dimensionless)
             // EndEffectFactor = End Effect Factor (dimensionless)
-            this.mast_parameters.tubes[i].force_coefficient =
-                this.mast_parameters.tubes[i].force_coefficient_wo_end_effect *
-                this.mast_parameters.tubes[i].end_effect_factor; // Force Coefficient (dimensionless)
+            this.params.tubes[i].force_coefficient =
+                this.params.tubes[i].force_coefficient_wo_end_effect *
+                this.params.tubes[i].end_effect_factor; // Force Coefficient (dimensionless)
 
             // ***********************************************************************************
             // Total Wind Force
             // Total Wind Force Formula: Fw = Structural Factor * Force Coefficient * Peak Velocity Pressure * Reference Area
             // ***********************************************************************************
 
-            // console.log(
-            //     this.mast_parameters.tubes[i].structural_factor,
-            //     this.mast_parameters.tubes[i].force_coefficient,
-            //     this.mast_parameters.tubes[i].peak_velocity_pressure_qp,
-            //     this.mast_parameters.tubes[i].reference_area,
-            // );
-            this.mast_parameters.tubes[i].wind_load =
-                this.mast_parameters.tubes[i].structural_factor *
-                this.mast_parameters.tubes[i].force_coefficient *
-                this.mast_parameters.tubes[i].peak_velocity_pressure_qp *
-                this.mast_parameters.tubes[i].reference_area;
+            this.params.tubes[i].wind_load =
+                this.params.tubes[i].structural_factor *
+                this.params.tubes[i].force_coefficient *
+                this.params.tubes[i].peak_velocity_pressure_qp *
+                this.params.tubes[i].reference_area;
         });
     }
 
@@ -463,31 +441,31 @@ export class MastGeometry {
             - V: wind velocity (m/s)
             - A: sail area (m^2)
         */
-        this.mast_parameters.payload = {
+        this.payload = {
             wind_load_z: null,
             wind_load: null,
         };
 
-        this.mast_parameters.payload.wind_load_z =
-            this.mast_parameters.extendedHeight +
-            Math.sqrt(this.mast_parameters.sail_area * 1e6) / 2;
+        this.payload.wind_load_z =
+            this.extendedHeight +
+            Math.sqrt(this.params.sail_area * 1e6) / 2;
 
-        this.mast_parameters.payload.wind_load =
+        this.payload.wind_load =
             0.5 *
-            air_density *
-            drag_coefficient_Cd *
-            Math.pow(this.mast_parameters.wind_speed / 3.6, 2) *
-            this.mast_parameters.sail_area;
+            this.config.air_density *
+            this.config.drag_coefficient_Cd *
+            Math.pow(this.params.wind_speed / 3.6, 2) *
+            this.params.sail_area;
     }
 
     estimateMastMass() {
-        this.mast_parameters.weight = {
+        this.weight = {
             lifted_mass: 0,
             total_mast_mass: 0,
         };
 
-        this.mast_parameters.tubes.forEach((tube) => {
-            this.mast_parameters.weight.total_mast_mass += tube.mass; // kg
+        this.params.tubes.forEach((tube) => {
+            this.weight.total_mast_mass += tube.mass; // kg
         });
     }
 
@@ -502,16 +480,16 @@ export class MastGeometry {
         let moment_b, moment_t, moment_at_wind_load;
         let z_coordinate_b, z_coordinate_t;
 
-        this.mast_parameters.tubes.forEach((tube, i) => {
+        this.params.tubes.forEach((tube, i) => {
             // Find root moment caused by each wind load (without side adapter force moment)
             root_moment = (tube.wind_load * tube.wind_load_z) / 1000; // Convert to Nm
             shear_force = (tube.wind_load * tube.wind_load_z) / 1000; // Convert to Nm
 
-            this.mast_parameters.tubes[i].moments = {};
+            this.params.tubes[i].moments = {};
 
             let a = {};
 
-            this.mast_parameters.tubes.forEach((t, k) => {
+            this.params.tubes.forEach((t, k) => {
                 // moment formula
                 moment_b =
                     (root_moment / tube.wind_load_z) * t.extended_zb -
@@ -540,11 +518,11 @@ export class MastGeometry {
 
                 // ie Top Tube
                 if (k === 0) {
-                    a[this.mast_parameters.extendedHeight] = moment_t;
+                    a[this.extendedHeight] = moment_t;
                 }
 
                 // ie Bottom Tube
-                if (k === this.mast_parameters.tubes.length - 1) {
+                if (k === this.params.tubes.length - 1) {
                     a[0] = -root_moment;
                 }
 
@@ -553,131 +531,131 @@ export class MastGeometry {
                 a[t.extended_zt] = moment_t;
             });
 
-            this.mast_parameters.tubes[i].moments = a;
+            this.params.tubes[i].moments = a;
         });
 
         // Z-Offset Moment Calculation
         // Add moment caused by z_offset shift of payload wind load from the top of the mast to the payload center of pressure
-        this.mast_parameters.payload.tip_moment_due_z_offset_Nm =
+        this.payload.tip_moment_due_z_offset_Nm =
             -(
-                this.mast_parameters.payload.wind_load *
-                this.mast_parameters.z_offset
+                this.payload.wind_load *
+                this.params.z_offset
             ) / 1000; // Convert to Nm
 
         // X-Offset Moment Calculation
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load
-        this.mast_parameters.payload.tip_moment_due_x_offset_Nm =
-            -(9.81 * payload_mass * this.mast_parameters.x_offset) / 1000; // Convert to Nm
+        this.payload.tip_moment_due_x_offset_Nm =
+            -(9.81 * payload_mass * this.params.x_offset) / 1000; // Convert to Nm
 
         // Moment Caused by Deflection of the Mast under Wind Load
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load, limited to a maximum of tip_deflection_percentage % of the extended height of the mast
-        this.mast_parameters.payload.tip_moment_due_deflection_Nm =
+        this.payload.tip_moment_due_deflection_Nm =
             -(9.81 * payload_mass * this.allowed_tip_deflection_mm) / 1000; // Convert to Nm
 
         console.log("Buraya mast ağırlığı da eklenecek)");
 
         // Total Tip Moment - Constant throughout the mast
-        this.mast_parameters.payload.total_tip_moment_Nm =
-            this.mast_parameters.payload.tip_moment_due_z_offset_Nm +
-            this.mast_parameters.payload.tip_moment_due_x_offset_Nm +
-            this.mast_parameters.payload.tip_moment_due_deflection_Nm;
+        this.payload.total_tip_moment_Nm =
+            this.payload.tip_moment_due_z_offset_Nm +
+            this.payload.tip_moment_due_x_offset_Nm +
+            this.payload.tip_moment_due_deflection_Nm;
 
         // Find total_moments_and_shear_forces at each tube section by adding the moment caused by the side adapter reaction force to the root moment calculated above for each tube section
-        this.mast_parameters.total_moments = {};
+        this.params.total_moments = {};
 
         const total_moments = {};
         const sortedKeys = Object.keys(
-            this.mast_parameters.tubes[0].moments,
+            this.params.tubes[0].moments,
         ).sort((a, b) => Number(a) - Number(b));
 
         sortedKeys.forEach((key) => {
             total_moments[key] = 0;
         });
 
-        this.mast_parameters.payload.moments = {};
+        this.payload.moments = {};
 
         let payload_root_moment =
-            (this.mast_parameters.payload.wind_load *
-                this.mast_parameters.extendedHeight) /
+            (this.payload.wind_load *
+                this.extendedHeight) /
             1000; // Nm
-        let slope = payload_root_moment / this.mast_parameters.extendedHeight; // N/mm
+        let slope = payload_root_moment / this.extendedHeight; // N/mm
 
         sortedKeys.forEach((key) => {
-            this.mast_parameters.payload.moments[key] =
+            this.payload.moments[key] =
                 slope * key -
                 payload_root_moment +
-                this.mast_parameters.payload.total_tip_moment_Nm;
+                this.payload.total_tip_moment_Nm;
         });
 
-        this.mast_parameters.tubes.forEach((tube, i) => {
+        this.params.tubes.forEach((tube, i) => {
             sortedKeys.forEach((key) => {
                 total_moments[key] += tube.moments[key];
             });
         });
 
         sortedKeys.forEach((key) => {
-            total_moments[key] += this.mast_parameters.payload.moments[key];
+            total_moments[key] += this.payload.moments[key];
         });
 
-        this.mast_parameters.total_moments = total_moments;
+        this.params.total_moments = total_moments;
 
         // M/EI in 1/m
 
         let z_mei_start, z_mei_end;
 
-        this.mast_parameters.tubes.forEach((tube, i) => {
-            if (i > 0 && i < this.mast_parameters.noOfTubes - 1) {
-                z_mei_start = this.mast_parameters.tubes[i + 1].extended_zt;
+        this.params.tubes.forEach((tube, i) => {
+            if (i > 0 && i < this.params.noOfTubes - 1) {
+                z_mei_start = this.params.tubes[i + 1].extended_zt;
                 z_mei_end = tube.extended_zt;
             }
 
             // When tube is at the top end
             if (i === 0) {
-                z_mei_end = this.mast_parameters.extendedHeight;
-                if (this.mast_parameters.tubes.length > 1) {
-                    z_mei_start = this.mast_parameters.tubes[i + 1].extended_zt;
+                z_mei_end = this.extendedHeight;
+                if (this.params.tubes.length > 1) {
+                    z_mei_start = this.params.tubes[i + 1].extended_zt;
                 }
             }
 
             // When tube is biggest (at the bottom end)
-            if (tube.od === this.mast_parameters.tubes.at(-1).od) {
+            if (tube.od === this.params.tubes.at(-1).od) {
                 z_mei_end = tube.extended_zt;
                 z_mei_start = 0;
             }
 
             // When there is single tube
-            if (this.mast_parameters.tubes.length === 1) {
+            if (this.params.tubes.length === 1) {
                 z_mei_start = 0;
-                z_mei_end = this.mast_parameters.extendedHeight;
+                z_mei_end = this.extendedHeight;
             }
 
-            this.mast_parameters.tubes[i].M_EI = {
+            this.params.tubes[i].M_EI = {
                 [z_mei_start]: total_moments[z_mei_start] / tube.EI_Nm2,
                 [z_mei_end]: total_moments[z_mei_end] / tube.EI_Nm2,
             };
         });
 
-        this.mast_parameters.deflections = {};
+        this.params.deflections = {};
         // Find deflection at side adapter location
-        this.mast_parameters.deflections["at_side_adapter"] =
+        this.params.deflections["at_side_adapter"] =
             this.findDeflectionAtGivenPoint(
-                this.mast_parameters.side_adapter_z,
+                this.side_adapter_z,
             );
 
         // Find deflection at payload location
-        this.mast_parameters.deflections["at_mast_tip"] =
+        this.params.deflections["at_mast_tip"] =
             this.findDeflectionAtGivenPoint(
-                this.mast_parameters.extendedHeight,
+                this.extendedHeight,
             );
 
         // Find Reaction Force at Side Adapter
         // def = PL^3/(3EI)
         // P = 3EI*deflection/(L^3)
-        this.mast_parameters.reaction_force_at_side_adapter =
+        this.params.reaction_force_at_side_adapter =
             (3 *
-                this.mast_parameters.tubes.at(-1).EI_Nm2 *
-                this.mast_parameters.deflection_at_side_adapter) /
-            Math.pow(this.mast_parameters.side_adapter_z / 1000, 3);
+                this.params.tubes.at(-1).EI_Nm2 *
+                this.params.deflection_at_side_adapter) /
+            Math.pow(this.side_adapter_z / 1000, 3);
     }
 
     findDeflectionAtGivenPoint(height) {
@@ -691,7 +669,7 @@ export class MastGeometry {
         // Moment-Area Method
         // M/EI Diagram Area * xbar
 
-        this.mast_parameters.tubes.forEach((tube, i) => {
+        this.params.tubes.forEach((tube, i) => {
             if (height > tube.extended_zb) {
                 if (height < tube.extended_zt) {
                     // Use All Area between extended_zb and height
@@ -699,14 +677,14 @@ export class MastGeometry {
                     z_end = tube.extended_zt;
 
                     // When tube is biggest (at the bottom end)
-                    if (tube.od === this.mast_parameters.tubes.at(-1).od) {
+                    if (tube.od === this.params.tubes.at(-1).od) {
                         z_start = 0;
                     } else {
-                        z_start = this.mast_parameters.tubes[i + 1].extended_zt;
+                        z_start = this.params.tubes[i + 1].extended_zt;
                     }
 
                     if (i === 0) {
-                        z_end = this.mast_parameters.extendedHeight;
+                        z_end = this.extendedHeight;
                     }
 
                     mei_end = tube.M_EI[z_end];
@@ -733,14 +711,14 @@ export class MastGeometry {
                     z_end = tube.extended_zt;
 
                     // When tube is biggest (at the bottom end)
-                    if (tube.od === this.mast_parameters.tubes.at(-1).od) {
+                    if (tube.od === this.params.tubes.at(-1).od) {
                         z_start = 0;
                     } else {
-                        z_start = this.mast_parameters.tubes[i + 1].extended_zt;
+                        z_start = this.params.tubes[i + 1].extended_zt;
                     }
 
                     if (i === 0) {
-                        z_end = this.mast_parameters.extendedHeight;
+                        z_end = this.extendedHeight;
                     }
 
                     mei_end = tube.M_EI[z_end];
@@ -763,25 +741,6 @@ export class MastGeometry {
                         (delta_z * (mei_start + (1 * delta_m) / 3)) /
                         (mei_end + mei_start);
                 }
-
-                // console.log(
-                //     "mei_start",
-                //     mei_start,
-                //     "mei_end",
-                //     mei_end,
-                //     "z_start",
-                //     z_start,
-                //     "z_end",
-                //     z_end,
-                //     "xbar",
-                //     xbar,
-                //     "moment_area",
-                //     moment_area,
-                //     "i",
-                //     i,
-                //     "height",
-                //     height,
-                // );
 
                 // Deflection calculation
                 deflection += (xbar * moment_area) / 1000;
