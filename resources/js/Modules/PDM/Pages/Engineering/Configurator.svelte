@@ -21,21 +21,17 @@
     import Chart from "chart.js/auto";
 
     import { Braces, X, ChevronRight } from "@lucide/svelte";
-    import { config } from "$modules/PDM/Shared/tube_data.js";
+    import { config } from "$modules/PDM/Shared/config.js";
 
     let chartCanvas;
     let chartInstance;
 
     let { params, isEdit = false, supportFixedData } = $props();
 
-
-
-
-
     // Function to update/create the chart
-    function updateChart() {
+    function drawBMChart() {
         if (!chartCanvas) return;
-        
+
         const ctx = chartCanvas.getContext("2d");
         let min_EI = mast.params.tubes.at(-1).M_EI["0"];
 
@@ -63,7 +59,7 @@
             // Update existing chart
             chartInstance.data = chartData;
             chartInstance.options.scales.y1.min = min_EI * 1.2;
-            chartInstance.update('none'); // 'none' for performance, or omit for animation
+            chartInstance.update("none"); // 'none' for performance, or omit for animation
         } else {
             // Initialize chart
             chartInstance = new Chart(ctx, {
@@ -143,35 +139,11 @@
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     onMount(() => {
-
-        return () => {
-                if (chartInstance) chartInstance.destroy();
-            };
+        drawBMChart();
+        // return () => {
+        //     if (chartInstance) chartInstance.destroy();
+        // };
     });
 
     let showJson = $state(false);
@@ -219,49 +191,40 @@
         }
 
         // We "touch" mast to ensure this effect re-runs when form changes
-        const _mast = mast; 
-        
-        // 1. Update the Chart and Svg
-        updateChart();
-        updateSvg();
-    });
+        const _mast = mast;
 
+        // 1. Update the Bending Moment Chart and Svg
+        drawBMChart();
+    });
 
     let mast = $derived(new MastGeometry($form, config));
     let svgDraw = $derived(new SvgDraw(mast));
 
-    let currentTab = 'BM'
+    let currentTab = "BM";
 
     function toggleTab(elName) {
+        currentTab = elName;
 
-        currentTab = elName
+        let tabSelected = "tab" + elName;
+        let divSelected = "div" + elName;
+        let tabId, divId;
+        let tabs = ["BM", "Loads", "Extended", "Nested"];
 
-        let tabSelected = 'tab'+elName
-        let divSelected = 'div'+elName
-        let tabId,divId
-        let tabs = ['BM','Loads','Extended','Nested']
+        tabs.forEach((element) => {
+            tabId = "tab" + element;
+            divId = "div" + element;
 
-        tabs.forEach(element => {
-
-            tabId = 'tab'+element
-            divId = 'div'+element
-
-            document.getElementById(tabId).classList.remove('is-active')
-            document.getElementById(divId).classList.add('is-hidden')
+            document.getElementById(tabId).classList.remove("is-active");
+            document.getElementById(divId).classList.add("is-hidden");
         });
 
-        document.getElementById(tabSelected).classList.add('is-active')
-        document.getElementById(divSelected).classList.remove('is-hidden')
+        document.getElementById(tabSelected).classList.add("is-active");
+        document.getElementById(divSelected).classList.remove("is-hidden");
 
-        if (currentTab != 'BM' ) {
-            updateSvg()
-        } 
+        if (currentTab != "BM") {
+            svgDraw.svgDraw(currentTab);
+        }
     }
-
-    function updateSvg() {
-        svgDraw.svgDraw(currentTab);
-    }
-
 </script>
 
 <Layout>
@@ -278,7 +241,6 @@
         </button>
 
         <form onsubmit={submit} novalidate id="genericForm" class="my-6">
-
             <div class="fixed-grid has-4-cols">
                 <div class="grid">
                     <div class="cell">
@@ -289,12 +251,11 @@
                             placeholder="Select Top Tube"
                             options={config.tubes.map((tube) => ({
                                 value: tube.no,
-                                label: `MT-${String(tube.no).padStart(2, '0')} ... Dia ${tube.od}`,
+                                label: `MT-${String(tube.no).padStart(2, "0")} ... Dia ${tube.od}`,
                             }))}
                             required={true}
                         />
                     </div>
-
 
                     <div class="cell">
                         <FormSelect
@@ -304,7 +265,7 @@
                             placeholder="Select Bottom Tube"
                             options={config.tubes.map((tube) => ({
                                 value: tube.no,
-                                label: `MT-${String(tube.no).padStart(2, '0')} ... Dia ${tube.od}`,
+                                label: `MT-${String(tube.no).padStart(2, "0")} ... Dia ${tube.od}`,
                             }))}
                             required={true}
                         />
@@ -337,14 +298,12 @@
                             required={true}
                         />
                     </div>
-
                 </div>
             </div>
 
             <div class="fixed-grid has-4-cols">
                 <div class="grid">
                     <div class="cell">
-
                         <FormInput
                             {form}
                             name="head_height"
@@ -357,7 +316,6 @@
                             required={true}
                         />
                     </div>
-
 
                     <div class="cell">
                         <FormInput
@@ -393,22 +351,25 @@
                             name="terrain_category"
                             label="Terrain Category"
                             placeholder="Select Terrain Category"
-                            options={config.terrain_category.map((category) => ({
-                                value: category.no,
-                                label: category.no+" - "+ category.description.slice(0, 16)+"...",
-                            }))}
-
+                            options={config.terrain_category.map(
+                                (category) => ({
+                                    value: category.no,
+                                    label:
+                                        category.no +
+                                        " - " +
+                                        category.description.slice(0, 16) +
+                                        "...",
+                                }),
+                            )}
                             required={true}
                         />
                     </div>
-
                 </div>
             </div>
 
             <div class="fixed-grid has-4-cols">
                 <div class="grid">
                     <div class="cell">
-
                         <FormInput
                             {form}
                             name="wind_speed"
@@ -421,7 +382,6 @@
                             required={true}
                         />
                     </div>
-
 
                     <div class="cell">
                         <FormInput
@@ -464,21 +424,13 @@
                             required={true}
                         />
                     </div>
-
                 </div>
             </div>
-
         </form>
-
-
-
-
 
         <!-- SUMMARY TABLE -->
         <div class="card has-background-white-ter py-2 my-4">
-
             <nav class="level">
-
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Extended Height</p>
@@ -498,7 +450,9 @@
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Wind Load on Payload</p>
-                        <p class="title mb-0">{mast.payload.wind_load.toFixed(0)}</p>
+                        <p class="title mb-0">
+                            {mast.payload.wind_load.toFixed(0)}
+                        </p>
                         <p class="heading">N</p>
                     </div>
                 </div>
@@ -506,49 +460,43 @@
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Lifted Weight / Total Weight</p>
-                        <p class="title mb-0">{mast.weight.lifted_mass.toFixed(0)} / {mast.weight.total_mast_mass.toFixed(0)}</p>
+                        <p class="title mb-0">
+                            {mast.weight.lifted_mass.toFixed(0)} / {mast.weight.total_mast_mass.toFixed(
+                                0,
+                            )}
+                        </p>
                         <p class="heading">kg</p>
                     </div>
                 </div>
-
             </nav>
         </div>
 
-
-
-
-
-
-
-
-
-
         <div class="card">
-
-
-            <div class="tabs" >
+            <div class="tabs">
                 <ul>
                     <li id="tabBM" class="is-active">
-                        <a onclick={() => toggleTab('BM')}>Bending Moment Diagram</a>
+                        <a onclick={() => toggleTab("BM")}
+                            >Bending Moment Diagram
+                        </a>
                     </li>
 
                     <li id="tabLoads">
-                        <a onclick={() => toggleTab('Loads')}>Loads</a>
+                        <a onclick={() => toggleTab("Loads")}>Loads</a>
                     </li>
 
-                    <li id="tabExtended" >
-                        <a onclick={() => toggleTab('Extended')}>Extended Position</a>
+                    <li id="tabExtended">
+                        <a onclick={() => toggleTab("Extended")}
+                            >Extended Position</a
+                        >
                     </li>
 
-                    <li id="tabNested" >
-                        <a onclick={() => toggleTab('Nested')}>Nested Position</a>
+                    <li id="tabNested">
+                        <a onclick={() => toggleTab("Nested")}
+                            >Nested Position</a
+                        >
                     </li>
                 </ul>
             </div>
-
-
-
-
 
             <!-- BENDING MOMENT DIAGRAM -->
             <div class="container mx-auto" id="divBM">
@@ -563,11 +511,7 @@
 
             <!-- NESTED DIAGRAM -->
             <div class="container mx-auto is-hidden" id="divNested"></div>
-
         </div>
-
-
-
 
         <!-- JSON MODAL -->
         <div class="modal {showJson ? 'is-active' : ''}" id="jsonModal">

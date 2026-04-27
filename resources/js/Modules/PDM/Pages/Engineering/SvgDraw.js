@@ -7,34 +7,31 @@ export class SvgDraw {
         this.svgHeight = null;
         this.scale = null;
         this.vcline_x = null;
+        this.vcline_info = null;
     }
 
     svgDraw(drawType) {
-
-        this.drawType = drawType
-        this.svgDiv = document.getElementById("div"+drawType);
+        this.drawType = drawType;
+        this.svgDiv = document.getElementById("div" + drawType);
         this.setSvgParams();
 
         switch (drawType) {
-            case 'Loads':
-                this.svgDrawLoads ()
+            case "Loads":
+                this.svgDrawLoads();
                 break;
 
             default:
-            case 'Extended':
-                this.svgDrawExtended ()
+            case "Extended":
+                this.svgDrawExtended();
                 break;
 
-            case 'Nested':
-                this.svgDrawNested ()
+            case "Nested":
+                this.svgDrawNested();
                 break;
-
         }
-        
     }
 
-
-    svgDrawLoads () {
+    svgDrawLoads() {
         this.addSvgElement();
         this.drawCoordinateAxis();
         this.drawTubes();
@@ -44,7 +41,6 @@ export class SvgDraw {
         this.drawForceArrows();
         this.drawTextAndLines();
     }
-
 
     svgDrawExtended() {
         this.addSvgElement();
@@ -58,14 +54,10 @@ export class SvgDraw {
     svgDrawNested() {
         this.addSvgElement();
         this.drawCoordinateAxis();
-        this.drawTubes('Nested');
+        this.drawTubes("Nested");
         this.drawVehicleAdapter();
         this.drawTextAndLines();
     }
-
-
-
-
 
     setSvgParams() {
         this.MX = 50;
@@ -77,21 +69,25 @@ export class SvgDraw {
             window.getComputedStyle(this.svgDiv).paddingRight.replace("px", "");
         this.svgHeight = (16 * this.svgWidth) / 19;
         this.vcline_x = 0.5 * this.svgWidth;
+        this.vcline_info = 1.3 * this.vcline_x;
+
+        console.log("ggg", this.vcline_x, this.vcline_info);
 
         let totalHeight;
 
-
         switch (this.drawType) {
-            case 'Loads':
-                totalHeight = 1000 * Math.sqrt(this.data.params.sail_area) + this.data.extendedHeight;
+            case "Loads":
+                totalHeight =
+                    1000 * Math.sqrt(this.data.params.sail_area) +
+                    this.data.extendedHeight;
                 break;
 
             default:
-            case 'Extended':
+            case "Extended":
                 totalHeight = this.data.extendedHeight;
                 break;
 
-            case 'Nested':
+            case "Nested":
                 totalHeight = this.data.nestedHeight;
                 break;
         }
@@ -99,12 +95,10 @@ export class SvgDraw {
         this.scale = (this.svgHeight - 2 * this.MY) / totalHeight;
     }
 
-
     addSvgElement() {
-
         // Check if it's empty or has an SVG; destroy old one
-        if (this.svgDiv.querySelector('svg')) {
-            this.svgDiv.innerHTML = ''; 
+        if (this.svgDiv.querySelector("svg")) {
+            this.svgDiv.innerHTML = "";
         }
 
         this.svg = document.createElementNS(
@@ -120,12 +114,10 @@ export class SvgDraw {
         this.svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
         this.svg.setAttribute("class", "mast-svg");
 
-        //const svgDiv = document.getElementById("svgDiv");
         this.svgDiv.appendChild(this.svg);
 
         this.g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     }
-
 
     drawCoordinateAxis() {
         this.drawLine(
@@ -134,7 +126,7 @@ export class SvgDraw {
             this.svgWidth - this.MX,
             this.svgHeight - this.MY,
             "ground",
-        ); // Horizontal Ground Line 
+        ); // Horizontal Ground Line
 
         this.drawLine(
             this.vcline_x,
@@ -144,18 +136,24 @@ export class SvgDraw {
             "centerline",
         ); // Vertical Centerline
 
-        this.drawRectangle(this.MX, this.svgHeight - this.MY, this.svgWidth - 2*this.MX, this.MY/2, "side_adapter");
+        this.drawRectangle(
+            this.MX,
+            this.svgHeight - this.MY,
+            this.svgWidth - 2 * this.MX,
+            this.MY / 2,
+            "side_adapter",
+        );
     }
 
-
-    drawTubes(state = 'Extended') {
+    drawTubes(state = "Extended") {
         let x, y, w, h, payload_plate_w;
-        let z,th
+        let z, th;
 
         this.data.params.tubes.forEach((tube, i) => {
-
-            state === 'Nested' ? z = tube.nested_zt : z = tube.extended_zt
-            state === 'Nested' ? th = this.data.nestedHeight : th = this.data.extendedHeight
+            state === "Nested" ? (z = tube.nested_zt) : (z = tube.extended_zt);
+            state === "Nested"
+                ? (th = this.data.nestedHeight)
+                : (th = this.data.extendedHeight);
 
             if (i === 0) {
                 payload_plate_w = 1.2 * this.scale * tube.od;
@@ -168,7 +166,7 @@ export class SvgDraw {
             h = this.scale * this.data.params.tube_length;
             this.drawRectangle(x, y, w, h, "tube");
 
-            if (this.drawType === 'Extended') {
+            if (this.drawType === "Extended") {
                 // Nested State
                 x = 1.6 * this.vcline_x - (this.scale * tube.od) / 2;
                 y = this.svgHeight - this.MY - this.scale * tube.nested_zt;
@@ -180,18 +178,17 @@ export class SvgDraw {
 
         // Payload Adapter in Extended State
         x = this.vcline_x - payload_plate_w;
-        y = this.svgHeight - this.MY -this.scale * th
-        w = 2 * payload_plate_w
-        h = this.scale * this.data.params.payload_adapter_height
+        y = this.svgHeight - this.MY - this.scale * th;
+        w = 2 * payload_plate_w;
+        h = this.scale * this.data.params.payload_adapter_height;
         this.drawRectangle(x, y, w, h, "tube");
 
-        if (this.drawType === 'Extended') {
-
+        if (this.drawType === "Extended") {
             // Payload Adapter in Nested State
             x = 1.6 * this.vcline_x - payload_plate_w;
-            y = this.svgHeight - this.MY -this.scale * this.data.nestedHeight
-            w = 2 * payload_plate_w
-            h = this.scale * this.data.params.payload_adapter_height
+            y = this.svgHeight - this.MY - this.scale * this.data.nestedHeight;
+            w = 2 * payload_plate_w;
+            h = this.scale * this.data.params.payload_adapter_height;
             this.drawRectangle(x, y, w, h, "tube");
 
             this.drawLine(
@@ -201,20 +198,16 @@ export class SvgDraw {
                 this.svgHeight - this.MY - this.scale * this.data.nestedHeight,
                 "centerline",
             ); // Vertical Centerline
-
         }
-
-
 
         x = 1.04 * 1.6 * this.vcline_x;
         let x2 = 1.15 * 1.6 * this.vcline_x;
-        y = this.svgHeight - this.MY - this.scale * this.data.nestedHeight
+        y = this.svgHeight - this.MY - this.scale * this.data.nestedHeight;
 
         this.drawLine(x, y, x2, y, "guying"); // Mast Top Face
         this.drawText(x2 - 15, y - 5, this.data.nestedHeight.toFixed(0));
-        this.drawText(x2 - 15, y + 15, 'Nested HEIGHT');
+        this.drawText(x2 - 15, y + 15, "Nested HEIGHT");
     }
-
 
     drawPayload() {
         let payload_dim = 1000 * Math.sqrt(this.data.params.sail_area);
@@ -231,27 +224,41 @@ export class SvgDraw {
         this.drawRectangle(x, y, w, h, "payload");
     }
 
-
     drawVehicleAdapter() {
+        let side_support_height =
+            0.6 *
+            2 *
+            (this.data.params.tubes.at(-1).extended_zt -
+                this.data.side_adapter_z);
+        let side_support_width = 1.3 * this.data.params.tubes.at(-1).od;
 
-        let side_support_height = 0.6 * 2 * (this.data.params.tubes.at(-1).extended_zt - this.data.side_adapter_z)
-        let side_support_width = 1.3 * this.data.params.tubes.at(-1).od
+        let x = this.vcline_x - this.scale * side_support_width * 0.5;
+        let y =
+            this.svgHeight -
+            this.MY -
+            this.scale * (this.data.side_adapter_z + 0.5 * side_support_height);
 
-        let x = this.vcline_x - (this.scale * side_support_width * 0.5);
-        let y = this.svgHeight -
-            this.MY - this.scale * (this.data.side_adapter_z + 0.5 * side_support_height);
-
-        let w = this.scale * side_support_width *1.5;
+        let w = this.scale * side_support_width * 1.5;
         let h = this.scale * side_support_height;
 
         this.drawRectangle(x, y, w, h, "side_adapter");
-        this.drawCircle(this.vcline_x, this.svgHeight - this.MY - this.data.side_adapter_z * this.scale, 2,"side")
+        this.drawCircle(
+            this.vcline_x,
+            this.svgHeight - this.MY - this.data.side_adapter_z * this.scale,
+            2,
+            "side",
+        );
 
-        x += w
+        x += w;
 
-        this.drawRectangle(x, y, 0.5 * w, this.scale * (this.data.side_adapter_z + 0.5 * side_support_height), "side_adapter");
+        this.drawRectangle(
+            x,
+            y,
+            0.5 * w,
+            this.scale * (this.data.side_adapter_z + 0.5 * side_support_height),
+            "side_adapter",
+        );
     }
-
 
     drawForceArrows() {
         let ax1, ay1, ax2, ay2, ax3, ay3;
@@ -267,8 +274,26 @@ export class SvgDraw {
             ax1 = this.vcline_x - force_line_strength;
             ay2 = ay1;
 
-            this.drawInfo(ax1, ay1, force_line_strength, 'L', 'force', tube.wind_load.toFixed(0) + " N", false);
+            // Force arrows and load values
+            this.drawInfo(
+                ax1,
+                ay1,
+                force_line_strength,
+                "L",
+                "force",
+                tube.wind_load.toFixed(0) + " N",
+                false,
+            );
 
+            this.drawInfo(
+                this.vcline_info,
+                ay1,
+                this.vcline_info - ax1,
+                "R",
+                "info",
+                tube.wind_load_z.toFixed(0),
+                false,
+            );
         });
 
         // PAYLOAD ARROW LINE AND ARROW
@@ -281,9 +306,16 @@ export class SvgDraw {
         ax2 = ax1 + force_line_strength;
         ay2 = ay1;
 
-
         // PAYLOAD FORCE TEXT AND ARROW
-        this.drawInfo(ax1, ay1, force_line_strength, 'L', 'force', this.data.payload.wind_load.toFixed(0) + " N", false);
+        this.drawInfo(
+            ax1,
+            ay1,
+            force_line_strength,
+            "L",
+            "force",
+            this.data.payload.wind_load.toFixed(0) + " N",
+            false,
+        );
 
         // this.drawLine(ax1, ay1, ax2, ay2, "arrow-line");
         // this.drawText(
@@ -292,13 +324,17 @@ export class SvgDraw {
         //     this.data.payload.wind_load.toFixed(0) + " N",
         // ); // Load Value
 
-
-
         // this.drawArrow(ax2, ay2);
 
-        this.drawInfo(ax1, ay1, force_line_strength, 'R', 'info', this.data.payload.wind_load_z.toFixed(0), false);
-
-
+        // this.drawInfo(
+        //     this.vcline_info,
+        //     ay1,
+        //     this.vcline_info - force_line_strength,
+        //     "R",
+        //     "info",
+        //     this.data.payload.wind_load_z.toFixed(0),
+        //     false,
+        // );
 
         // this.drawLine(ax2 + 10, ay1, text_line_end, ay2, "guying");
         // this.drawText(
@@ -308,13 +344,10 @@ export class SvgDraw {
         // );
     }
 
-
     drawGuyings() {
-
         let ax1, ay1, ax2, ay2, ax3, ay3;
 
         this.data.params.tubes.forEach((tube, i) => {
-
             // Guying
             ax1 = this.MX;
             ay1 = this.svgHeight - this.MY;
@@ -324,21 +357,18 @@ export class SvgDraw {
         });
     }
 
-
     drawTextAndLines() {
-
         let ax1, ay1, ax2, ay2, ax3, ay3;
         let text_line_end = 1.3 * this.vcline_x;
         let zt, zb;
 
         this.data.params.tubes.forEach((tube, i) => {
-
-            if (this.drawType === 'Nested') {
-                zt = tube.nested_zt
-                zb = tube.nested_zb
+            if (this.drawType === "Nested") {
+                zt = tube.nested_zt;
+                zb = tube.nested_zb;
             } else {
-                zt = tube.extended_zt
-                zb = tube.extended_zb
+                zt = tube.extended_zt;
+                zb = tube.extended_zb;
             }
 
             ax1 = this.vcline_x + this.scale * tube.od;
@@ -347,16 +377,40 @@ export class SvgDraw {
             ay2 = ay1;
 
             // Z-Lines
-            if (this.drawType === 'Loads') {
-                this.drawLine(ax1, ay1, ax2, ay2, "guying"); // Load Acting Point
-                this.drawText(text_line_end - 15, ay2 - 5, tube.wind_load_z.toFixed(0)); // Z-Value
+            if (this.drawType === "Loads") {
+                // this.drawLine(ax1, ay1, ax2, ay2, "guying"); // Load Acting Point
+                // this.drawText(
+                //     text_line_end - 15,
+                //     ay2 - 5,
+                //     tube.wind_load_z.toFixed(0),
+                // ); // Z-Value
+
+                this.drawInfo(
+                    ax2,
+                    ay2,
+                    ax2 - ax1,
+                    "R",
+                    "guying",
+                    tube.wind_load_z.toFixed(0),
+                    false,
+                );
             }
 
             // Tube Top End Z-Line
-            ay1 = this.svgHeight - this.MY - this.scale * zt;
-            ay2 = ay1;
-            this.drawLine(ax1, ay1, ax2, ay2, "guying"); // Top Point
-            this.drawText(text_line_end - 15, ay2 - 2, zt.toFixed(0));
+            // ay1 = this.svgHeight - this.MY - this.scale * zt;
+            // ay2 = ay1;
+            // this.drawLine(ax1, ay1, ax2, ay2, "guying"); // Top Point
+            // this.drawText(text_line_end - 15, ay2 - 2, zt.toFixed(0));
+
+            this.drawInfo(
+                ax2,
+                ay2,
+                ax2 - ax1,
+                "R",
+                "guying",
+                zt.toFixed(0),
+                false,
+            );
 
             // Tube Bottom End Z-Line
             ay1 = this.svgHeight - this.MY - this.scale * zb;
@@ -367,17 +421,24 @@ export class SvgDraw {
 
         ax1 = 0.75 * this.vcline_x;
         ax2 = 0.9 * this.vcline_x;
-        ay1 = this.svgHeight - this.MY - this.scale * this.data.extendedHeight
+        ay1 = this.svgHeight - this.MY - this.scale * this.data.extendedHeight;
         ay2 = ay1;
 
-        this.drawLine(ax1, ay1, ax2, ay2, "guying"); // Mast Top Face
-        this.drawText(ax1+15, ay2 - 5, this.data.extendedHeight.toFixed(0));
+        // this.drawLine(ax1, ay1, ax2, ay2, "guying"); // Mast Top Face
+        // this.drawText(ax1 + 15, ay2 - 5, this.data.extendedHeight.toFixed(0));
+
+        this.drawInfo(
+            ax1,
+            ay1,
+            ax2 - ax1,
+            "L",
+            "guying",
+            this.data.extendedHeight.toFixed(0),
+            "Extended",
+        );
     }
 
-
-
-    drawInfo (x,y,length,direction,type,text1,text2=false) {
-
+    drawInfo(x, y, length, direction, type, text1, text2 = false) {
         /*
             direction L, R
             text1 : above line
@@ -387,28 +448,26 @@ export class SvgDraw {
 
         let x2;
 
-        if (direction === 'L') {
-            x2 = x + length
-            this.drawText(x, y - 2, text1, "start")
+        if (direction === "L") {
+            x2 = x + length;
+            this.drawText(x, y - 2, text1, "start");
             if (text2) {
-                this.drawText(x, y - 2, text2, "start")
+                this.drawText(x, y + 12, text2, "start");
             }
         } else {
-            x2 = x - this.scale * length
-            this.drawText(x, y, text1, "end")
+            x2 = x - this.scale * length;
+            this.drawText(x, y - 2, text1, "end");
             if (text2) {
-                this.drawText(x, y, text2, "end")
+                this.drawText(x, y + 8, text2, "end");
             }
         }
 
-        this.drawLine(x,y,x2,y,"info")
+        this.drawLine(x, y, x2, y, "info");
 
-        if (type == 'force') {
-            this.drawArrow(x2,y)
+        if (type == "force") {
+            this.drawArrow(x2, y);
         }
     }
-
-
 
     drawLine(x1, y1, x2, y2, type) {
         let line = document.createElementNS(
@@ -452,7 +511,6 @@ export class SvgDraw {
         this.svg.appendChild(line);
     }
 
-
     drawArrow(x, y) {
         let arrow_height = 5;
         let arrow_width = 20;
@@ -476,7 +534,6 @@ export class SvgDraw {
         this.svg.appendChild(arr);
     }
 
-
     drawText(x, y, text_content, align = "start") {
         let text = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -490,7 +547,6 @@ export class SvgDraw {
         text.textContent = text_content;
         this.svg.appendChild(text);
     }
-
 
     drawRectangle(x, y, width, height, type) {
         let rect = document.createElementNS(
@@ -537,9 +593,7 @@ export class SvgDraw {
         this.svg.appendChild(rect);
     }
 
-
-    drawCircle(x,y,r,type) {
-
+    drawCircle(x, y, r, type) {
         let c = document.createElementNS(
             "http://www.w3.org/2000/svg",
             "circle",
@@ -552,7 +606,6 @@ export class SvgDraw {
         c.setAttribute("stroke", "black");
         c.setAttribute("fill", "none");
         c.setAttribute("stroke-width", "1");
-
 
         this.svg.appendChild(c);
     }
