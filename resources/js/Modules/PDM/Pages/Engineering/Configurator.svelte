@@ -195,6 +195,11 @@
 
         // 1. Update the Bending Moment Chart and Svg
         drawBMChart();
+
+        if (currentTab != "BM") {
+            svgDraw.svgDraw(currentTab);
+        }
+
     });
 
     let mast = $derived(new MastGeometry($form, config));

@@ -33,6 +33,8 @@ export class MastGeometry {
         this.estimateMastMass();
         this.findSideAdapterReaction();
 
+        this.torqueRequired();
+
         //this.mastCapacityChart("myChart");
     }
 
@@ -751,6 +753,40 @@ export class MastGeometry {
 
         return deflection;
     }
+
+
+
+    torqueRequired() {
+        // Torque Required to Extend the Mast
+
+        let torque, torque_required_to_extend_mast_Nm;
+        let load = 1000 * 9.81; // N
+        let shaft_dia = 30; // Diameter of the shaft in mm
+        let lead = 25; // Lead of the thread in mm
+        let mu = 0.15; // Coefficient of friction for steel (shaft) on bronze (nut)
+
+        let thread_angle = Math.atan( lead /  (Math.PI * shaft_dia) ); // Thread angle in degrees
+
+        let secant = 1 / Math.cos(thread_angle);
+
+        torque = 0.5 * load * shaft_dia *(lead + Math.PI * mu * shaft_dia * secant ) /(Math.PI * shaft_dia - mu * lead * secant) / 1000; // Convert to Nm
+
+        console.log("Torque Required to Extend the Mast (Nm):", torque);
+
+        this.params.torque_required_to_extend_mast_Nm = torque;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     mastCapacityChart(elementId) {
         const data = [
