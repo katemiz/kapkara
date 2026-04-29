@@ -20,7 +20,7 @@
 
     import Chart from "chart.js/auto";
 
-    import { Braces, X, ChevronRight } from "@lucide/svelte";
+    import { Braces, X, ChevronRight, FileText, ChartLine, WeightTilde, ArrowUpNarrowWide, ArrowDownNarrowWide } from "@lucide/svelte";
     import { config } from "$modules/PDM/Shared/config.js";
 
     let chartCanvas;
@@ -214,31 +214,66 @@
             tabId = "tab" + element;
             divId = "div" + element;
 
-            document.getElementById(tabId).classList.remove("is-active");
+            document.getElementById(tabId).classList.remove("is-inverted");
             document.getElementById(divId).classList.add("is-hidden");
         });
 
-        document.getElementById(tabSelected).classList.add("is-active");
+        document.getElementById(tabSelected).classList.add("is-inverted");
         document.getElementById(divSelected).classList.remove("is-hidden");
 
         if (currentTab != "BM") {
             svgDraw.svgDraw(currentTab);
         }
     }
+
+
+    function generatePDF() {
+
+
+
+
+        //let pdf = new PDF(mast)
+
+        console.log("PDF Object Created:");
+
+        //await pdf.init();  // ✅ Initialize QR code first
+        //pdf.run();
+
+    }
+
+
+
 </script>
 
 <Layout>
     <section class="section content">
-        <Title
-            title="Mast Configurator"
-            subtitle="An Engineering Configurator for Circular Telescopic Masts"
-        />
 
-        <button onclick={toggle} class="button is-link">
-            <span class="icon is-small">
-                <Braces size="16" />
-            </span>
-        </button>
+        <div class="columns">
+
+            <div class="column is-10">
+                <Title
+                    title="Mast Configurator"
+                    subtitle="Payload - Extended/Nested Height - Weight / Loads Estimation"
+                />
+            </div>
+
+            <div class="column has-text-right has-text-left-mobile">
+
+                <button onclick={toggle} class="button is-link is-light">
+                    <span class="icon is-small">
+                        <Braces size="16" />
+                    </span>
+                </button>
+
+                <button onclick={generatePDF} class="button is-link is-light">
+                    <span class="icon is-small">
+                        <FileText size="16" />
+                    </span>
+                </button>
+
+            </div>
+
+        </div>
 
         <form onsubmit={submit} novalidate id="genericForm" class="my-6">
             <div class="fixed-grid has-4-cols">
@@ -471,31 +506,38 @@
             </nav>
         </div>
 
-        <div class="card">
-            <div class="tabs">
-                <ul>
-                    <li id="tabBM" class="is-active">
-                        <a onclick={() => toggleTab("BM")}
-                            >Bending Moment Diagram
-                        </a>
-                    </li>
+        <div class="card p-4 ">
 
-                    <li id="tabLoads">
-                        <a onclick={() => toggleTab("Loads")}>Loads</a>
-                    </li>
+            <div class="buttons">
 
-                    <li id="tabExtended">
-                        <a onclick={() => toggleTab("Extended")}
-                            >Extended Position</a
-                        >
-                    </li>
+                <button class="button is-light is-inverted" onclick={() => toggleTab("BM")} id="tabBM">
+                    <span class="icon">
+                        <ChartLine size="16"  color="red"/>
+                    </span>
+                    <span>Bending Moment Diagram</span>
+                </button>
 
-                    <li id="tabNested">
-                        <a onclick={() => toggleTab("Nested")}
-                            >Nested Position</a
-                        >
-                    </li>
-                </ul>
+                <button class="button is-light" onclick={() => toggleTab("Loads")} id="tabLoads">
+                    <span class="icon">
+                        <WeightTilde size="16"  color="red"/>
+                    </span>
+                    <span>Loads</span>
+                </button>
+
+                <button class="button is-light" onclick={() => toggleTab("Extended")} id="tabExtended">
+                    <span class="icon">
+                        <ArrowUpNarrowWide size="16" color="red" />
+                    </span>
+                    <span>Extended Position</span>
+                </button>
+
+                <button class="button is-light" onclick={() => toggleTab("Nested")} id="tabNested">
+                    <span class="icon">
+                        <ArrowDownNarrowWide size="16" color="red" />
+                    </span>
+                    <span>Nested Position</span>
+                </button>
+
             </div>
 
             <!-- BENDING MOMENT DIAGRAM -->

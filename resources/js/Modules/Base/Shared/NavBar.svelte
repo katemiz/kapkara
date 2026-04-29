@@ -1,12 +1,9 @@
 <script>
-    // import { page } from "@inertiajs/svelte";
     import { auth } from "$modules/Auth/auth.svelte.js";
-
     import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
-    import { logout } from "$lib/common_functions.js";
-
-    import { Link } from '@inertiajs/svelte'
     import { router } from '@inertiajs/svelte';
+    import KapkaraIcon from "$components/Icons/KapkaraIcon.svelte";
+
 
     import {
         House,
@@ -21,22 +18,23 @@
         ShieldUser
     } from "@lucide/svelte";
 
-    // import { router } from "@inertiajs/svelte";
 
-    // let user = $derived($page.props.auth.user);
+    // Create a simple state variable for the menu
+    let isMenuOpen = $state(false);
 
+    function toggleMenu() {
+        isMenuOpen = !isMenuOpen;
+    }
 
 </script>
+
 
 <nav class="navbar is-dark">
     <div class="navbar-brand">
         <a class="navbar-item" href="/">
             <span class="icon-text is-size-5">
                 <span class="icon">
-                    <img
-                        src="{PATHS.path_images_prefix}{KAPKARA.logo}"
-                        alt="baykus logo"
-                    />
+                    <KapkaraIcon />
                 </span>
 
                 <span class="has-text-weight-bold">kapkara</span>
@@ -47,11 +45,11 @@
         </a>
 
         <button
-            href="#"
-            class="navbar-burger button is-text has-text-white"
+            class="navbar-burger button  {isMenuOpen ? 'is-active' : ''}"
             aria-label="menu"
-            aria-expanded="false"
             data-target="navbarMenu"
+            aria-expanded={isMenuOpen}
+            onclick={toggleMenu}
         >
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -60,9 +58,9 @@
         </button>
     </div>
 
-    <div id="navbarMenu" class="navbar-menu">
+    <div id="navbarMenu" class="navbar-menu {isMenuOpen ? 'is-active' : ''}">
         <div class="navbar-end">
-            <a href="/" class="navbar-item is-active">
+            <a href="/" class="navbar-item is-active" onclick={() => isMenuOpen = false}>
                 <span class="icon has-text-warning">
                     <House size={18} />
                 </span>
@@ -74,12 +72,12 @@
                 <div class="navbar-dropdown">
 
                     {#if auth.isAuthenticated && auth.hasRole('admin')}
-                    <a class="navbar-item" href='/admin'>
-                        <span class="icon">
-                            <ShieldUser size={18} />
-                        </span>
-                        <span>Admin Panel</span>
-                    </a>
+                        <a class="navbar-item" href='/admin'>
+                            <span class="icon">
+                                <ShieldUser size={18} />
+                            </span>
+                            <span>Admin Panel</span>
+                        </a>
                     {/if}
 
                     {#each MYAPPS as app}
@@ -115,8 +113,6 @@
                 <span>Contact</span>
             </a>
 
-
-
             {#if auth.isAuthenticated}
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a
@@ -146,8 +142,6 @@
                             <span>Material</span>
                         </a>
 
-
-
                         <button
                             type="button"
                             class="navbar-item"
@@ -160,9 +154,6 @@
                             </span>
                             <span>Logout</span>
                         </button>
-
-
-
 
                     </div>
                 </div>

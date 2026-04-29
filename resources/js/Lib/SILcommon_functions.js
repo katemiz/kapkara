@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add a click event on each of them
     navbarBurgers.forEach((el) => {
+
+        console.log("Adding click event listener to navbar burger:", el);
+
+
         el.addEventListener("click", () => {
             // Get the target from the "data-target" attribute
             const target = el.dataset.target;

@@ -1,18 +1,15 @@
 <script>
-    import { KAPKARA, PATHS } from "$lib/config";
+    import { KAPKARA } from "$lib/config";
     import { app_config } from "$modules/PDM/Shared/app_config.js";
 
-    import { Boxes } from "@lucide/svelte";
+    import PdmIcon from "$components/Icons/PdmIcon.svelte";
+    import KapkaraIcon from "$components/Icons/KapkaraIcon.svelte";
 </script>
 
 <footer class="footer has-background-dark" id="footer">
     <div class="columns has-text-white">
         <div class="column has-text-centered-mobile">
-            <img
-                src="{PATHS.path_images_prefix}{KAPKARA.logo}"
-                width="28px"
-                alt="Company Icon"
-            />
+            <KapkaraIcon />
             <br />
             <a href={KAPKARA.url} class="has-text-weight-light has-text-white">
                 {KAPKARA.name}
@@ -20,7 +17,7 @@
         </div>
 
         <div class="column has-text-centered has-text-centered-mobile">
-            <Boxes size="32" color="#ffb70f" />
+            <PdmIcon color="white " />
 
             <p class="has-text-weight-light mt-4">
                 {app_config.code}

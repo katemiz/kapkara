@@ -1,15 +1,12 @@
 <script>
-    import { KAPKARA, PATHS } from "$lib/config";
+    import { KAPKARA } from "$lib/config";
+    import KapkaraIcon from "$components/Icons/KapkaraIcon.svelte";
 </script>
 
 <footer class="footer has-background-dark" id="footer">
     <div class="columns has-text-white">
         <div class="column has-text-centered-mobile">
-            <img
-                src="{PATHS.path_images_prefix}{KAPKARA.logo}"
-                width="28px"
-                alt="Company Icon"
-            />
+            <KapkaraIcon />
             <br />
             <a href={KAPKARA.url} class="has-text-weight-light has-text-white">
                 {KAPKARA.name}

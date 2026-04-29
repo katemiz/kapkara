@@ -1,7 +1,8 @@
 <script>
     import { auth } from "$modules/Auth/auth.svelte.js";
     import { app_config } from "$modules/PDM/Shared/app_config";
-    import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
+
+    import PdmIcon from "$components/Icons/PdmIcon.svelte";
 
     import {
         House,
@@ -28,31 +29,12 @@
 
     import { router } from "@inertiajs/svelte";
 
-    // let user = $derived($page.props.auth.user);
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // Get all "navbar-burger" elements
-        const navbarBurgers = Array.prototype.slice.call(
-            document.querySelectorAll(".navbar-burger"),
-            0,
-        );
+    // Create a simple state variable for the menu
+    let isMenuOpen = $state(false);
 
-        // Add a click event on each of them
-        navbarBurgers.forEach((el) => {
-            el.addEventListener("click", () => {
-                // Get the target from the "data-target" attribute
-                const target = el.dataset.target;
-                const target2 = document.getElementById(target);
-
-                // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-                el.classList.toggle("is-active");
-                target2.classList.toggle("is-active");
-            });
-        });
-    });
-
-    function logout() {
-        router.post("/logout");
+    function toggleMenu() {
+        isMenuOpen = !isMenuOpen;
     }
 </script>
 
@@ -64,10 +46,7 @@
             aria-label="Home"
         >
             <span class="icon has-text-dark">
-                <img
-                    src="{PATHS.path_images_prefix}/PDM/{app_config.icon}"
-                    alt="PDM Icon"
-                />
+                <PdmIcon/>
             </span>
         </a>
 
@@ -80,11 +59,11 @@
         </a>
 
         <button
-            href="#"
-            class="navbar-burger button is-text has-text-white"
+            class="navbar-burger button  {isMenuOpen ? 'is-active' : ''}"
             aria-label="menu"
-            aria-expanded="false"
+            aria-expanded={isMenuOpen}
             data-target="navbarMenu"
+            onclick={toggleMenu}
         >
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -93,7 +72,7 @@
         </button>
     </div>
 
-    <div id="navbarMenu" class="navbar-menu">
+    <div id="navbarMenu" class="navbar-menu {isMenuOpen ? 'is-active' : ''}">
         <div class="navbar-start" id="navstart">
             {#if auth.isAuthenticated}
                 {#if auth.hasRole("admin")}
