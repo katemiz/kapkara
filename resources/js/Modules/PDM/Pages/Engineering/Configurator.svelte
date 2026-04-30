@@ -20,7 +20,7 @@
 
     import Chart from "chart.js/auto";
 
-    import { Braces, X, ChevronRight, FileText, ChartLine, WeightTilde, ArrowUpNarrowWide, ArrowDownNarrowWide } from "@lucide/svelte";
+    import { Braces, X, ChevronRight, FileText, ChartLine, WeightTilde, ArrowUpNarrowWide, ArrowDownNarrowWide, Wrench } from "@lucide/svelte";
     import { config } from "$modules/PDM/Shared/config.js";
 
     let chartCanvas;
@@ -141,9 +141,6 @@
 
     onMount(() => {
         drawBMChart();
-        // return () => {
-        //     if (chartInstance) chartInstance.destroy();
-        // };
     });
 
     let showJson = $state(false);
@@ -167,6 +164,9 @@
         terrain_category: params?.terrain_category ?? "",
         x_offset: params?.x_offset ?? "",
         z_offset: params?.z_offset ?? "",
+        payload_weight: params?.payload_weight ?? "",
+        motor_id: params?.motor_id ?? "",
+        gearbox_id: params?.gearbox_id ?? "",
     });
 
     // If you need the form to update when the 'params' prop changes
@@ -187,6 +187,9 @@
                 terrain_category: params.terrain_category,
                 x_offset: params.x_offset,
                 z_offset: params.z_offset,
+                payload_weight: params.payload_weight,
+                motor_id: params.motor_id,
+                gearbox_id: params.gearbox_id,
             });
         }
 
@@ -196,10 +199,9 @@
         // 1. Update the Bending Moment Chart and Svg
         drawBMChart();
 
-        if (currentTab != "BM") {
+        if (currentTab != "BM" && currentTab != "Torque") {
             svgDraw.svgDraw(currentTab);
         }
-
     });
 
     let mast = $derived(new MastGeometry($form, config));
@@ -213,7 +215,7 @@
         let tabSelected = "tab" + elName;
         let divSelected = "div" + elName;
         let tabId, divId;
-        let tabs = ["BM", "Loads", "Extended", "Nested"];
+        let tabs = ["BM", "Loads", "Extended", "Nested","Torque"];
 
         tabs.forEach((element) => {
             tabId = "tab" + element;
@@ -226,24 +228,37 @@
         document.getElementById(tabSelected).classList.add("is-inverted");
         document.getElementById(divSelected).classList.remove("is-hidden");
 
-        if (currentTab != "BM") {
+        if (currentTab != "BM" && currentTab != "Torque") {
             svgDraw.svgDraw(currentTab);
         }
+    }
+
+    function getMotorTorque() {
+
+        return 9550 * mast.config.motors.find(g => g.id === $form.motor_id)?.power_kW / mast.config.motors.find(g => g.id === $form.motor_id)?.max_speed_rpm; // Power in kW
+    }
+
+    function getLiftingTorque() {
+        return  getMotorTorque() * mast.config.gearboxes.find(g => g.id === $form.gearbox_id)?.gear_ratio;
+    }
+
+
+    function getScrewSpeed() {
+        const motor_rpm = mast.config.motors.find(g => g.id === $form.motor_id)?.max_speed_rpm;
+        const gearbox_ratio = mast.config.gearboxes.find(g => g.id === $form.gearbox_id)?.gear_ratio;
+
+        const screw_rpm = motor_rpm / gearbox_ratio;
+        const vertical_speed = (screw_rpm * mast.config.screw_lead) / 1000 ; // Convert RPM to m/min
+        return { rpm: screw_rpm, vertical_speed: vertical_speed }; // Convert RPM to m/s
     }
 
 
     function generatePDF() {
 
-
-
-
         //let pdf = new PDF(mast)
-
         console.log("PDF Object Created:");
-
         //await pdf.init();  // ✅ Initialize QR code first
         //pdf.run();
-
     }
 
 
@@ -466,6 +481,58 @@
                     </div>
                 </div>
             </div>
+
+
+            <div class="fixed-grid has-4-cols">
+                <div class="grid">
+                    <div class="cell">
+                        <FormInput
+                            {form}
+                            name="payload_weight"
+                            label="Payload Weight[kg]"
+                            placeholder="Enter Payload"
+                            type="number"
+                            min="5"
+                            max="1000"
+                            step="5"
+                            required={true}
+                        />
+                    </div>
+
+                    <div class="cell">
+                        <FormSelect
+                            {form}
+                            name="motor_id"
+                            label="Motor"
+                            placeholder="Select Motor"
+                            options={config.motors.map((motor) => ({
+                                value: motor.id,
+                                label: `${motor.name} (${motor.max_speed_rpm} RPM)`,
+                            }))}
+                            required={true}
+                        />
+
+                    </div>
+
+                    <div class="cell">
+                        <FormSelect
+                            {form}
+                            name="gearbox_id"
+                            label="Gearbox"
+                            placeholder="Select Gearbox"
+                            options={config.gearboxes.map((gearbox) => ({
+                                value: gearbox.id,
+                                label: `${gearbox.name}`,
+                            }))}
+                            required={true}
+                        />
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </form>
 
         <!-- SUMMARY TABLE -->
@@ -519,7 +586,7 @@
                     <span class="icon">
                         <ChartLine size="16"  color="red"/>
                     </span>
-                    <span>Bending Moment Diagram</span>
+                    <span>Bending Moments</span>
                 </button>
 
                 <button class="button is-light" onclick={() => toggleTab("Loads")} id="tabLoads">
@@ -543,6 +610,13 @@
                     <span>Nested Position</span>
                 </button>
 
+                <button class="button is-light" onclick={() => toggleTab("Torque")} id="tabTorque">
+                    <span class="icon">
+                        <Wrench size="16" color="red" />
+                    </span>
+                    <span>Torque/Power</span>
+                </button>
+
             </div>
 
             <!-- BENDING MOMENT DIAGRAM -->
@@ -558,11 +632,113 @@
 
             <!-- NESTED DIAGRAM -->
             <div class="container mx-auto is-hidden" id="divNested"></div>
+
+            <!-- TORQUE/POWER REQUIRED DIAGRAM -->
+            <div class="container mx-auto is-hidden" id="divTorque">
+
+                <table class="table is-fullwidth is-striped">
+                    <tbody>
+                        <tr>
+                            <th>Screw Data</th>
+                            <td>
+                                <table class="table is-fullwidth is-striped mt-2">
+                                <tbody>
+                                    <tr>
+                                        <th>Screw Nominal Diameter [mm]</th>
+                                        <td>{mast.config.screw_nominal_diameter.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Screw Lead [mm]</th>
+                                        <td>{mast.config.screw_lead.toFixed(2)}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Coefficient of Friction [Steel-Bronze]</th>
+                                        <td>{mast.config.screw_coefficient_of_friction.toFixed(2)}</td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Minimum Torque Required to Extend Mast</th>
+                            <td>
+                                <table class="table is-fullwidth is-striped mt-2">
+                                    <tbody>
+
+                                        <tr>
+                                            <th>Selected Motor Power</th>
+                                            <td>{mast.config.motors.find(g => g.id === $form.motor_id)?.power_kW.toFixed(2)} kW</td>
+
+
+                                        </tr>
+
+                                        <tr>
+                                            <th>Selected Motor Maximum Speed</th>
+                                            <td>{mast.config.motors.find(g => g.id === $form.motor_id)?.max_speed_rpm.toFixed(0)} RPM</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Selected Motor Output Torque</th>
+                                            <td>{getMotorTorque().toFixed(1)} Nm</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Total Driveline Speed Reduction Ratio</th>
+                                            <td>{mast.config.gearboxes.find(g => g.id === $form.gearbox_id)?.gear_ratio.toFixed(0)}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Screw Speed</th>
+                                            <td>{getScrewSpeed().rpm.toFixed(0)} RPM<br>{getScrewSpeed().vertical_speed.toFixed(3)} m/min</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Minimum Torque Required to Extend Mast</th>
+                                            <td>{mast.torque_required_to_extend_mast_Nm.toFixed(2)} Nm</td>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Total Torque at Screw End</th>
+                                            <td>{getLiftingTorque().toFixed(1)} Nm</td>
+                                        </tr>
+
+                                        <tr>
+
+                                                {#if getLiftingTorque() > mast.torque_required_to_extend_mast_Nm}
+                                                <td colspan="2" class="is-success">
+                                                    Available Torque <strong> {getLiftingTorque().toFixed(1)} </strong> > Required Torque <strong> {mast.torque_required_to_extend_mast_Nm.toFixed(1)} </strong> Nm
+                                                </td>
+                                                {/if}
+
+                                                {#if getLiftingTorque() <mast.torque_required_to_extend_mast_Nm}
+                                                <td colspan="2" class="is-danger is-light">
+                                                    Available Torque <strong> {getLiftingTorque().toFixed(1)} </strong> <span class="has-text-danger"> <strong> &lt; </strong> </span> Required Torque <strong> {mast.torque_required_to_extend_mast_Nm.toFixed(1)} </strong> Nm
+                                                </td>
+                                                {/if}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
         </div>
 
         <!-- JSON MODAL -->
         <div class="modal {showJson ? 'is-active' : ''}" id="jsonModal">
-            <div class="modal-background" onclick={toggle}></div>
+
+            <button
+                type="button"
+                class="modal-background {showJson ? 'is-active' : ''}"
+                id="jsonModal"
+                onclick={() => showJson = false}
+                aria-label="close"
+            ></button>
+
             <div class="modal-content">
                 <pre>
                   {JSON.stringify(mast.params, null, 2)}

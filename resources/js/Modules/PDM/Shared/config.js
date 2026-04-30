@@ -171,4 +171,55 @@ export const config = {
     alum_6063_E: 70e9, // Pa
     alum_6063_yield_strength: 170e6, // Pa
     alum_6063_ultimate_strength: 210e6, // Pa
+
+    screw_nominal_diameter: 30, // mm
+    screw_lead: 25, // mm
+    screw_coefficient_of_friction: 0.15, // For steel on bronze
+
+
+    motors : [
+        {
+            id: 1,
+            name: "TEPAŞ 0.35kW",
+            power_kW: 0.35,
+            max_torque_Nm: 10,
+            max_speed_rpm: 1400,
+        },
+        {
+            id: 2,
+            name: "TEPAŞ 0.55kW",
+            power_kW: 0.55,
+            max_torque_Nm: 10,
+            max_speed_rpm: 1400,
+        },
+        {
+            id: 3,
+            name: "TEPAŞ 0.75kW",
+            power_kW: 0.75,
+            max_torque_Nm: 15,
+            max_speed_rpm: 1400,
+        },
+    ],
+
+    gearboxes : [
+        {
+            id:1,
+            name: "i 1:6",
+            gear_ratio: 6,
+            efficiency: 0.85,
+        },
+        {
+            id:2,
+            name: "i 1:24",
+            gear_ratio: 24,
+            efficiency: 0.75,
+        },
+        {
+            id:3,
+            name: "i 1:60",
+            gear_ratio: 60,
+            efficiency: 0.65,
+        },
+    ],
+
 };

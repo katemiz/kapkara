@@ -52,7 +52,10 @@ class ConfiguratorController extends Controller
         "wind_speed" => 120,
         "sail_area" => 1.2,
         "x_offset" => 100,
-        "z_offset" => null
+        "z_offset" => null,
+        "payload_weight" => 300,
+        "motor_id" => 1,
+        "gearbox_id" => 1,
     ];
 
     /**
@@ -63,7 +66,7 @@ class ConfiguratorController extends Controller
         $this->setZOffset();
 
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
-            
+
             "per_page" => config("pagination.per_page"),
             "filters" => $request->only(["search"]),    // 'filters' sends the search term back to Svelte so the input stays filled
             "params" => $this->params,

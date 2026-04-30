@@ -1,7 +1,7 @@
 export class SvgDraw {
     constructor(data) {
 
-        console.log("SVG Draw Initialized with Data:", data);
+        //console.log("SVG Draw Initialized with Data:", data);
         this.data = data;
         this.drawType = null;
         this.svgDiv = null;
