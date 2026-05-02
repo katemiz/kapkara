@@ -1,16 +1,13 @@
-
 import Chart from "chart.js/auto";
 
 export class MastGeometry {
     constructor(params, config) {
-
         this.params = params;
         this.config = config;
+        this.power = {};
 
         this.params.noOfTubes =
-            this.params.end_tube_no -
-            this.params.start_tube_no +
-            1;
+            this.params.end_tube_no - this.params.start_tube_no + 1;
 
         this.payload_mass = null;
         this.extendedHeight = null;
@@ -41,8 +38,7 @@ export class MastGeometry {
     setAllowedTipDeflection() {
         // Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
         this.allowed_tip_deflection_mm =
-            (this.config.tip_deflection_percentage * this.extendedHeight) /
-            100; // mm
+            (this.config.tip_deflection_percentage * this.extendedHeight) / 100; // mm
     }
 
     setCircularArea(tube) {
@@ -64,7 +60,8 @@ export class MastGeometry {
                 this.tube_material_density = this.config.alum_6063_density; // kg/m³
                 this.tube_material_e = this.config.alum_6063_E; // Pa
                 this.tube_yield_strength = this.config.alum_6063_yield_strength; // Pa
-                this.tube_ultimate_strength = this.config.alum_6063_ultimate_strength; // Pa
+                this.tube_ultimate_strength =
+                    this.config.alum_6063_ultimate_strength; // Pa
                 break;
         }
 
@@ -143,15 +140,13 @@ export class MastGeometry {
     setMastHeights() {
         this.extendedHeight =
             this.params.noOfTubes * this.params.tube_length -
-            (this.params.noOfTubes - 1) *
-                this.params.overlap +
+            (this.params.noOfTubes - 1) * this.params.overlap +
             this.params.payload_adapter_height +
             this.params.base_adapter_height;
 
         this.nestedHeight =
             this.params.tube_length +
-            (this.params.noOfTubes - 1) *
-                this.params.head_height +
+            (this.params.noOfTubes - 1) * this.params.head_height +
             this.params.payload_adapter_height +
             this.params.base_adapter_height;
     }
@@ -162,15 +157,11 @@ export class MastGeometry {
         this.params.tubes.forEach((tube, index) => {
             if (index === 0) {
                 // Extended State
-                ezt =
-                    this.extendedHeight -
-                    this.params.payload_adapter_height;
+                ezt = this.extendedHeight - this.params.payload_adapter_height;
                 ezb = ezt - this.params.tube_length;
 
                 // Nested State
-                nzt =
-                    this.nestedHeight -
-                    this.params.payload_adapter_height;
+                nzt = this.nestedHeight - this.params.payload_adapter_height;
                 nzb = nzt - this.params.tube_length;
             } else {
                 // Extended State
@@ -192,8 +183,7 @@ export class MastGeometry {
         // Side Adapter
         const lastTube = this.params.tubes.at(-1);
 
-        this.side_adapter_z =
-            lastTube.extended_zt - this.params.overlap / 2;
+        this.side_adapter_z = lastTube.extended_zt - this.params.overlap / 2;
     }
 
     windLoadsOnTubes() {
@@ -225,17 +215,14 @@ export class MastGeometry {
 
         this.params.tubes.forEach((tube, i) => {
             if (i != this.params.noOfTubes - 1) {
-                exposed_length =
-                    this.params.tube_length -
-                    this.params.overlap; // mm
+                exposed_length = this.params.tube_length - this.params.overlap; // mm
 
                 this.params.tubes[i].wind_load_z =
                     tube.extended_zt - exposed_length / 2;
             } else {
                 exposed_length = tube.extended_zt; // mm
 
-                this.params.tubes[i].wind_load_z =
-                    tube.extended_zt / 2;
+                this.params.tubes[i].wind_load_z = tube.extended_zt / 2;
             }
 
             this.params.tubes[i].reference_area =
@@ -272,10 +259,7 @@ export class MastGeometry {
             // Turbulence Intensity
             this.params.tubes[i].turbulence_intensity_TI =
                 1.0 /
-                (1.0 *
-                    Math.log(
-                        this.params.tubes[i].max_height / terrain.z0,
-                    ));
+                (1.0 * Math.log(this.params.tubes[i].max_height / terrain.z0));
 
             // Basic Velocity Pressure
             // Basic Velocity Pressure Formula: q = 0.5 * ρ * V^2
@@ -287,8 +271,7 @@ export class MastGeometry {
             // Peak Velocity Pressure
             // Peak Velocity Pressure Formula: qp =[ 1+ 7* TI ] * 0.5 *  ρ *  Vm^2
             this.params.tubes[i].peak_velocity_pressure_qp =
-                (1 +
-                    7 * this.params.tubes[i].turbulence_intensity_TI) *
+                (1 + 7 * this.params.tubes[i].turbulence_intensity_TI) *
                 0.5 *
                 this.config.air_density *
                 Math.pow(this.params.tubes[i].mean_wind_speed_Vm, 2); // Peak velocity pressure in N/m2
@@ -349,18 +332,14 @@ export class MastGeometry {
             } else {
                 this.params.tubes[i].end_effect_factor =
                     0.698573 +
-                    0.001977401 *
-                        this.params.tubes[i].effective_slenderness +
+                    0.001977401 * this.params.tubes[i].effective_slenderness +
                     0.00008741341 *
                         Math.pow(
                             this.params.tubes[i].effective_slenderness,
                             2,
                         ) -
                     0.00000103591 *
-                        Math.pow(
-                            this.params.tubes[i].effective_slenderness,
-                            3,
-                        ); // For slenderness greater than 10
+                        Math.pow(this.params.tubes[i].effective_slenderness, 3); // For slenderness greater than 10
             }
 
             // Force Coefficient without End Effect
@@ -371,15 +350,12 @@ export class MastGeometry {
                 1.2 +
                 (0.18 *
                     Math.log10(
-                        10 *
-                            this.params.tubes[i]
-                                .equivalent_roughness_k_b,
+                        10 * this.params.tubes[i].equivalent_roughness_k_b,
                     )) /
                     (1 +
                         0.4 *
                             Math.log10(
-                                this.params.tubes[i]
-                                    .reynolds_number_Re / 1e6,
+                                this.params.tubes[i].reynolds_number_Re / 1e6,
                             ));
 
             if (this.params.tubes[i].reynolds_number_Re < 1.8e5) {
@@ -449,8 +425,7 @@ export class MastGeometry {
         };
 
         this.payload.wind_load_z =
-            this.extendedHeight +
-            Math.sqrt(this.params.sail_area * 1e6) / 2;
+            this.extendedHeight + Math.sqrt(this.params.sail_area * 1e6) / 2;
 
         this.payload.wind_load =
             0.5 *
@@ -539,10 +514,7 @@ export class MastGeometry {
         // Z-Offset Moment Calculation
         // Add moment caused by z_offset shift of payload wind load from the top of the mast to the payload center of pressure
         this.payload.tip_moment_due_z_offset_Nm =
-            -(
-                this.payload.wind_load *
-                this.params.z_offset
-            ) / 1000; // Convert to Nm
+            -(this.payload.wind_load * this.params.z_offset) / 1000; // Convert to Nm
 
         // X-Offset Moment Calculation
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load
@@ -566,9 +538,9 @@ export class MastGeometry {
         this.params.total_moments = {};
 
         const total_moments = {};
-        const sortedKeys = Object.keys(
-            this.params.tubes[0].moments,
-        ).sort((a, b) => Number(a) - Number(b));
+        const sortedKeys = Object.keys(this.params.tubes[0].moments).sort(
+            (a, b) => Number(a) - Number(b),
+        );
 
         sortedKeys.forEach((key) => {
             total_moments[key] = 0;
@@ -577,9 +549,7 @@ export class MastGeometry {
         this.payload.moments = {};
 
         let payload_root_moment =
-            (this.payload.wind_load *
-                this.extendedHeight) /
-            1000; // Nm
+            (this.payload.wind_load * this.extendedHeight) / 1000; // Nm
         let slope = payload_root_moment / this.extendedHeight; // N/mm
 
         sortedKeys.forEach((key) => {
@@ -640,15 +610,11 @@ export class MastGeometry {
         this.params.deflections = {};
         // Find deflection at side adapter location
         this.params.deflections["at_side_adapter"] =
-            this.findDeflectionAtGivenPoint(
-                this.side_adapter_z,
-            );
+            this.findDeflectionAtGivenPoint(this.side_adapter_z);
 
         // Find deflection at payload location
         this.params.deflections["at_mast_tip"] =
-            this.findDeflectionAtGivenPoint(
-                this.extendedHeight,
-            );
+            this.findDeflectionAtGivenPoint(this.extendedHeight);
 
         // Find Reaction Force at Side Adapter
         // def = PL^3/(3EI)
@@ -754,34 +720,71 @@ export class MastGeometry {
         return deflection;
     }
 
-
-
     torqueRequired() {
-
         // Torque Required to Extend the Mast
         let torque, torque_required_to_extend_mast_Nm;
         let load = this.params.payload_weight * 9.81; // N
 
-        let thread_angle = Math.atan( this.config.screw_lead /  (Math.PI * this.config.screw_nominal_diameter) ); // Thread angle in degrees
+        let thread_angle = Math.atan(
+            this.config.screw_lead /
+                (Math.PI * this.config.screw_nominal_diameter),
+        ); // Thread angle in degrees
         let secant = 1 / Math.cos(thread_angle);
 
-        torque = 0.5 * load * this.config.screw_nominal_diameter *(this.config.screw_lead + Math.PI * this.config.screw_coefficient_of_friction * this.config.screw_nominal_diameter * secant ) /(Math.PI * this.config.screw_nominal_diameter - this.config.screw_coefficient_of_friction * this.config.screw_lead * secant) / 1000; // Convert to Nm
+        torque =
+            (0.5 *
+                load *
+                this.config.screw_nominal_diameter *
+                (this.config.screw_lead +
+                    Math.PI *
+                        this.config.screw_coefficient_of_friction *
+                        this.config.screw_nominal_diameter *
+                        secant)) /
+            (Math.PI * this.config.screw_nominal_diameter -
+                this.config.screw_coefficient_of_friction *
+                    this.config.screw_lead *
+                    secant) /
+            1000; // Convert to Nm
 
         //console.log("Torque Required to Extend the Mast (Nm):", torque);
-
-        this.torque_required_to_extend_mast_Nm = torque;
+        this.power.torque_required_to_extend_mast_Nm = torque;
+        this.getMotorTorque();
+        this.getLiftingTorque();
+        this.getScrewSpeed();
     }
 
+    getMotorTorque() {
+        this.power.motor_power = this.config.motors.find(
+            (g) => g.id === this.params.motor_id,
+        )?.power_kW;
 
+        this.power.motor_rpm = this.config.motors.find(
+            (g) => g.id === this.params.motor_id,
+        )?.max_speed_rpm;
 
+        this.power.motor_torque =
+            (9550 * this.power.motor_power) / this.power.motor_rpm;
+    }
 
+    getLiftingTorque() {
+        this.power.lifting_torque =
+            this.power.motor_torque *
+            this.config.gearboxes.find((g) => g.id === this.params.gearbox_id)
+                ?.gear_ratio;
+    }
 
+    getScrewSpeed() {
+        const motor_rpm = this.config.motors.find(
+            (g) => g.id === this.params.motor_id,
+        )?.max_speed_rpm;
+        const gearbox_ratio = this.config.gearboxes.find(
+            (g) => g.id === this.params.gearbox_id,
+        )?.gear_ratio;
 
-
-
-
-
-
+        this.power.screw_rpm = motor_rpm / gearbox_ratio;
+        this.power.vertical_speed =
+            (this.power.screw_rpm * this.config.screw_lead) / 1000; // Convert RPM to m/min
+    }
 
     mastCapacityChart(elementId) {
         const data = [
