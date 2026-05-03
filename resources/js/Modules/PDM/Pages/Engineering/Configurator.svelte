@@ -244,36 +244,6 @@
         }
     }
 
-    function getMotorTorque() {
-        return (
-            (9550 *
-                mast.config.motors.find((g) => g.id === $form.motor_id)
-                    ?.power_kW) /
-            mast.config.motors.find((g) => g.id === $form.motor_id)
-                ?.max_speed_rpm
-        ); // Power in kW
-    }
-
-    function getLiftingTorque() {
-        return (
-            getMotorTorque() *
-            mast.config.gearboxes.find((g) => g.id === $form.gearbox_id)
-                ?.gear_ratio
-        );
-    }
-
-    function getScrewSpeed() {
-        const motor_rpm = mast.config.motors.find(
-            (g) => g.id === $form.motor_id,
-        )?.max_speed_rpm;
-        const gearbox_ratio = mast.config.gearboxes.find(
-            (g) => g.id === $form.gearbox_id,
-        )?.gear_ratio;
-        const screw_rpm = motor_rpm / gearbox_ratio;
-        const vertical_speed = (screw_rpm * mast.config.screw_lead) / 1000; // Convert RPM to m/min
-        return { rpm: screw_rpm, vertical_speed: vertical_speed }; // Convert RPM to m/s
-    }
-
     async function generatePDF() {
         let pdf = new MakePDF(mast);
 
@@ -709,65 +679,44 @@
                                     <tbody>
                                         <tr>
                                             <th>Selected Motor Power</th>
-                                            <td
-                                                >{mast.config.motors
-                                                    .find(
-                                                        (g) =>
-                                                            g.id ===
-                                                            $form.motor_id,
-                                                    )
-                                                    ?.power_kW.toFixed(2)} kW</td
-                                            >
+                                            <td>{mast.power.motor_power} kW</td>
                                         </tr>
 
                                         <tr>
                                             <th>Selected Motor Maximum Speed</th
                                             >
-                                            <td
-                                                >{mast.config.motors
-                                                    .find(
-                                                        (g) =>
-                                                            g.id ===
-                                                            $form.motor_id,
-                                                    )
-                                                    ?.max_speed_rpm.toFixed(0)} RPM</td
-                                            >
+                                            <td>{mast.power.motor_rpm} RPM</td>
                                         </tr>
 
                                         <tr>
                                             <th>Selected Motor Output Torque</th
                                             >
-                                            <td
-                                                >{getMotorTorque().toFixed(1)} Nm</td
-                                            >
+                                            <td>
+                                                {mast.power.motor_torque.toFixed(
+                                                    2,
+                                                )} Nm
+                                            </td>
                                         </tr>
 
                                         <tr>
-                                            <th
-                                                >Total Driveline Speed Reduction
-                                                Ratio</th
-                                            >
-                                            <td
-                                                >{mast.config.gearboxes
-                                                    .find(
-                                                        (g) =>
-                                                            g.id ===
-                                                            $form.gearbox_id,
-                                                    )
-                                                    ?.gear_ratio.toFixed(0)}</td
-                                            >
+                                            <th>
+                                                Total Driveline Speed Reduction
+                                                Ratio
+                                            </th>
+                                            <td>{mast.power.gearbox_ratio}</td>
                                         </tr>
 
                                         <tr>
                                             <th>Screw Speed</th>
-                                            <td
-                                                >{getScrewSpeed().rpm.toFixed(
-                                                    0,
-                                                )} RPM<br
-                                                />{getScrewSpeed().vertical_speed.toFixed(
+                                            <td>
+                                                {mast.power.screw_rpm.toFixed(
+                                                    1,
+                                                )} RPM
+                                                <br />
+                                                {mast.power.vertical_speed.toFixed(
                                                     3,
-                                                )} m/min</td
-                                            >
+                                                )} m/min
+                                            </td>
                                         </tr>
 
                                         <tr>
@@ -784,19 +733,20 @@
 
                                         <tr>
                                             <th>Total Torque at Screw End</th>
-                                            <td
-                                                >{getLiftingTorque().toFixed(1)} Nm</td
-                                            >
+                                            <td>
+                                                {mast.power.lifting_torque.toFixed(
+                                                    2,
+                                                )} Nm
+                                            </td>
                                         </tr>
-
                                         <tr>
-                                            {#if getLiftingTorque() > mast.power.torque_required_to_extend_mast_Nm}
+                                            {#if mast.power.lifting_torque > mast.power.torque_required_to_extend_mast_Nm}
                                                 <td
                                                     colspan="2"
                                                     class="is-success"
                                                 >
                                                     Available Torque <strong>
-                                                        {getLiftingTorque().toFixed(
+                                                        {mast.power.lifting_torque.toFixed(
                                                             1,
                                                         )}
                                                     </strong>
@@ -809,13 +759,13 @@
                                                 </td>
                                             {/if}
 
-                                            {#if getLiftingTorque() < mast.power.torque_required_to_extend_mast_Nm}
+                                            {#if mast.power.lifting_torque < mast.power.torque_required_to_extend_mast_Nm}
                                                 <td
                                                     colspan="2"
                                                     class="is-danger is-light"
                                                 >
                                                     Available Torque <strong>
-                                                        {getLiftingTorque().toFixed(
+                                                        {mast.power.lifting_torque.toFixed(
                                                             1,
                                                         )}
                                                     </strong>

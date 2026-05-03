@@ -20,6 +20,11 @@ export default class MakePDF {
         this.logoImage;
         this.qrCodeImage = null; // Store QR code
 
+        this.image_warning =
+            "Image shown in cover page is for illustration purposes only.";
+
+        this.product_code = Math.ceil(data.extendedHeight / 1000) + "MTNX-";
+
         this.config = {
             pageBgColor: "204, 204, 204",
             pageHeaderBgColor: [25, 50, 60],
@@ -27,22 +32,6 @@ export default class MakePDF {
             imgS: 12,
             gap: 20,
         };
-
-        this.props = [
-            ["Maximum Payload Capacity", "this.data.maxPayloadCapacity", "kg"],
-            ["Extended Height", "this.data.extendedHeight", "mm"],
-            ["Nested Height", "this.data.nestedHeight", "mm"],
-            ["Number of Sections", "this.data.mastTubes.length", ""],
-            ["Maximum Operational Wind Speed", "this.data.windspeed", "km/h"],
-            ["Maximum Survival Wind Speed", 160, "km/h"],
-            ["Maximum Sail Area", "this.data.sailarea", "m2"],
-            ["Mast Tube Material", "Aluminium", ""],
-            [
-                "Mast Weight [Estimated]",
-                "this.data.mastWeight.toFixed(0)",
-                "kg",
-            ],
-        ];
     }
 
     // Pre-generate QR code  and images before running
@@ -55,18 +44,18 @@ export default class MakePDF {
         this.coverBGImage = await this.getImageData(
             "/images/PDM/mtnx_background.png",
         );
+
+        this.bigLogo = await this.getImageData("/images/PDM/masttech-big.png");
     }
 
     run() {
-        console.log("PDF Object Created:");
-
         this.coverPage();
         // this.propertiesPage();
         // this.dimensionPages("NestedSvgImage", "Nested Height Diagram");
         // this.dimensionPages("ExtendedSvgImage", "Extended Height Diagram");
         // this.optionalAccessoriesPage();
-        // this.disclaimerPage();
-        this.powerPage();
+        this.specificationsPage();
+        this.disclaimerPage();
 
         this.pdf.save("AAA.pdf");
     }
@@ -83,10 +72,10 @@ export default class MakePDF {
 
         this.pdf.setFontSize(24);
         this.pdf.setFont("helvetica", "normal");
-        this.pdf.text("this.mastCode", this.mx, this.pageHeight * 0.27 + 10);
+        this.pdf.text(this.product_code, this.mx, this.pageHeight * 0.27 + 10);
 
         this.pdf.setFontSize(8);
-        this.pdf.text("this.image_warning", 207, 294, { angle: 90 });
+        this.pdf.text(this.image_warning, 207, 294, { angle: 90 });
 
         // QR CODE
         this.addQrCode();
@@ -115,15 +104,15 @@ export default class MakePDF {
         //     // y = y + this.config.gap;
         // }
 
-        // MASTTECH BIG LOGO
-        // this.pdf.addImage(
-        //     document.getElementById("masttech"),
-        //     "PNG",
-        //     this.mx,
-        //     this.pageHeight - 50 - this.my,
-        //     52,
-        //     50,
-        // );
+        //MASTTECH BIG LOGO
+        this.pdf.addImage(
+            this.bigLogo,
+            "PNG",
+            this.mx,
+            this.pageHeight - 50 - this.my,
+            52,
+            50,
+        );
     }
 
     HeaderFooter(title = false) {
@@ -135,7 +124,7 @@ export default class MakePDF {
             this.pdf.setFont("courier", "normal");
             this.pdf.setTextColor(255, 255, 255);
 
-            this.pdf.text("this.mastCode", this.pageWidth / 2, 15, {
+            this.pdf.text(this.product_code, this.pageWidth / 2, 15, {
                 align: "center",
             });
             this.pdf.text(title, this.pageWidth / 2, 25, { align: "center" });
@@ -161,25 +150,56 @@ export default class MakePDF {
         // );
     }
 
-    powerPage() {
+    specificationsPage() {
         this.pdf.addPage("a4", "portrait");
         this.HeaderFooter("General Mast Properties");
 
         const props = [
-            ["Selected Motor Power", this.data.power.motor_power, "kW"],
-            ["Selected Motor Speed", this.data.power.motor_rpm, "RPM"],
-
+            ["Maximum Payload Capacity", this.data.params.payload_weight, "kg"],
+            ["Extended Height", this.data.extendedHeight, "mm"],
+            ["Nested Height", this.data.nestedHeight, "mm"],
+            ["Number of Sections", this.data.params.noOfTubes, ""],
             [
-                "Selected Motor Output Torque",
-                this.data.power.output_torque,
+                "Maximum Operational Wind Speed",
+                this.data.params.wind_speed,
+                "km/h",
+            ],
+            //["Maximum Survival Wind Speed", 160, "km/h"],
+            ["Maximum Sail Area", this.data.params.sail_area, "m2"],
+            ["Mast Tube Material", "Aluminium", ""],
+            [
+                "Mast Weight [Estimated - Moved]",
+                this.data.weight.lifted_mass.toFixed(0),
+                "kg",
+            ],
+            [
+                "Mast Weight [Estimated - Total]",
+                this.data.weight.total_mast_mass.toFixed(0),
+                "kg",
+            ],
+
+            ["Motor Power", this.data.power.motor_power, "kW"],
+            ["Motor Speed", this.data.power.motor_rpm, "RPM"],
+            [
+                "Motor Output Torque",
+                this.data.power.motor_torque.toFixed(2),
                 "Nm",
             ],
             [
                 "Total Driveline Speed Reduction Ratio",
-                this.data.power.screw_rpm,
+                this.data.power.gearbox_ratio.toFixed(0),
                 "RPM",
             ],
-            ["Screw Speed", this.data.power.screw_rpm, ""],
+            [
+                "Screw Speed, Rotational",
+                this.data.power.screw_rpm.toFixed(0),
+                "RPM",
+            ],
+            [
+                "Lifting Speed, Vertical",
+                this.data.power.vertical_speed.toFixed(2),
+                "m/min",
+            ],
         ];
 
         autoTable(this.pdf, {
@@ -206,6 +226,47 @@ export default class MakePDF {
         } else {
             console.error("QR code not initialized. Call init() first.");
         }
+    }
+
+    disclaimerPage() {
+        this.pdf.addPage("a4", "portrait");
+        this.HeaderFooter("Disclaimer");
+
+        this.pdf.setFontSize(10);
+        this.pdf.setTextColor(0, 0, 0);
+        this.pdf.setFont("helvetica", "normal");
+
+        const disclaimerText = `
+         The information provided in this brochure is for general informational purposes only. While we strive to keep the information up to date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability with respect to the brochure or the information, products, services, or related graphics contained in the brochure for any purpose. Any reliance you place on such information is therefore strictly at your own risk. In no event will we be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any loss or damage whatsoever arising from loss of data or profits arising out of, or in connection with, the use of this brochure. Through this brochure you are able to link to other websites which are not under the control of our company. We have no control over the nature, content and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them. Every effort is made to keep the brochure up and running smoothly. However, our company takes no responsibility for, and will not be liable for, the brochure being temporarily unavailable due to technical issues beyond our control.
+         `;
+
+        this.pdf.text(
+            this.pdf.splitTextToSize(
+                disclaimerText,
+                this.pageWidth - 2 * this.mx,
+            ),
+            this.mx,
+            60,
+        );
+
+        let imgWidth = 84;
+        let imgHeight = 80;
+
+        // MASTTECH BIG LOGO
+        this.pdf.addImage(
+            this.bigLogo,
+            "PNG",
+            (this.pageWidth - imgWidth) / 2,
+            120,
+            imgWidth,
+            imgHeight,
+        );
+
+        const now = new Date();
+
+        this.pdf.text(String(now), this.pageWidth / 2, 220, {
+            align: "center",
+        });
     }
 
     async getImageData(path) {

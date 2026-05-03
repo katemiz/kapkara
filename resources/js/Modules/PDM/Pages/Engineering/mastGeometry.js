@@ -774,14 +774,11 @@ export class MastGeometry {
     }
 
     getScrewSpeed() {
-        const motor_rpm = this.config.motors.find(
-            (g) => g.id === this.params.motor_id,
-        )?.max_speed_rpm;
-        const gearbox_ratio = this.config.gearboxes.find(
+        this.power.gearbox_ratio = this.config.gearboxes.find(
             (g) => g.id === this.params.gearbox_id,
         )?.gear_ratio;
 
-        this.power.screw_rpm = motor_rpm / gearbox_ratio;
+        this.power.screw_rpm = this.power.motor_rpm / this.power.gearbox_ratio;
         this.power.vertical_speed =
             (this.power.screw_rpm * this.config.screw_lead) / 1000; // Convert RPM to m/min
     }
