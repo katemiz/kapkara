@@ -210,19 +210,15 @@
         // 1. Update the Bending Moment Chart and Svg
         drawBMChart();
 
-        if (currentTab != "BM" && currentTab != "Torque") {
-            svgDraw.svgDraw(currentTab);
-        }
+        svgDraw.svgDraw("Loads");
+        svgDraw.svgDraw("Extended");
+        svgDraw.svgDraw("Nested");
     });
 
     let mast = $derived(new MastGeometry($form, config));
     let svgDraw = $derived(new SvgDraw(mast));
 
-    let currentTab = "BM";
-
     function toggleTab(elName) {
-        currentTab = elName;
-
         let tabSelected = "tab" + elName;
         let divSelected = "div" + elName;
         let tabId, divId;
@@ -239,9 +235,9 @@
         document.getElementById(tabSelected).classList.add("is-inverted");
         document.getElementById(divSelected).classList.remove("is-hidden");
 
-        if (currentTab != "BM" && currentTab != "Torque") {
-            svgDraw.svgDraw(currentTab);
-        }
+        svgDraw.svgDraw("Loads");
+        svgDraw.svgDraw("Extended");
+        svgDraw.svgDraw("Nested");
     }
 
     async function generatePDF() {

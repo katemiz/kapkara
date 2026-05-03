@@ -1,6 +1,5 @@
 export class SvgDraw {
     constructor(data) {
-
         //console.log("SVG Draw Initialized with Data:", data);
         this.data = data;
         this.drawType = null;
@@ -38,7 +37,7 @@ export class SvgDraw {
     svgDrawLoads() {
         this.addSvgElement();
         this.drawCoordinateAxis();
-        this.drawTubes('Extended', true);
+        this.drawTubes("Extended", true);
         this.drawGuyings();
         this.drawPayload();
         this.drawVehicleAdapter();
@@ -48,7 +47,7 @@ export class SvgDraw {
     svgDrawExtended() {
         this.addSvgElement();
         this.drawCoordinateAxis();
-        this.drawTubes('Extended', false);
+        this.drawTubes("Extended", false);
         this.drawPayloadAdapter();
         this.drawGuyings();
         this.drawVehicleAdapter();
@@ -58,12 +57,12 @@ export class SvgDraw {
         this.addSvgElement();
         this.drawCoordinateAxis();
         this.drawTubes("Nested", false);
-        this.drawPayloadAdapter('Nested');
+        this.drawPayloadAdapter("Nested");
         this.drawVehicleAdapter();
     }
 
     setSvgParams() {
-        this.MX = 50;
+        this.MX = 250;
         this.MY = 20;
 
         this.svgWidth =
@@ -154,49 +153,64 @@ export class SvgDraw {
         let force_line_strength;
 
         this.data.params.tubes.forEach((tube, i) => {
-            state === "Nested" ? (zt = tube.nested_zt) : (zt = tube.extended_zt);
-            state === "Nested" ? (zb = tube.nested_zb) : (zb = tube.extended_zb);
+            state === "Nested"
+                ? (zt = tube.nested_zt)
+                : (zt = tube.extended_zt);
+            state === "Nested"
+                ? (zb = tube.nested_zb)
+                : (zb = tube.extended_zb);
 
             x = this.vcline_x - (this.scale * tube.od) / 2;
             yt = this.svgHeight - this.MY - this.scale * zt;
             yb = this.svgHeight - this.MY - this.scale * zb;
             w = this.scale * tube.od;
             h = this.scale * this.data.params.tube_length;
-            this.drawRectangle(x, yt, w, h, "tube");    // Draw Tube Rectangle
+            this.drawRectangle(x, yt, w, h, "tube"); // Draw Tube Rectangle
 
             start_x = this.vcline_x + this.scale * tube.od * 0.8;
 
             // Add Dimension text and lines
-            this.drawLine(start_x, yt, this.vcline_info, yt, 'dimension'); // Z-Line
-            this.drawText(this.vcline_info, yt - 4, zt.toFixed(0), 'end'); // Z- Value Text
-            this.drawLine(start_x , yb, this.vcline_info, yb, 'dimension'); // Z-Line
-            this.drawText(this.vcline_info, yb - 4, zb.toFixed(0), 'end'); // Z- Value Text
+            this.drawLine(start_x, yt, this.vcline_info, yt, "dimension"); // Z-Line
+            this.drawText(this.vcline_info, yt - 4, zt.toFixed(0), "end"); // Z- Value Text
+            this.drawLine(start_x, yb, this.vcline_info, yb, "dimension"); // Z-Line
+            this.drawText(this.vcline_info, yb - 4, zb.toFixed(0), "end"); // Z- Value Text
 
             if (showForces) {
                 y = this.svgHeight - this.MY - this.scale * tube.wind_load_z;
 
-                this.drawLine(start_x, y, this.vcline_info, y, 'dimension'); // Load Acting Point
-                this.drawText(this.vcline_info, y - 4, tube.wind_load_z.toFixed(0), 'end'); // Z-Value Text
+                this.drawLine(start_x, y, this.vcline_info, y, "dimension"); // Load Acting Point
+                this.drawText(
+                    this.vcline_info,
+                    y - 4,
+                    tube.wind_load_z.toFixed(0),
+                    "end",
+                ); // Z-Value Text
 
                 force_line_strength = this.force_line_scale * tube.wind_load;
 
                 start_x = this.vcline_x - force_line_strength;
 
-                this.drawLine(start_x , y, this.vcline_x, y, 'dimension'); // Force Line
-                this.drawText(start_x, y - 4, tube.wind_load.toFixed(0) + " N", 'start'); // Force Value Text
+                this.drawLine(start_x, y, this.vcline_x, y, "dimension"); // Force Line
+                this.drawText(
+                    start_x,
+                    y - 4,
+                    tube.wind_load.toFixed(0) + " N",
+                    "start",
+                ); // Force Value Text
                 this.drawArrow(this.vcline_x, y); // Force Arrow
             }
         });
     }
 
-
     drawPayloadAdapter(state = "Extended") {
-
-        let x,y,w,h;
+        let x, y, w, h;
         const payload_plate_w = 1.2 * this.scale * this.data.params.tubes[0].od;
 
         let stateTxt = state === "Nested" ? "Nested" : "Extended";
-        let z = state === "Nested" ? this.data.nestedHeight : this.data.extendedHeight;
+        let z =
+            state === "Nested"
+                ? this.data.nestedHeight
+                : this.data.extendedHeight;
 
         // Payload Adapter in Extended State
         x = this.vcline_x - payload_plate_w;
@@ -210,16 +224,14 @@ export class SvgDraw {
 
         this.drawLine(x, y, x2, y, "guying"); // Mast Top Face
         this.drawText(x2, y - 5, z.toFixed(0));
-        this.drawText(x2, y + 15, `${stateTxt} Height`, 'start');
+        this.drawText(x2, y + 15, `${stateTxt} Height`, "start");
     }
-
-
 
     drawPayload() {
         let payload_dim = 1000 * Math.sqrt(this.data.params.sail_area);
 
-
-        let force_line_strength = this.force_line_scale * this.data.payload.wind_load;
+        let force_line_strength =
+            this.force_line_scale * this.data.payload.wind_load;
 
         let x = this.vcline_x - (this.scale * payload_dim) / 2;
         let y =
@@ -232,26 +244,37 @@ export class SvgDraw {
 
         this.drawRectangle(x, y, w, h, "payload");
 
-        y = this.svgHeight - this.MY - this.scale * this.data.payload.wind_load_z;
+        y =
+            this.svgHeight -
+            this.MY -
+            this.scale * this.data.payload.wind_load_z;
 
         let cg_x = this.vcline_x + this.scale * this.data.params.x_offset;
 
-        this.drawLine(cg_x - force_line_strength , y, cg_x, y, 'dimension'); // Force Line
-        this.drawText(cg_x - force_line_strength, y - 4, this.data.payload.wind_load.toFixed(0) + " N", 'start'); // Force Value Text
+        this.drawLine(cg_x - force_line_strength, y, cg_x, y, "dimension"); // Force Line
+        this.drawText(
+            cg_x - force_line_strength,
+            y - 4,
+            this.data.payload.wind_load.toFixed(0) + " N",
+            "start",
+        ); // Force Value Text
         this.drawArrow(cg_x, y); // Force Arrow
 
-        this.drawLine(1.1 *this.vcline_x , y, this.vcline_info, y, 'dimension'); // Force Line
-        this.drawText(this.vcline_info, y - 4, this.data.payload.wind_load_z.toFixed(0), 'end'); // Force Value Text
+        this.drawLine(1.1 * this.vcline_x, y, this.vcline_info, y, "dimension"); // Force Line
+        this.drawText(
+            this.vcline_info,
+            y - 4,
+            this.data.payload.wind_load_z.toFixed(0),
+            "end",
+        ); // Force Value Text
 
         // CG and Center of Pressure
         this.drawCircle(cg_x, y, 6, "cg");
 
         // Weight
-        this.drawLine(cg_x , y, cg_x, 0, 'dimension'); // Force Line
+        this.drawLine(cg_x, y, cg_x, 0, "dimension"); // Force Line
         this.drawArrow(cg_x, y, "Down"); // Force Arrow
-
     }
-
 
     drawVehicleAdapter() {
         let side_support_height =
@@ -288,7 +311,6 @@ export class SvgDraw {
             "side_adapter",
         );
     }
-
 
     SILdrawForceArrows() {
         let ax1, ay1, ax2, ay2, ax3, ay3;
@@ -348,7 +370,6 @@ export class SvgDraw {
         );
     }
 
-
     drawGuyings() {
         let ax1, ay1, ax2, ay2, ax3, ay3;
 
@@ -361,7 +382,6 @@ export class SvgDraw {
             this.drawLine(ax1, ay1, ax2, ay2, "guying");
         });
     }
-
 
     drawLine(x1, y1, x2, y2, type) {
         let line = document.createElementNS(
@@ -409,7 +429,7 @@ export class SvgDraw {
         this.svg.appendChild(line);
     }
 
-    drawArrow(x, y , direction = "Right") {
+    drawArrow(x, y, direction = "Right") {
         let arrow_height = 5;
         let arrow_width = 20;
 
@@ -420,8 +440,8 @@ export class SvgDraw {
         let x3 = x1;
         let y3 = y1 + 2 * arrow_height;
 
-        if ( direction === "Down") {
-            x1 = x
+        if (direction === "Down") {
+            x1 = x;
             x2 = x + arrow_height;
             x3 = x - arrow_height;
             y1 = y;
