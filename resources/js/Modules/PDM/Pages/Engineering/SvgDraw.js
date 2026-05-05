@@ -16,6 +16,8 @@ export class SvgDraw {
     svgDraw(drawType) {
         this.drawType = drawType;
         this.svgDiv = document.getElementById("div" + drawType);
+        //this.svgDiv = document.getElementById("fixedWidth");
+
         this.setSvgParams();
 
         switch (drawType) {
@@ -62,11 +64,13 @@ export class SvgDraw {
     }
 
     setSvgParams() {
-        this.MX = 250;
+        this.MX = 20;
         this.MY = 20;
 
+        let wDiv = document.getElementById("fixedWidth")
+
         this.svgWidth =
-            this.svgDiv.clientWidth -
+            wDiv.clientWidth -
             window.getComputedStyle(this.svgDiv).paddingLeft.replace("px", "") -
             window.getComputedStyle(this.svgDiv).paddingRight.replace("px", "");
         this.svgHeight = (16 * this.svgWidth) / 19;
@@ -105,6 +109,7 @@ export class SvgDraw {
             "http://www.w3.org/2000/svg",
             "svg",
         );
+        this.svg.setAttribute("id", "svg-" + this.drawType);
         this.svg.setAttribute("width", this.svgWidth);
         this.svg.setAttribute("height", this.svgHeight);
         this.svg.setAttribute(
@@ -274,6 +279,14 @@ export class SvgDraw {
         // Weight
         this.drawLine(cg_x, y, cg_x, 0, "dimension"); // Force Line
         this.drawArrow(cg_x, y, "Down"); // Force Arrow
+
+
+        this.drawText(
+            cg_x+4,
+            10,
+            (this.data.params.payload_weight * 9.81).toFixed(0) + " N",
+            "start",
+        ); // Weight Value Text
     }
 
     drawVehicleAdapter() {
@@ -312,63 +325,7 @@ export class SvgDraw {
         );
     }
 
-    SILdrawForceArrows() {
-        let ax1, ay1, ax2, ay2, ax3, ay3;
-        const force_line_scale = 250 / this.data.payload.wind_load;
-        let force_line_strength;
-        let text_line_end = 1.3 * this.vcline_x;
 
-        this.data.params.tubes.forEach((tube, i) => {
-            force_line_strength = force_line_scale * tube.wind_load;
-
-            ax2 = this.vcline_x;
-            ay1 = this.svgHeight - this.MY - this.scale * tube.wind_load_z;
-            ax1 = this.vcline_x - force_line_strength;
-            ay2 = ay1;
-
-            // Force arrows and load values
-            this.drawInfo(
-                ax1,
-                ay1,
-                force_line_strength,
-                "L",
-                "force",
-                tube.wind_load.toFixed(0) + " N",
-                false,
-            );
-
-            this.drawInfo(
-                this.vcline_info,
-                ay1,
-                this.vcline_info - ax1,
-                "R",
-                "info",
-                tube.wind_load_z.toFixed(0),
-                false,
-            );
-        });
-
-        // PAYLOAD ARROW LINE AND ARROW
-        ax1 = this.vcline_x + this.scale * this.data.params.x_offset;
-        ay1 =
-            this.svgHeight -
-            this.MY -
-            this.scale * this.data.payload.wind_load_z;
-
-        ax2 = ax1 + force_line_strength;
-        ay2 = ay1;
-
-        // PAYLOAD FORCE TEXT AND ARROW
-        this.drawInfo(
-            ax1,
-            ay1,
-            force_line_strength,
-            "L",
-            "force",
-            this.data.payload.wind_load.toFixed(0) + " N",
-            false,
-        );
-    }
 
     drawGuyings() {
         let ax1, ay1, ax2, ay2, ax3, ay3;
@@ -396,22 +353,22 @@ export class SvgDraw {
 
         switch (type) {
             case "arrow-line":
-                line.setAttribute("stroke", "rgb(216, 30, 91)");
+                line.setAttribute("stroke", "#d81e5b");
                 line.setAttribute("stroke-width", "1");
                 break;
 
             case "ground":
-                line.setAttribute("stroke", "rgb(130, 48, 56)");
+                line.setAttribute("stroke", "#5f6b08");
                 line.setAttribute("stroke-width", "0.3");
                 break;
 
             case "centerline":
-                line.setAttribute("stroke", "rgb(3, 83, 164)");
+                line.setAttribute("stroke", "#1226c1");
                 line.setAttribute("stroke-width", "1");
                 break;
 
             case "dimension":
-                line.setAttribute("stroke", "rgb(3, 83, 164)");
+                line.setAttribute("stroke", "#1226c1");
                 line.setAttribute("stroke-width", "0.4");
                 break;
 
@@ -455,7 +412,7 @@ export class SvgDraw {
         );
 
         arr.setAttribute("d", `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z`);
-        arr.setAttribute("fill", "rgb(216, 30, 91)");
+        arr.setAttribute("fill", "#d81e5b");
         arr.setAttribute("stroke-width", "1");
         this.svg.appendChild(arr);
     }
@@ -488,25 +445,26 @@ export class SvgDraw {
         switch (type) {
             case "tube":
                 rect.setAttribute("stroke", "black");
-                rect.setAttribute("fill", "rgb(184, 213, 184,0.3");
+                rect.setAttribute("fill", "#667a8f");
+                rect.setAttribute("fill-opacity", "0.3");
                 rect.setAttribute("stroke-width", "1");
                 break;
             case "payload":
-                //rect.setAttribute("stroke", "rgb(16, 25, 53)");
-                rect.setAttribute("fill", "rgb(149, 178, 184)");
-                //rect.setAttribute("stroke-width", "1");
+                rect.setAttribute("fill", "#86a1c0");
+                rect.setAttribute("fill-opacity", "0.6");
                 break;
 
             case "ground":
-                rect.setAttribute("stroke", "rgb(121, 82, 10)");
-                rect.setAttribute("fill", "rgb(151, 139, 82,0.6)");
+                rect.setAttribute("stroke", "#5f6b08");
+                rect.setAttribute("fill", "#302804");
+                rect.setAttribute("fill-opacity", "0.6");
                 rect.setAttribute("stroke-width", ".1");
                 break;
 
             case "side_adapter":
-                //rect.setAttribute("stroke", "rgb(121, 82, 10)");
-                rect.setAttribute("fill", "rgb(151, 139, 82,0.3)");
-                //rect.setAttribute("stroke-width", ".1");
+                rect.setAttribute("fill", "#5f6b08");
+                rect.setAttribute("fill-opacity", "0.3");
+
                 break;
 
             default:

@@ -1,20 +1,10 @@
 <script>
     import Layout from "$modules/PDM/Shared/Layout.svelte";
     import Title from "$components/Title.svelte";
-    import Editor from "$components/Editor.svelte";
     import FormInput from "$components/FormInput.svelte";
     import FormSelect from "$components/FormSelect.svelte";
-    import FilesList from "$components/FilesList.svelte";
-
-    import FormRadio from "$components/FormRadio.svelte";
-    import FormCheckBoxSingle from "$components/FormCheckBoxSingle.svelte";
-    import FormCheckBoxMultiple from "$components/FormCheckBoxMultiple.svelte";
-    import FormDate from "$components/FormDate.svelte";
-    import FormUpload from "$components/FormUpload.svelte";
 
     import { useForm } from "@inertiajs/svelte";
-
-    import { onMount } from "svelte";
     import { MastGeometry } from "$modules/PDM/Pages/Engineering/mastGeometry.js";
     import { SvgDraw } from "$modules/PDM/Pages/Engineering/SvgDraw.js";
 
@@ -23,8 +13,6 @@
 
     import {
         Braces,
-        X,
-        ChevronRight,
         FileText,
         ChartLine,
         WeightTilde,
@@ -50,17 +38,22 @@
             labels: Object.keys(mast.params.total_moments),
             datasets: [
                 {
-                    label: "Total Moments (Nm)",
+                    label: "Bending Moments (Nm)",
                     data: Object.values(mast.params.total_moments),
+                    borderColor: '#D7263D',
                     // ... styles
                     yAxisID: "y",
                 },
                 ...mast.params.tubes.map((tube) => ({
-                    label: `Section ${tube.no}`,
+                    label: `M/EI S${tube.no}`,
                     data: Object.entries(tube.M_EI)
                         .map(([z, value]) => ({ x: parseFloat(z), y: value }))
                         .sort((a, b) => a.x - b.x),
                     // ... styles
+                    borderColor: '#02182B',
+                    backgroundColor: 'rgb(1, 151, 246, 0.1)',
+                    fill: true,
+                    opacity: 0.3,
                     yAxisID: "y1",
                 })),
             ],
@@ -142,17 +135,18 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: "Bending Moment Diagram for Mast Configuration",
+                            text: "Bending Moment and M/EI Diagram",
                         },
+
+                        tooltip: {
+                        }
                     },
                 },
             });
         }
     }
 
-    onMount(() => {
-        drawBMChart();
-    });
+
 
     let showJson = $state(false);
 
@@ -207,9 +201,8 @@
         // We "touch" mast to ensure this effect re-runs when form changes
         const _mast = mast;
 
-        // 1. Update the Bending Moment Chart and Svg
+        // Chart and SVG should update whenever form changes and mast recalculates
         drawBMChart();
-
         svgDraw.svgDraw("Loads");
         svgDraw.svgDraw("Extended");
         svgDraw.svgDraw("Nested");
@@ -234,17 +227,13 @@
 
         document.getElementById(tabSelected).classList.add("is-inverted");
         document.getElementById(divSelected).classList.remove("is-hidden");
-
-        svgDraw.svgDraw("Loads");
-        svgDraw.svgDraw("Extended");
-        svgDraw.svgDraw("Nested");
     }
 
     async function generatePDF() {
         let pdf = new MakePDF(mast);
 
         await pdf.init(); // ✅ Initialize QR code first
-        pdf.run();
+        await pdf.run();
     }
 </script>
 
@@ -550,7 +539,7 @@
             </nav>
         </div>
 
-        <div class="card p-4">
+        <div class="card p-4" id="aaaa">
             <div class="buttons">
                 <button
                     class="button is-light is-inverted"
@@ -608,22 +597,24 @@
                 </button>
             </div>
 
+            <div class="container" id="fixedWidth"></div>
+
             <!-- BENDING MOMENT DIAGRAM -->
-            <div class="container mx-auto" id="divBM">
+            <div class="container" id="divBM">
                 <canvas bind:this={chartCanvas}></canvas>
             </div>
 
             <!-- LOADS DIAGRAM -->
-            <div class="container mx-auto is-hidden" id="divLoads"></div>
+            <div class="container is-hidden" id="divLoads"></div>
 
             <!-- EXTENDED DIAGRAM -->
-            <div class="container mx-auto is-hidden" id="divExtended"></div>
+            <div class="container is-hidden" id="divExtended"></div>
 
             <!-- NESTED DIAGRAM -->
-            <div class="container mx-auto is-hidden" id="divNested"></div>
+            <div class="container is-hidden" id="divNested"></div>
 
             <!-- TORQUE/POWER REQUIRED DIAGRAM -->
-            <div class="container mx-auto is-hidden" id="divTorque">
+            <div class="container is-hidden" id="divTorque">
                 <table class="table is-fullwidth is-striped">
                     <tbody>
                         <tr>

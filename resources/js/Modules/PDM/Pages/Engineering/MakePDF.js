@@ -1,5 +1,8 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import "svg2pdf.js";
+
+
 
 import QRCode from "qrcode";
 
@@ -20,18 +23,15 @@ export default class MakePDF {
         this.logoImage;
         this.qrCodeImage = null; // Store QR code
 
-        this.image_warning =
-            "Image shown in cover page is for illustration purposes only.";
-
-        this.product_code = Math.ceil(data.extendedHeight / 1000) + "MTNX-";
-
         this.config = {
             pageBgColor: "204, 204, 204",
             pageHeaderBgColor: [25, 50, 60],
             pageFontSize: 12,
-            imgS: 12,
+            imgS: 14,
             gap: 20,
         };
+
+        this.productNaming();
     }
 
     // Pre-generate QR code  and images before running
@@ -48,16 +48,21 @@ export default class MakePDF {
         this.bigLogo = await this.getImageData("/images/PDM/masttech-big.png");
     }
 
-    run() {
+    async run() {
+        this
         this.coverPage();
-        // this.propertiesPage();
-        // this.dimensionPages("NestedSvgImage", "Nested Height Diagram");
-        // this.dimensionPages("ExtendedSvgImage", "Extended Height Diagram");
-        // this.optionalAccessoriesPage();
         this.specificationsPage();
+        await this.svgPage("Extended");
+        await this.svgPage("Nested");
         this.disclaimerPage();
+        this.pdf.save(this.product_code + ".pdf");
+    }
 
-        this.pdf.save("AAA.pdf");
+    productNaming() {
+        this.product_family = 'MTNX';
+        this.product_family_name = 'MTNX';
+        this.image_warning = "Image shown in cover page is for illustration purposes only.";
+        this.product_code = Math.ceil(this.data.extendedHeight / 1000) + this.product_family + "-" + (this.data.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
     }
 
     coverPage() {
@@ -68,7 +73,7 @@ export default class MakePDF {
         // COVER TITLE AND SUBTITLE
         this.pdf.setFontSize(72);
         this.pdf.setFont("helvetica", "bold");
-        this.pdf.text("this.data.mastType", this.mx, this.pageHeight * 0.27);
+        this.pdf.text(this.product_family, this.mx, this.pageHeight * 0.27);
 
         this.pdf.setFontSize(24);
         this.pdf.setFont("helvetica", "normal");
@@ -115,6 +120,33 @@ export default class MakePDF {
         );
     }
 
+    async svgPage(state) {
+
+        this.pdf.addPage("a4", "portrait");
+        this.HeaderFooter(state + " View");
+
+        document.getElementById("div" + state).classList.remove("is-hidden");
+
+        const svgElement = document.getElementById("svg-" + state);
+
+        if (!svgElement) {
+            console.error("SVG element not found for state:", state);
+            alert("Error: SVG element not found for " + state);
+            return;
+        }
+
+        // Use svg2pdf to add the element to the PDF
+        await this.pdf.svg(svgElement, {
+            x: this.mx,
+            y: 0,
+            width: 178,
+            height: 290
+        });
+
+        document.getElementById("div" + state).classList.add("is-hidden");
+
+    }
+
     HeaderFooter(title = false) {
         if (title) {
             this.pdf.setFillColor(...this.config.pageHeaderBgColor);
@@ -133,26 +165,16 @@ export default class MakePDF {
         // Footer
         this.pdf.setFontSize(9);
         this.pdf.setTextColor(0, 0, 0);
-        this.pdf.setFont("helvetica", "normal");
+        this.pdf.setFont('helvetica', 'normal');
 
-        // this.pdf.text(
-        //     "kapkara.one",
-        //     this.pageWidth - this.mx,
-        //     this.pageHeight - this.my * 0.6,
-        //     { align: "right" },
-        // );
+        this.pdf.text('kapkara.one', this.pageWidth - this.mx, this.pageHeight - this.my * 0.6, { align: 'right' });
+        this.pdf.text('PDM Product Data Management', this.mx, this.pageHeight - this.my * 0.6, { align: 'left' });
 
-        // this.pdf.text(
-        //     "PDM Product Data Management",
-        //     this.mx,
-        //     this.pageHeight - this.my * 0.6,
-        //     { align: "left" },
-        // );
     }
 
     specificationsPage() {
         this.pdf.addPage("a4", "portrait");
-        this.HeaderFooter("General Mast Properties");
+        this.HeaderFooter("Specifications");
 
         const props = [
             ["Maximum Payload Capacity", this.data.params.payload_weight, "kg"],
@@ -166,7 +188,7 @@ export default class MakePDF {
             ],
             //["Maximum Survival Wind Speed", 160, "km/h"],
             ["Maximum Sail Area", this.data.params.sail_area, "m2"],
-            ["Mast Tube Material", "Aluminium", ""],
+            ["Mast Tube Material", "", "Aluminium"],
             [
                 "Mast Weight [Estimated - Moved]",
                 this.data.weight.lifted_mass.toFixed(0),
@@ -232,7 +254,7 @@ export default class MakePDF {
         this.pdf.addPage("a4", "portrait");
         this.HeaderFooter("Disclaimer");
 
-        this.pdf.setFontSize(10);
+        this.pdf.setFontSize(12);
         this.pdf.setTextColor(0, 0, 0);
         this.pdf.setFont("helvetica", "normal");
 
@@ -257,14 +279,14 @@ export default class MakePDF {
             this.bigLogo,
             "PNG",
             (this.pageWidth - imgWidth) / 2,
-            120,
+            180,
             imgWidth,
             imgHeight,
         );
 
         const now = new Date();
 
-        this.pdf.text(String(now), this.pageWidth / 2, 220, {
+        this.pdf.text(String(now), this.pageWidth / 2, 275, {
             align: "center",
         });
     }
