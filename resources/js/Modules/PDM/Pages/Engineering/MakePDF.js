@@ -62,7 +62,7 @@ export default class MakePDF {
         this.product_family = 'MTNX';
         this.product_family_name = 'MTNX';
         this.image_warning = "Image shown in cover page is for illustration purposes only.";
-        this.product_code = Math.ceil(this.data.extendedHeight / 1000) + this.product_family + "-" + (this.data.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
+        this.product_code = Math.ceil(this.data.props.extendedHeight / 1000) + this.product_family + "-" + (this.data.props.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
     }
 
     coverPage() {
@@ -178,8 +178,8 @@ export default class MakePDF {
 
         const props = [
             ["Maximum Payload Capacity", this.data.params.payload_weight, "kg"],
-            ["Extended Height", this.data.extendedHeight, "mm"],
-            ["Nested Height", this.data.nestedHeight, "mm"],
+            ["Extended Height", this.data.props.extendedHeight, "mm"],
+            ["Nested Height", this.data.props.nestedHeight, "mm"],
             ["Number of Sections", this.data.params.noOfTubes, ""],
             [
                 "Maximum Operational Wind Speed",
@@ -191,12 +191,12 @@ export default class MakePDF {
             ["Mast Tube Material", "", "Aluminium"],
             [
                 "Mast Weight [Estimated - Moved]",
-                this.data.weight.lifted_mass.toFixed(0),
+                this.data.weights.lifted_mass.toFixed(0),
                 "kg",
             ],
             [
                 "Mast Weight [Estimated - Total]",
-                this.data.weight.total_mast_mass.toFixed(0),
+                this.data.weights.total_mast_mass.toFixed(0),
                 "kg",
             ],
 

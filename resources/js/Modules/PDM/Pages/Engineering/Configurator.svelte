@@ -9,6 +9,8 @@
     import { SvgDraw } from "$modules/PDM/Pages/Engineering/SvgDraw.js";
 
     import MakePDF from "$modules/PDM/Pages/Engineering/MakePDF.js";
+    import MastDeflection from "$modules/PDM/Pages/Engineering/Deflection.js";
+
     import Chart from "chart.js/auto";
 
     import {
@@ -20,6 +22,7 @@
         ArrowDownNarrowWide,
         Wrench,
     } from "@lucide/svelte";
+
     import { config } from "$modules/PDM/Shared/config.js";
 
     let chartCanvas;
@@ -28,23 +31,23 @@
     let { params, isEdit = false, supportFixedData } = $props();
 
     // Function to update/create the chart
-    function drawBMChart() {
+    function drawBMChart(data) {
         if (!chartCanvas) return;
 
         const ctx = chartCanvas.getContext("2d");
-        let min_EI = mast.params.tubes.at(-1).M_EI["0"];
+        let min_EI = data.params.tubes.at(-1).M_EI["0"];
 
         const chartData = {
-            labels: Object.keys(mast.params.total_moments),
+            labels: Object.keys(data.props.total_moments),
             datasets: [
                 {
                     label: "Bending Moments (Nm)",
-                    data: Object.values(mast.params.total_moments),
+                    data: Object.values(data.props.total_moments),
                     borderColor: '#D7263D',
                     // ... styles
                     yAxisID: "y",
                 },
-                ...mast.params.tubes.map((tube) => ({
+                ...data.params.tubes.map((tube) => ({
                     label: `M/EI S${tube.no}`,
                     data: Object.entries(tube.M_EI)
                         .map(([z, value]) => ({ x: parseFloat(z), y: value }))
@@ -169,7 +172,7 @@
         terrain_category: params?.terrain_category ?? "",
         x_offset: params?.x_offset ?? "",
         z_offset: params?.z_offset ?? "",
-        payload_weight: params?.payload_weight ?? "",
+        payload_mass: params?.payload_mass ?? "",
         motor_id: params?.motor_id ?? "",
         gearbox_id: params?.gearbox_id ?? "",
     });
@@ -192,7 +195,7 @@
                 terrain_category: params.terrain_category,
                 x_offset: params.x_offset,
                 z_offset: params.z_offset,
-                payload_weight: params.payload_weight,
+                payload_mass: params.payload_mass,
                 motor_id: params.motor_id,
                 gearbox_id: params.gearbox_id,
             });
@@ -202,14 +205,19 @@
         const _mast = mast;
 
         // Chart and SVG should update whenever form changes and mast recalculates
-        drawBMChart();
         svgDraw.svgDraw("Loads");
         svgDraw.svgDraw("Extended");
         svgDraw.svgDraw("Nested");
+
+        deflection.run();
+        drawBMChart(deflection.data);
+
     });
 
     let mast = $derived(new MastGeometry($form, config));
-    let svgDraw = $derived(new SvgDraw(mast));
+    let svgDraw = $derived(new SvgDraw(mast.data));
+    let deflection = $derived(new MastDeflection(mast.data));
+
 
     function toggleTab(elName) {
         let tabSelected = "tab" + elName;
@@ -230,11 +238,14 @@
     }
 
     async function generatePDF() {
-        let pdf = new MakePDF(mast);
+        let pdf = new MakePDF(mast.data);
 
         await pdf.init(); // ✅ Initialize QR code first
         await pdf.run();
     }
+
+
+
 </script>
 
 <Layout>
@@ -454,9 +465,9 @@
                     <div class="cell">
                         <FormInput
                             {form}
-                            name="payload_weight"
-                            label="Payload Weight[kg]"
-                            placeholder="Enter Payload"
+                            name="payload_mass"
+                            label="Payload Mass [kg]"
+                            placeholder="Enter Payload Mass"
                             type="number"
                             min="5"
                             max="1000"
@@ -502,7 +513,7 @@
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Extended Height</p>
-                        <p class="title mb-0">{mast.extendedHeight}</p>
+                        <p class="title mb-0">{mast.data.props.extendedHeight}</p>
                         <p class="heading">mm</p>
                     </div>
                 </div>
@@ -510,7 +521,7 @@
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Nested Height</p>
-                        <p class="title mb-0">{mast.nestedHeight}</p>
+                        <p class="title mb-0">{mast.data.props.nestedHeight}</p>
                         <p class="heading">mm</p>
                     </div>
                 </div>
@@ -519,7 +530,7 @@
                     <div>
                         <p class="heading mb-0">Wind Load on Payload</p>
                         <p class="title mb-0">
-                            {mast.payload.wind_load.toFixed(0)}
+                            {mast.data.props.payload.wind_load.toFixed(0)}
                         </p>
                         <p class="heading">N</p>
                     </div>
@@ -527,9 +538,9 @@
 
                 <div class="level-item has-text-centered">
                     <div>
-                        <p class="heading mb-0">Lifted Weight / Total Weight</p>
+                        <p class="heading mb-0">Lifted Mass / Total Mast Mass</p>
                         <p class="title mb-0">
-                            {mast.weight.lifted_mass.toFixed(0)} / {mast.weight.total_mast_mass.toFixed(
+                            {mast.data.weights.lifted_mass.toFixed(0)} / {mast.data.weights.total_mast_mass.toFixed(
                                 0,
                             )}
                         </p>
@@ -627,7 +638,7 @@
                                         <tr>
                                             <th>Screw Nominal Diameter [mm]</th>
                                             <td
-                                                >{mast.config.screw_nominal_diameter.toFixed(
+                                                >{mast.data.config.screw_nominal_diameter.toFixed(
                                                     2,
                                                 )}</td
                                             >
@@ -635,7 +646,7 @@
                                         <tr>
                                             <th>Screw Lead [mm]</th>
                                             <td
-                                                >{mast.config.screw_lead.toFixed(
+                                                >{mast.data.config.screw_lead.toFixed(
                                                     2,
                                                 )}</td
                                             >
@@ -647,7 +658,7 @@
                                                 [Steel-Bronze]</th
                                             >
                                             <td
-                                                >{mast.config.screw_coefficient_of_friction.toFixed(
+                                                >{mast.data.config.screw_coefficient_of_friction.toFixed(
                                                     2,
                                                 )}</td
                                             >
@@ -666,20 +677,20 @@
                                     <tbody>
                                         <tr>
                                             <th>Selected Motor Power</th>
-                                            <td>{mast.power.motor_power} kW</td>
+                                            <td>{mast.data.power.motor_power} kW</td>
                                         </tr>
 
                                         <tr>
                                             <th>Selected Motor Maximum Speed</th
                                             >
-                                            <td>{mast.power.motor_rpm} RPM</td>
+                                            <td>{mast.data.power.motor_rpm} RPM</td>
                                         </tr>
 
                                         <tr>
                                             <th>Selected Motor Output Torque</th
                                             >
                                             <td>
-                                                {mast.power.motor_torque.toFixed(
+                                                {mast.data.power.motor_torque.toFixed(
                                                     2,
                                                 )} Nm
                                             </td>
@@ -690,17 +701,17 @@
                                                 Total Driveline Speed Reduction
                                                 Ratio
                                             </th>
-                                            <td>{mast.power.gearbox_ratio}</td>
+                                            <td>{mast.data.power.gearbox_ratio}</td>
                                         </tr>
 
                                         <tr>
                                             <th>Screw Speed</th>
                                             <td>
-                                                {mast.power.screw_rpm.toFixed(
+                                                {mast.data.power.screw_rpm.toFixed(
                                                     1,
                                                 )} RPM
                                                 <br />
-                                                {mast.power.vertical_speed.toFixed(
+                                                {mast.data.power.vertical_speed.toFixed(
                                                     3,
                                                 )} m/min
                                             </td>
@@ -712,7 +723,7 @@
                                                 Extend Mast</th
                                             >
                                             <td
-                                                >{mast.power.torque_required_to_extend_mast_Nm.toFixed(
+                                                >{mast.data.power.torque_required_to_extend_mast_Nm.toFixed(
                                                     2,
                                                 )} Nm</td
                                             >
@@ -721,38 +732,38 @@
                                         <tr>
                                             <th>Total Torque at Screw End</th>
                                             <td>
-                                                {mast.power.lifting_torque.toFixed(
+                                                {mast.data.power.lifting_torque.toFixed(
                                                     2,
                                                 )} Nm
                                             </td>
                                         </tr>
                                         <tr>
-                                            {#if mast.power.lifting_torque > mast.power.torque_required_to_extend_mast_Nm}
+                                            {#if mast.data.power.lifting_torque > mast.data.power.torque_required_to_extend_mast_Nm}
                                                 <td
                                                     colspan="2"
                                                     class="is-success"
                                                 >
                                                     Available Torque <strong>
-                                                        {mast.power.lifting_torque.toFixed(
+                                                        {mast.data.power.lifting_torque.toFixed(
                                                             1,
                                                         )}
                                                     </strong>
                                                     > Required Torque
                                                     <strong>
-                                                        {mast.power.torque_required_to_extend_mast_Nm.toFixed(
+                                                        {mast.data.power.torque_required_to_extend_mast_Nm.toFixed(
                                                             1,
                                                         )}
                                                     </strong> Nm
                                                 </td>
                                             {/if}
 
-                                            {#if mast.power.lifting_torque < mast.power.torque_required_to_extend_mast_Nm}
+                                            {#if mast.data.power.lifting_torque < mast.data.power.torque_required_to_extend_mast_Nm}
                                                 <td
                                                     colspan="2"
                                                     class="is-danger is-light"
                                                 >
                                                     Available Torque <strong>
-                                                        {mast.power.lifting_torque.toFixed(
+                                                        {mast.data.power.lifting_torque.toFixed(
                                                             1,
                                                         )}
                                                     </strong>
@@ -763,7 +774,7 @@
                                                     </span>
                                                     Required Torque
                                                     <strong>
-                                                        {mast.power.torque_required_to_extend_mast_Nm.toFixed(
+                                                        {mast.data.power.torque_required_to_extend_mast_Nm.toFixed(
                                                             1,
                                                         )}
                                                     </strong> Nm
@@ -791,7 +802,7 @@
 
             <div class="modal-content">
                 <pre>
-                  {JSON.stringify(mast, null, 2)}
+                  {JSON.stringify(deflection.data, null, 2)}
                 </pre>
             </div>
             <button

@@ -10,7 +10,7 @@ export class SvgDraw {
         this.vcline_x = null;
         this.vcline_info = null;
 
-        this.force_line_scale = 250 / this.data.payload.wind_load;
+        this.force_line_scale = 250 / this.data.props.payload.wind_load;
     }
 
     svgDraw(drawType) {
@@ -83,16 +83,16 @@ export class SvgDraw {
             case "Loads":
                 totalHeight =
                     1000 * Math.sqrt(this.data.params.sail_area) +
-                    this.data.extendedHeight;
+                    this.data.props.extendedHeight;
                 break;
 
             default:
             case "Extended":
-                totalHeight = this.data.extendedHeight;
+                totalHeight = this.data.props.extendedHeight;
                 break;
 
             case "Nested":
-                totalHeight = this.data.nestedHeight;
+                totalHeight = this.data.props.nestedHeight;
                 break;
         }
 
@@ -214,8 +214,8 @@ export class SvgDraw {
         let stateTxt = state === "Nested" ? "Nested" : "Extended";
         let z =
             state === "Nested"
-                ? this.data.nestedHeight
-                : this.data.extendedHeight;
+                ? this.data.props.nestedHeight
+                : this.data.props.extendedHeight;
 
         // Payload Adapter in Extended State
         x = this.vcline_x - payload_plate_w;
@@ -236,13 +236,13 @@ export class SvgDraw {
         let payload_dim = 1000 * Math.sqrt(this.data.params.sail_area);
 
         let force_line_strength =
-            this.force_line_scale * this.data.payload.wind_load;
+            this.force_line_scale * this.data.props.payload.wind_load;
 
         let x = this.vcline_x - (this.scale * payload_dim) / 2;
         let y =
             this.svgHeight -
             this.MY -
-            this.scale * this.data.extendedHeight -
+            this.scale * this.data.props.extendedHeight -
             this.scale * payload_dim;
         let w = this.scale * payload_dim;
         let h = this.scale * payload_dim;
@@ -252,7 +252,7 @@ export class SvgDraw {
         y =
             this.svgHeight -
             this.MY -
-            this.scale * this.data.payload.wind_load_z;
+            this.scale * this.data.props.payload.wind_load_z;
 
         let cg_x = this.vcline_x + this.scale * this.data.params.x_offset;
 
@@ -260,7 +260,7 @@ export class SvgDraw {
         this.drawText(
             cg_x - force_line_strength,
             y - 4,
-            this.data.payload.wind_load.toFixed(0) + " N",
+            this.data.props.payload.wind_load.toFixed(0) + " N",
             "start",
         ); // Force Value Text
         this.drawArrow(cg_x, y); // Force Arrow
@@ -269,7 +269,7 @@ export class SvgDraw {
         this.drawText(
             this.vcline_info,
             y - 4,
-            this.data.payload.wind_load_z.toFixed(0),
+            this.data.props.payload.wind_load_z.toFixed(0),
             "end",
         ); // Force Value Text
 
@@ -284,7 +284,7 @@ export class SvgDraw {
         this.drawText(
             cg_x+4,
             10,
-            (this.data.params.payload_weight * 9.81).toFixed(0) + " N",
+            (this.data.params.payload_mass * 9.81).toFixed(0) + " N",
             "start",
         ); // Weight Value Text
     }
@@ -294,14 +294,14 @@ export class SvgDraw {
             0.6 *
             2 *
             (this.data.params.tubes.at(-1).extended_zt -
-                this.data.side_adapter_z);
+                this.data.props.side_adapter_z);
         let side_support_width = 1.3 * this.data.params.tubes.at(-1).od;
 
         let x = this.vcline_x - this.scale * side_support_width * 0.5;
         let y =
             this.svgHeight -
             this.MY -
-            this.scale * (this.data.side_adapter_z + 0.5 * side_support_height);
+            this.scale * (this.data.props.side_adapter_z + 0.5 * side_support_height);
 
         let w = this.scale * side_support_width * 1.5;
         let h = this.scale * side_support_height;
@@ -309,7 +309,7 @@ export class SvgDraw {
         this.drawRectangle(x, y, w, h, "side_adapter");
         this.drawCircle(
             this.vcline_x,
-            this.svgHeight - this.MY - this.data.side_adapter_z * this.scale,
+            this.svgHeight - this.MY - this.data.props.side_adapter_z * this.scale,
             2,
             "side",
         );
@@ -320,7 +320,7 @@ export class SvgDraw {
             x,
             y,
             0.5 * w,
-            this.scale * (this.data.side_adapter_z + 0.5 * side_support_height),
+            this.scale * (this.data.props.side_adapter_z + 0.5 * side_support_height),
             "side_adapter",
         );
     }
