@@ -4,6 +4,9 @@
     import FormInput from "$components/FormInput.svelte";
     import FormSelect from "$components/FormSelect.svelte";
 
+    import JsonTree from "$components/JsonTree.svelte";
+
+
     import { useForm } from "@inertiajs/svelte";
     import { MastGeometry } from "$modules/PDM/Pages/Engineering/mastGeometry.js";
     import { SvgDraw } from "$modules/PDM/Pages/Engineering/SvgDraw.js";
@@ -17,16 +20,21 @@
         Braces,
         FileText,
         ChartLine,
+        ChartSpline,
         WeightTilde,
         ArrowUpNarrowWide,
         ArrowDownNarrowWide,
         Wrench,
+        Table
     } from "@lucide/svelte";
 
     import { config } from "$modules/PDM/Shared/config.js";
 
     let chartCanvas;
+    let chartDeflection;
     let chartInstance;
+    let chartDeflectionInstance;
+
 
     let { params, isEdit = false, supportFixedData } = $props();
 
@@ -151,6 +159,90 @@
 
 
 
+
+    function drawDeflectionChart(data) {
+        if (!chartDeflection) return;
+
+        const ctx = chartDeflection.getContext("2d");
+        let min_EI = data.params.tubes.at(-1).M_EI["0"];
+
+        const chartData = {
+            labels: Object.keys(data.deflections.Z5065),
+            datasets: [
+                {
+                    label: "Bending Moments (Nm)",
+                    data: Object.values(data.deflections.Z5065),
+                    borderColor: '#D7263D',
+                    // ... styles
+                    yAxisID: "y",
+                },
+
+            ],
+        };
+
+        if (chartDeflectionInstance) {
+            // Update existing chart
+            chartDeflectionInstance.data = chartData;
+            chartDeflectionInstance.options.scales.y1.min = min_EI * 1.2;
+            chartDeflectionInstance.update("none"); // 'none' for performance, or omit for animation
+        } else {
+            // Initialize chart
+            chartDeflectionInstance = new Chart(ctx, {
+                type: "line",
+                data: chartData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: "linear",
+                            display: true,
+                            title: {
+                                display: true,
+                                text: "Mast Height, z [mm]",
+                                color: "#666",
+                                font: {
+                                    size: 14,
+                                    weight: "bold",
+                                },
+                            },
+                        },
+                        y: {
+                            type: "linear",
+                            display: true,
+                            position: "left",
+                            title: {
+                                display: true,
+                                text: "Deflection, [mm]",
+                                color: "#666",
+                                font: {
+                                    size: 14,
+                                    weight: "bold",
+                                },
+                            },
+                            // Useful if you want the negative values to stay consistent
+                            beginAtZero: false,
+                        },
+
+
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bending Moment and M/EI Diagram",
+                        },
+
+                        tooltip: {
+                        }
+                    },
+                },
+            });
+        }
+    }
+
+
+
+
+
     let showJson = $state(false);
 
     function toggle() {
@@ -211,6 +303,7 @@
 
         deflection.run();
         drawBMChart(deflection.data);
+        drawDeflectionChart(deflection.data)
 
     });
 
@@ -219,11 +312,12 @@
     let deflection = $derived(new MastDeflection(mast.data));
 
 
+
     function toggleTab(elName) {
         let tabSelected = "tab" + elName;
         let divSelected = "div" + elName;
         let tabId, divId;
-        let tabs = ["BM", "Loads", "Extended", "Nested", "Torque"];
+        let tabs = ["BM", "Deflection", "Loads", "Extended", "Nested", "Torque"];
 
         tabs.forEach((element) => {
             tabId = "tab" + element;
@@ -259,6 +353,13 @@
             </div>
 
             <div class="column has-text-right has-text-left-mobile">
+
+                <a href="/pdm/engineering/profiles_table" class="button is-link is-light">
+                    <span class="icon is-small">
+                        <Table size="16" />
+                    </span>
+                </a>
+
                 <button onclick={toggle} class="button is-link is-light">
                     <span class="icon is-small">
                         <Braces size="16" />
@@ -550,6 +651,48 @@
             </nav>
         </div>
 
+
+
+<nav class="navbar is-warning"  aria-label="main navigation">
+
+
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("BM")} id="tabBM">
+            <span class="icon"><ChartLine size="16" color="red" /></span>
+            <span>Bending Moments</span>
+        </button>
+
+        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("Deflection")} id="tabBM">
+            <span class="icon"><ChartSpline size="16" color="red" /></span>
+            <span>Deflections</span>
+        </button>
+
+        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("Loads")} id="tabBM">
+            <span class="icon"><WeightTilde size="16" color="red" /></span>
+            <span>Loads</span>
+        </button>
+
+        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("BM")} id="tabBM">
+            <span class="icon"><ChartLine size="16" color="red" /></span>
+            <span>Bending Moments</span>
+        </button>
+
+    </div>
+
+
+  </div>
+</nav>
+
+
+
+
+
+
+
+
+
+
         <div class="card p-4" id="aaaa">
             <div class="buttons">
                 <button
@@ -561,6 +704,17 @@
                         <ChartLine size="16" color="red" />
                     </span>
                     <span>Bending Moments</span>
+                </button>
+
+                <button
+                    class="button is-light is-inverted"
+                    onclick={() => toggleTab("Deflection")}
+                    id="tabDeflection"
+                >
+                    <span class="icon">
+                        <ChartSpline size="16" color="red" />
+                    </span>
+                    <span>Deflection</span>
                 </button>
 
                 <button
@@ -613,6 +767,11 @@
             <!-- BENDING MOMENT DIAGRAM -->
             <div class="container" id="divBM">
                 <canvas bind:this={chartCanvas}></canvas>
+            </div>
+
+            <!-- DEFLECTION DIAGRAM -->
+            <div class="container" id="divDeflection">
+                <canvas bind:this={chartDeflection}></canvas>
             </div>
 
             <!-- LOADS DIAGRAM -->
@@ -802,7 +961,8 @@
 
             <div class="modal-content">
                 <pre>
-                  {JSON.stringify(deflection.data, null, 2)}
+                  <!-- {JSON.stringify(deflection.data, null, 2)} -->
+                  <JsonTree data={deflection.data} />
                 </pre>
             </div>
             <button
@@ -812,4 +972,7 @@
             ></button>
         </div>
     </section>
+
+
+
 </Layout>

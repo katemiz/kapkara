@@ -7,6 +7,7 @@ export const config = {
             thk: 2,
             area_mm2: 531.42,
             inertia_mm4: 144359.94,
+            channel_number: 4,
         },
         {
             no: 2,
@@ -15,6 +16,7 @@ export const config = {
             thk: 2.2,
             area_mm2: 657.93,
             inertia_mm4: 351727.54,
+            channel_number: 4,
         },
         {
             no: 3,
@@ -23,6 +25,7 @@ export const config = {
             thk: 2.4,
             area_mm2: 852.28,
             inertia_mm4: 733496.51,
+            channel_number: 4,
         },
         {
             no: 4,
@@ -32,6 +35,7 @@ export const config = {
             length: 2000,
             area_mm2: 1057.42,
             inertia_mm4: 1372498.49,
+            channel_number: 4,
         },
         {
             no: 5,
@@ -40,6 +44,7 @@ export const config = {
             thk: 2.8,
             area_mm2: 1290.94,
             inertia_mm4: 2372673.47,
+            channel_number: 4,
         },
         {
             no: 6,
@@ -49,6 +54,7 @@ export const config = {
             length: 2000,
             area_mm2: 1553.09,
             inertia_mm4: 3861481.58,
+            channel_number: 4,
         },
         {
             no: 7,
@@ -57,6 +63,7 @@ export const config = {
             thk: 3.2,
             area_mm2: 1844.42,
             inertia_mm4: 5992457.14,
+            channel_number: 4,
         },
         {
             no: 8,
@@ -65,6 +72,7 @@ export const config = {
             thk: 3.4,
             area_mm2: 2165.56,
             inertia_mm4: 8947902.11,
+            channel_number:4,
         },
         {
             no: 9,
@@ -74,6 +82,7 @@ export const config = {
             length: 2000,
             area_mm2: 2517.21,
             inertia_mm4: 12941721.43,
+            channel_number: 4,
         },
         {
             no: 10,
@@ -83,6 +92,7 @@ export const config = {
             length: 2000,
             area_mm2: 2900.08,
             inertia_mm4: 18222403.31,
+            channel_number: 4,
         },
         {
             no: 11,
@@ -91,6 +101,7 @@ export const config = {
             thk: 4,
             area_mm2: 3538.49,
             inertia_mm4: 26761768.83,
+            channel_number: 8,
         },
         {
             no: 12,
@@ -99,6 +110,7 @@ export const config = {
             thk: 4.2,
             area_mm2: 3986.05,
             inertia_mm4: 35883568,
+            channel_number: 8,
         },
         {
             no: 13,
@@ -107,6 +119,7 @@ export const config = {
             thk: 4.4,
             area_mm2: 4467.07,
             inertia_mm4: 47211434.31,
+            channel_number: 8,
         },
         {
             no: 14,
@@ -115,7 +128,9 @@ export const config = {
             thk: 4.6,
             area_mm2: 4982.29,
             inertia_mm4: 61316545,
+            channel_number: 8,
         },
+
         {
             no: 15,
             od: 342,
@@ -123,6 +138,69 @@ export const config = {
             thk: 4.8,
             area_mm2: 5532.44,
             inertia_mm4: 78621879.48,
+            channel_number: 8,
+        },
+
+
+        {
+            no: 16,
+            od: 366,
+            id: 356.0,
+            thk: 5.0,
+            area_mm2: 6118.30,
+            inertia_mm4: 99656139.01,
+            channel_number: 8,
+        },
+
+        {
+            no: 17,
+            od: 390.4,
+            id: 380,
+            thk: 5.2,
+            area_mm2: 6740.59,
+            inertia_mm4: 125007834.15,
+            channel_number: 8,
+        },
+
+        {
+            no: 18,
+            od: 415.2,
+            id: 404.4,
+            thk: 5.4,
+            area_mm2: 7400.09,
+            inertia_mm4: 155329543.18,
+            channel_number: 8,
+        },
+
+
+        {
+            no: 19,
+            od: 440.4,
+            id: 429.2,
+            thk: 5.6,
+            area_mm2: 8097.53,
+            inertia_mm4: 191342344.57,
+            channel_number: 8,
+        },
+
+        {
+            no: 20,
+            od: 466.0,
+            id: 454.4,
+            thk: 5.8,
+            area_mm2: 8833.67,
+            inertia_mm4: 233840426.71,
+            channel_number: 8,
+        },
+
+        {
+            no: 21,
+            od: 492,
+            id: 480,
+            thk: 6.0,
+            area_mm2: 9609.26,
+            inertia_mm4: 283695878.24,
+            channel_number: 8,
         },
     ],
 
@@ -175,6 +253,7 @@ export const config = {
     screw_nominal_diameter: 30, // mm
     screw_lead: 25, // mm
     screw_coefficient_of_friction: 0.15, // For steel on bronze
+    screw_density: 7850, // kg/m³
 
     motors: [
         {
@@ -183,6 +262,7 @@ export const config = {
             power_kW: 0.35,
             max_torque_Nm: 10,
             max_speed_rpm: 1400,
+            mass_kg: 5,
         },
         {
             id: 2,
@@ -190,6 +270,7 @@ export const config = {
             power_kW: 0.55,
             max_torque_Nm: 10,
             max_speed_rpm: 1400,
+            mass_kg: 5,
         },
         {
             id: 3,
@@ -197,6 +278,7 @@ export const config = {
             power_kW: 0.75,
             max_torque_Nm: 15,
             max_speed_rpm: 1400,
+            mass_kg: 7,
         },
     ],
 
@@ -206,18 +288,240 @@ export const config = {
             name: "i 1:6",
             gear_ratio: 6,
             efficiency: 0.85,
+            mass_kg: 5,
         },
         {
             id: 2,
             name: "i 1:24",
             gear_ratio: 24,
             efficiency: 0.75,
+            mass_kg: 7,
         },
         {
             id: 3,
             name: "i 1:60",
             gear_ratio: 60,
             efficiency: 0.65,
+            mass_kg: 10,
         },
     ],
+
+
+    "weights" : {
+
+        "welded_bottom_structure":{
+            "C1": 0,
+            "C2": 0,
+            "C3": 0,
+            "C4": 0,
+            "C5": 0,
+            "C6": 0,
+            "C7": 0,
+            "C8": 7.8,
+            "C9": 8.9,
+            "C10": 10.1,
+            "C11": 11.3,
+            "C12": 12.4,
+            "C13": 13.6,
+            "C14": 14.9,
+            "C15": 16.2,
+        },
+
+        "fixed_top_flange":{
+            "C15": 1.6,
+            "C14": 1.5,
+            "C13": 1.4,
+            "C12": 1.3,
+            "C11": 1.2,
+            "C10": 1.15,
+            "C9": 1.05,
+            "C8": 1,
+            "C7": 0.9,
+            "C6": 0.8,
+            "C5": 0.7,
+            "C4": 0.6,
+            "C3": 0.55,
+            "C2": 0.45,
+            "C1": 0.35
+        },
+
+        "ice_breaker":{
+            "C15": 1.21,
+            "C14": 1.12,
+            "C13": 1.03,
+            "C12": 0.94,
+            "C11": 0.86,
+            "C10": 0.82,
+            "C9": 0.74,
+            "C8": 0.67,
+            "C7": 0.59,
+            "C6": 0.52,
+            "C5": 0.45,
+            "C4": 0.38,
+            "C3": 0.31,
+            "C2": 0.23,
+            "C1": 0.16
+        },
+
+
+        "screw_nut_frame":{
+
+            "C1": {
+                "frame": 0.32,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.14,
+            },
+            "C2": {
+                "frame": 0.42,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.24,
+            },
+            "C3": {
+                "frame": 0.52,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.34,
+            },
+            "C4": {
+                "frame": 0.62,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.44,
+            },
+            "C5": {
+                "frame": 0.72,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.54,
+            },
+            "C6": {
+                "frame": 0.83,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.65,
+            },
+            "C7": {
+                "frame": 0.93,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.75,
+            },
+            "C8": {
+                "frame": 1.03,
+                "nut": 0.12,
+                "nut_housing":  0.53,
+                "housing_cap": 0.17,
+                "assy": 1.85,
+            },
+            "C9": {
+                "frame": 1.04,
+                "nut":  0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 1.86,
+            },
+            "C10": {
+                "frame": 1.12,
+                "nut": 0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 1.94,
+            },
+            "C11": {
+                "frame": 1.42,
+                "nut": 0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 2.24,
+            },
+            "C12": {
+                "frame": 1.53,
+                "nut": 0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 2.35,
+            },
+            "C13": {
+                "frame": 1.64,
+                "nut": 0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 2.46,
+            },
+            "C14": {
+                "frame": 1.75,
+                "nut": 0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 2.57,
+            },
+            "C15": {
+                "frame": 1.86,
+                "nut": 0.12,
+                "nut_housing": 0.53,
+                "housing_cap": 0.17,
+                "assy": 2.68,
+            }
+        },
+
+        "lower_key_guides_each": 0.15,
+        "upper_key_guides_each": 0.12,
+
+        "euler_fixer":{
+            "C1": 0.61,
+            "C2": 0.71,
+            "C3":0.82,
+            "C4": 0.93,
+            "C5": 0.95,
+            "C6": 1.20,
+            "C7":  1.29,
+            "C8": 1.37,
+            "C9": 1.46,
+            "C10": 1.55,
+            "C11": 1.67,
+            "C12": 1.77,
+            "C13": 1.89,
+            "C14": 1.99,
+            "C15": 2.10
+        },
+
+        "payload_interface": {
+            "C1": 1.00,
+            "C2": 1.23,
+            "C3": 1.49,
+            "C4":1.76,
+            "C5": 2.08,
+            "C6": 2.43,
+            "C7": 2.80,
+            "C8": 3.22,
+            "C9": 3.67,
+            "C10": 4.16,
+            "C11": 4.63,
+            "C12": 5.20,
+            "C13": 5.81,
+            "C14":  6.47,
+            "C15": 7.17,
+        },
+
+        "lock_stopper_each" : 0.03,
+        "lock_key_each": 0.04,
+        "lock_mechanism_each": 0.15,
+    }
+
+
+
 };
+
+
+
+
+

@@ -21,8 +21,9 @@ export class MastGeometry {
         this.windLoadOnPayload();
         this.estimateMastMass();
         this.torqueRequired();
+        ///this.getMastMass();
 
-        console.log("Mast Geometry Data", this.data);
+        //console.log("Mast Geometry Data", this.data);
 
     }
 
@@ -36,7 +37,6 @@ export class MastGeometry {
     }
 
     calculateMass(tube, length) {
-
         // Length is in m, area is in mm2, density is in kg/m3, mass will be in kg
         return (tube.area_mm2 * length * tube.material_density) / 1000000; // kg
     }
@@ -114,6 +114,17 @@ export class MastGeometry {
 
                 // Calculate EI
                 tube.EI_Nm2 = tube.material_e * tube.inertia_mm4 * 1e-12; // Nm2
+
+                tube.state_name = "intermediate_section";
+
+                if (tube.no === this.data.params.start_tube_no) {
+                    tube.state_name = "top_section";
+                }
+
+                if (tube.no === this.data.params.end_tube_no) {
+                    tube.state_name = "bottom_section";
+                }
+
 
                 this.data.params.tubes.push(tube);
             }
@@ -460,7 +471,6 @@ export class MastGeometry {
                     secant) /
             1000; // Convert to Nm
 
-        //console.log("Torque Required to Extend the Mast (Nm):", torque);
         this.data.power.torque_required_to_extend_mast_Nm = torque;
         this.getMotorTorque();
         this.getLiftingTorque();
@@ -496,6 +506,172 @@ export class MastGeometry {
         this.data.power.vertical_speed =
             (this.data.power.screw_rpm * this.data.config.screw_lead) / 1000; // Convert RPM to m/min
     }
+
+
+
+
+
+
+
+
+
+
+    getMastMass() {
+
+        let lifted_mass = 0;
+        let total_mass = 0;
+
+        let breakdown = {
+            "all_tubes_mass": 0,
+            "fixed_top_flange_mass": 0,
+            "ice_breaker_mass": 0,
+            "screw_nut_frame_mass": 0,
+            "lower_key_guides_mass": 0,
+            "upper_key_guides_mass": 0,
+            "euler_fixer_mass": 0,
+            "payload_interface_mass": 0,
+            "lock_stopper_mass": 0,
+            "lock_key_mass": 0,
+            "lock_mechanism_mass": 0,
+            "welded_bottom_structure_mass": 0,
+            "motor_mass": 0,
+            "gearbox_mass": 0,
+        }
+
+        this.data.params.tubes.forEach((tube, i) => {
+
+            // TUBE PROFILES WEIGHT CALCULATION
+            if (tube.state_name === "bottom_section") {
+                total_mass += tube.mass;
+            } else {
+                lifted_mass += tube.mass;
+                total_mass += tube.mass;
+            }
+
+            console.log("Tube Mass", i, tube.mass, "Lifted Mass", lifted_mass, "Total Mass", total_mass);
+
+            breakdown.all_tubes_mass += tube.mass;
+
+            // FIXED TOP FLANGE WEIGHT CALCULATION
+            if (tube.state_name === "bottom_section") {
+                total_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+            } else {
+                lifted_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+                total_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+            }
+
+            breakdown.fixed_top_flange_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+
+            // ICE BREAKER WEIGHT CALCULATION
+            if (tube.state_name !== "top_section" && tube.state_name !== "bottom_section") {
+                total_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+                lifted_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+            }
+
+            breakdown.ice_breaker_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+
+            if (tube.state_name === "bottom_section") {
+                total_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+            }
+
+            // SCREW AND NUT FRAME WEIGHT CALCULATION
+            if (tube.state_name !== "bottom_section") {
+                total_mass += this.data.config.weights.screw_nut_frame["C" + tube.no].assy;
+                lifted_mass += this.data.config.weights.screw_nut_frame["C" + tube.no].assy;
+            }
+
+            // LOWER KEY GUIDES WEIGHT CALCULATION
+            if (tube.state_name !== "bottom_section") {
+                total_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
+                lifted_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
+                breakdown.lower_key_guides_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
+            } else {
+                total_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
+            }
+
+            // UPPER KEY GUIDES WEIGHT CALCULATION
+            if (tube.state_name !== "top_section") {
+                total_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
+                lifted_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
+                breakdown.upper_key_guides_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
+            } else {
+                total_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
+            }
+
+            // EULER FIXER WEIGHT CALCULATION
+            if (tube.state_name === "top_section") {
+                total_mass += this.data.config.weights.euler_fixer["C" + tube.no];
+                lifted_mass += this.data.config.weights.euler_fixer["C" + tube.no];
+                breakdown.euler_fixer_mass += this.data.config.weights.euler_fixer["C" + tube.no];
+            }
+
+            // PAYLOAD INTERFACE WEIGHT CALCULATION
+            if (tube.state_name === "top_section") {
+                total_mass += this.data.config.weights.payload_interface["C" + tube.no];
+                lifted_mass += this.data.config.weights.payload_interface["C" + tube.no];
+                breakdown.payload_interface_mass += this.data.config.weights.payload_interface["C" + tube.no];
+            }
+
+            // LOCK STOPPER (ON TUBES) WEIGHT CALCULATION
+            if (tube.state_name !== "bottom_section") {
+                total_mass += this.data.config.weights.lock_stopper_each * 2;
+                lifted_mass += this.data.config.weights.lock_stopper_each * 2;
+                breakdown.lock_stopper_mass += this.data.config.weights.lock_stopper_each * 2;
+            }
+
+            // LOCK KEYS WEIGHT CALCULATION
+            if (tube.state_name !== "bottom_section") {
+                total_mass += this.data.config.weights.lock_key_each * 2;
+                lifted_mass += this.data.config.weights.lock_key_each * 2;
+                breakdown.lock_key_mass += this.data.config.weights.lock_key_each * 2;
+            }
+
+            // LOCK MECHANISM WEIGHT CALCULATION
+            if (tube.state_name !== "bottom_section") {
+                total_mass += this.data.config.weights.lock_mechanism_each * 2;
+                lifted_mass += this.data.config.weights.lock_mechanism_each * 2;
+                breakdown.lock_mechanism_mass += this.data.config.weights.lock_mechanism_each * 2;
+            }
+
+            // WELDED BOTTOM STRUCTURE WEIGHT CALCULATION
+            if (tube.state_name === "bottom_section") {
+                total_mass += this.data.config.weights.welded_bottom_structure["C" + tube.no];
+
+                // MOTOR AND GEARBOX WEIGHT CALCULATION
+                total_mass += this.data.config.motors.find(
+                    (g) => g.id === this.data.params.motor_id,
+                )?.mass_kg;
+                total_mass += this.data.config.gearboxes.find(
+                    (g) => g.id === this.data.params.gearbox_id,
+                )?.mass_kg;
+
+                breakdown.motor_mass += this.data.config.motors.find(
+                    (g) => g.id === this.data.params.motor_id,
+                )?.mass_kg;
+                breakdown.gearbox_mass += this.data.config.gearboxes.find(
+                    (g) => g.id === this.data.params.gearbox_id,
+                )?.mass_kg;
+            }
+        });
+
+        this.data.weights.lifted_mass = lifted_mass;
+        this.data.weights.total_mast_mass = total_mass;
+        this.data.weights.breakdown = breakdown;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

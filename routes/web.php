@@ -126,6 +126,11 @@ Route::middleware(["auth", "verified"])->group(function () {
         ConfiguratorController::class,
     );
 
+    Route::get(
+        "/pdm/engineering/profiles_table",
+        fn() => Inertia::render("Modules/PDM/Pages/Engineering/Profiles")
+    );
+
     Route::resource("question", QuestionController::class);
     Route::resource("answer", AnswerController::class);
     Route::resource("user", UserController::class);

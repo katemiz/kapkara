@@ -5,13 +5,8 @@ import Chart from "chart.js/auto";
 export default class MastDeflection {
 
     constructor(data) {
-        // console.log("DATA", data);
         this.data = data;
-        // this.config = config;
-
-        this.deflections = {};
     }
-
 
     setAllowedTipDeflection() {
         // Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
@@ -19,14 +14,10 @@ export default class MastDeflection {
             (this.data.config.tip_deflection_percentage * this.data.props.extendedHeight) / 100; // mm
     }
 
-
     run() {
         this.setAllowedTipDeflection();
         this.findSideAdapterReaction();
     }
-
-
-
 
 
     findSideAdapterReaction() {
@@ -204,7 +195,7 @@ export default class MastDeflection {
         // Find Reaction Force at Side Adapter
         // def = PL^3/(3EI)
         // P = 3EI*deflection/(L^3)
-        this.data.reaction_force_at_side_adapter =
+        this.data.props.reaction_force_at_side_adapter =
             (3 *
                 this.data.params.tubes.at(-1).EI_Nm2 *
                 this.data.deflections["at_side_adapter"]) /
@@ -213,79 +204,66 @@ export default class MastDeflection {
 
 
     findDeflectionAtGivenPoint(height) {
-        let z_start, z_end;
+
+        let mei_start_z, mei_end_z;
         let mei_start, mei_end, mei_height;
 
         let moment_area, xbar;
         let delta_z, delta_m;
         let deflection = 0;
 
+        console.log("Finding deflection at height", height);
+
+        this.data.deflections["Z" + height] = [];
+
         // Moment-Area Method
         // M/EI Diagram Area * xbar
 
         this.data.params.tubes.forEach((tube, i) => {
-            if (height > tube.extended_zb) {
-                if (height < tube.extended_zt) {
-                    // Use All Area between extended_zb and height
+
+            xbar = 0;
+
+            console.log("MEI",tube.M_EI)
+
+            const data = tube.M_EI;
+            const keys = Object.keys(data);
+
+            mei_start_z = keys[0]
+            mei_end_z = keys[1]
+
+            mei_start = data[mei_start_z];
+            mei_end   = data[mei_end_z];
+
+            if (height > mei_start_z) {
+
+                if (height < mei_end_z ) {
+                    // Use All Area between mei_start and height
                     // ------------------------------------------------
-                    z_end = tube.extended_zt;
-
-                    // When tube is biggest (at the bottom end)
-                    if (tube.od === this.data.params.tubes.at(-1).od) {
-                        z_start = 0;
-                    } else {
-                        z_start = this.data.params.tubes[i + 1].extended_zt;
-                    }
-
-                    if (i === 0) {
-                        z_end = this.data.extendedHeight;
-                    }
-
-                    mei_end = tube.M_EI[z_end];
-                    mei_start = tube.M_EI[z_start];
 
                     // Find M/EI corresponding to height
                     if (mei_end < mei_start) {
                         mei_height =
                             mei_start -
-                            ((mei_start - mei_end) * (height - z_start)) /
-                                (z_end - z_start);
+                            ((mei_start - mei_end) * (height - mei_start_z)) /
+                                (mei_end_z - mei_start_z);
                     } else {
                         mei_height =
                             mei_start +
-                            ((mei_end - mei_start) * (height - z_start)) /
-                                (z_end - z_start);
+                            ((mei_end - mei_start) * (height - mei_start_z)) /
+                                (mei_end_z - mei_start_z);
                     }
 
                     mei_end = mei_height;
-                    z_end = height;
-                } else {
-                    // Use All Area between extended_zb and extended_zt
-                    // ------------------------------------------------
-                    z_end = tube.extended_zt;
-
-                    // When tube is biggest (at the bottom end)
-                    if (tube.od === this.data.params.tubes.at(-1).od) {
-                        z_start = 0;
-                    } else {
-                        z_start = this.data.params.tubes[i + 1].extended_zt;
-                    }
-
-                    if (i === 0) {
-                        z_end = this.data.props.extendedHeight;
-                    }
-
-                    mei_end = tube.M_EI[z_end];
-                    mei_start = tube.M_EI[z_start];
+                    mei_end_z = height;
                 }
 
                 // Find Moment-Area
-                delta_z = z_end - z_start;
+                delta_z = mei_end_z - mei_start_z;
                 delta_m = Math.abs(mei_end - mei_start);
 
                 moment_area = ((mei_start + mei_end) * delta_z) / 2;
 
-                // xbar calculation
+                // xbar calculation (from left side)
                 if (mei_end > mei_start) {
                     xbar =
                         (delta_z * (mei_start + (2 * delta_m) / 3)) /
@@ -296,19 +274,30 @@ export default class MastDeflection {
                         (mei_end + mei_start);
                 }
 
-                // Deflection calculation
-                deflection += (xbar * moment_area) / 1000;
+                // Since xbar is from left, xba needs to be corrected
+                // wrt deflection point : height
 
-                this.data.deflections["at_" + height] = {
+                xbar = height - mei_start_z - xbar;
+
+                // Deflection calculation
+                deflection += (xbar * moment_area) * 1e-3; //
+
+                this.data.deflections["Z" + height].push({
                     "tube_no": tube.no,
+                    "z_start": mei_end_z,
+                    "z_end": mei_end_z,
                     "xbar": xbar,
                     "moment_area": moment_area,
                     "deflection": deflection
-                };
+                });
+
+                console.log("counter",tube.no)
             }
+
+            console.log("CORRECTED xbar, moment_area", xbar,  moment_area);
         });
 
-        console.log("Deflection Class İçinde", this.data.deflections,this.data);
+        console.log("Deflection at height", height, "is", deflection, "mm");
 
         return deflection;
     }
