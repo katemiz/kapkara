@@ -1,9 +1,6 @@
 import Chart from "chart.js/auto";
 
-
-
 export default class MastDeflection {
-
     constructor(data) {
         this.data = data;
     }
@@ -11,7 +8,9 @@ export default class MastDeflection {
     setAllowedTipDeflection() {
         // Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
         this.data.props.allowed_tip_deflection_mm =
-            (this.data.config.tip_deflection_percentage * this.data.props.extendedHeight) / 100; // mm
+            (this.data.config.tip_deflection_percentage *
+                this.data.props.extendedHeight) /
+            100; // mm
     }
 
     run() {
@@ -19,14 +18,11 @@ export default class MastDeflection {
         this.findSideAdapterReaction();
     }
 
-
     findSideAdapterReaction() {
         this.findRootMomentWoSideAdapterReaction();
     }
 
-
     findRootMomentWoSideAdapterReaction() {
-
         let root_moment = 0; // Initialize root moment for each tube
         let shear_force = 0; // Initialize shear force for each tube
 
@@ -34,7 +30,6 @@ export default class MastDeflection {
         let z_coordinate_b, z_coordinate_t;
 
         this.data.params.tubes.forEach((tube, i) => {
-
             // Find root moment caused by each wind load (without side adapter force moment)
             root_moment = (tube.wind_load * tube.wind_load_z) / 1000; // Convert to Nm
             shear_force = (tube.wind_load * tube.wind_load_z) / 1000; // Convert to Nm
@@ -91,19 +86,28 @@ export default class MastDeflection {
         // Z-Offset Moment Calculation
         // Add moment caused by z_offset shift of payload wind load from the top of the mast to the payload center of pressure
         this.data.props.payload.tip_moment_due_z_offset_Nm =
-            -(this.data.props.payload.wind_load * this.data.params.z_offset) / 1000; // Convert to Nm
+            -(this.data.props.payload.wind_load * this.data.params.z_offset) /
+            1000; // Convert to Nm
 
         // X-Offset Moment Calculation
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load
         this.data.props.payload.tip_moment_due_x_offset_Nm =
-            -(9.81 * this.data.params.payload_mass * this.data.params.x_offset) / 1000; // Convert to Nm
+            -(
+                9.81 *
+                this.data.params.payload_mass *
+                this.data.params.x_offset
+            ) / 1000; // Convert to Nm
 
         // Moment Caused by Deflection of the Mast under Wind Load
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load, limited to a maximum of tip_deflection_percentage % of the extended height of the mast
         this.data.props.payload.tip_moment_due_deflection_Nm =
-            -(9.81 * this.data.params.payload_mass * this.data.props.allowed_tip_deflection_mm) / 1000; // Convert to Nm
+            -(
+                9.81 *
+                this.data.params.payload_mass *
+                this.data.props.allowed_tip_deflection_mm
+            ) / 1000; // Convert to Nm
 
-        console.log("Class : Buraya mast ağırlığı da eklenecek)",);
+        console.log("Class : Buraya mast ağırlığı da eklenecek)");
 
         // Total Tip Moment - Constant throughout the mast
         this.data.props.payload.total_tip_moment_Nm =
@@ -124,9 +128,12 @@ export default class MastDeflection {
         });
 
         this.data.props.payload.moments = {};
+        this.data.deflections.curve = [{ height: 0, deflection: 0 }];
 
         let payload_root_moment =
-            (this.data.props.payload.wind_load * this.data.props.extendedHeight) / 1000; // Nm
+            (this.data.props.payload.wind_load *
+                this.data.props.extendedHeight) /
+            1000; // Nm
         let slope = payload_root_moment / this.data.props.extendedHeight; // N/mm
 
         sortedKeys.forEach((key) => {
@@ -189,8 +196,9 @@ export default class MastDeflection {
             this.findDeflectionAtGivenPoint(this.data.props.side_adapter_z);
 
         // Find deflection at payload location
-        this.data.deflections["at_mast_tip"] =
-            this.findDeflectionAtGivenPoint(this.data.props.extendedHeight);
+        this.data.deflections["at_mast_tip"] = this.findDeflectionAtGivenPoint(
+            this.data.props.extendedHeight,
+        );
 
         // Find Reaction Force at Side Adapter
         // def = PL^3/(3EI)
@@ -202,9 +210,7 @@ export default class MastDeflection {
             Math.pow(this.data.props.side_adapter_z / 1000, 3);
     }
 
-
     findDeflectionAtGivenPoint(height) {
-
         let mei_start_z, mei_end_z;
         let mei_start, mei_end, mei_height;
 
@@ -220,23 +226,21 @@ export default class MastDeflection {
         // M/EI Diagram Area * xbar
 
         this.data.params.tubes.forEach((tube, i) => {
-
             xbar = 0;
 
-            console.log("MEI",tube.M_EI)
+            console.log("MEI", tube.M_EI);
 
             const data = tube.M_EI;
             const keys = Object.keys(data);
 
-            mei_start_z = keys[0]
-            mei_end_z = keys[1]
+            mei_start_z = keys[0];
+            mei_end_z = keys[1];
 
             mei_start = data[mei_start_z];
-            mei_end   = data[mei_end_z];
+            mei_end = data[mei_end_z];
 
             if (height > mei_start_z) {
-
-                if (height < mei_end_z ) {
+                if (height < mei_end_z) {
                     // Use All Area between mei_start and height
                     // ------------------------------------------------
 
@@ -280,21 +284,27 @@ export default class MastDeflection {
                 xbar = height - mei_start_z - xbar;
 
                 // Deflection calculation
-                deflection += (xbar * moment_area) * 1e-3; //
+                deflection += xbar * moment_area * 1e-3; //
 
                 this.data.deflections["Z" + height].push({
-                    "tube_no": tube.no,
-                    "z_start": mei_end_z,
-                    "z_end": mei_end_z,
-                    "xbar": xbar,
-                    "moment_area": moment_area,
-                    "deflection": deflection
+                    tube_no: tube.no,
+                    z_start: mei_end_z,
+                    z_end: mei_end_z,
+                    xbar: xbar,
+                    moment_area: moment_area,
+                    deflection: deflection,
+                    height: height,
                 });
 
-                console.log("counter",tube.no)
+                console.log("counter", tube.no);
             }
 
-            console.log("CORRECTED xbar, moment_area", xbar,  moment_area);
+            console.log("CORRECTED xbar, moment_area", xbar, moment_area);
+        });
+
+        this.data.deflections.curve.push({
+            height: height,
+            deflection: deflection,
         });
 
         console.log("Deflection at height", height, "is", deflection, "mm");

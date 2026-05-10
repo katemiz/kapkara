@@ -6,7 +6,6 @@
 
     import JsonTree from "$components/JsonTree.svelte";
 
-
     import { useForm } from "@inertiajs/svelte";
     import { MastGeometry } from "$modules/PDM/Pages/Engineering/mastGeometry.js";
     import { SvgDraw } from "$modules/PDM/Pages/Engineering/SvgDraw.js";
@@ -25,7 +24,7 @@
         ArrowUpNarrowWide,
         ArrowDownNarrowWide,
         Wrench,
-        Table
+        Table,
     } from "@lucide/svelte";
 
     import { config } from "$modules/PDM/Shared/config.js";
@@ -34,7 +33,6 @@
     let chartDeflection;
     let chartInstance;
     let chartDeflectionInstance;
-
 
     let { params, isEdit = false, supportFixedData } = $props();
 
@@ -51,7 +49,7 @@
                 {
                     label: "Bending Moments (Nm)",
                     data: Object.values(data.props.total_moments),
-                    borderColor: '#D7263D',
+                    borderColor: "#D7263D",
                     // ... styles
                     yAxisID: "y",
                 },
@@ -61,8 +59,8 @@
                         .map(([z, value]) => ({ x: parseFloat(z), y: value }))
                         .sort((a, b) => a.x - b.x),
                     // ... styles
-                    borderColor: '#02182B',
-                    backgroundColor: 'rgb(1, 151, 246, 0.1)',
+                    borderColor: "#02182B",
+                    backgroundColor: "rgb(1, 151, 246, 0.1)",
                     fill: true,
                     opacity: 0.3,
                     yAxisID: "y1",
@@ -149,41 +147,41 @@
                             text: "Bending Moment and M/EI Diagram",
                         },
 
-                        tooltip: {
-                        }
+                        tooltip: {},
                     },
                 },
             });
         }
     }
 
-
-
-
     function drawDeflectionChart(data) {
+        console.log(data);
         if (!chartDeflection) return;
 
+        const mast_tip_z = "Z" + data.props.extendedHeight;
+        const max_deflection = data.deflections.at_mast_tip;
+
         const ctx = chartDeflection.getContext("2d");
-        let min_EI = data.params.tubes.at(-1).M_EI["0"];
 
         const chartData = {
-            labels: Object.keys(data.deflections.Z5065),
+            labels: data.deflections.curve.map((point) => point.height),
             datasets: [
                 {
-                    label: "Bending Moments (Nm)",
-                    data: Object.values(data.deflections.Z5065),
-                    borderColor: '#D7263D',
+                    label: "Deflection (mm)",
+                    data: data.deflections.curve.map(
+                        (point) => point.deflection,
+                    ),
+                    borderColor: "#D7263D",
                     // ... styles
                     yAxisID: "y",
                 },
-
             ],
         };
 
         if (chartDeflectionInstance) {
             // Update existing chart
             chartDeflectionInstance.data = chartData;
-            chartDeflectionInstance.options.scales.y1.min = min_EI * 1.2;
+            chartDeflectionInstance.options.scales.y.min = 1.2 * max_deflection;
             chartDeflectionInstance.update("none"); // 'none' for performance, or omit for animation
         } else {
             // Initialize chart
@@ -222,8 +220,6 @@
                             // Useful if you want the negative values to stay consistent
                             beginAtZero: false,
                         },
-
-
                     },
                     plugins: {
                         title: {
@@ -231,17 +227,12 @@
                             text: "Bending Moment and M/EI Diagram",
                         },
 
-                        tooltip: {
-                        }
+                        tooltip: {},
                     },
                 },
             });
         }
     }
-
-
-
-
 
     let showJson = $state(false);
 
@@ -303,21 +294,25 @@
 
         deflection.run();
         drawBMChart(deflection.data);
-        drawDeflectionChart(deflection.data)
-
+        drawDeflectionChart(deflection.data);
     });
 
     let mast = $derived(new MastGeometry($form, config));
     let svgDraw = $derived(new SvgDraw(mast.data));
     let deflection = $derived(new MastDeflection(mast.data));
 
-
-
     function toggleTab(elName) {
         let tabSelected = "tab" + elName;
         let divSelected = "div" + elName;
         let tabId, divId;
-        let tabs = ["BM", "Deflection", "Loads", "Extended", "Nested", "Torque"];
+        let tabs = [
+            "BM",
+            "Deflection",
+            "Loads",
+            "Extended",
+            "Nested",
+            "Torque",
+        ];
 
         tabs.forEach((element) => {
             tabId = "tab" + element;
@@ -333,13 +328,9 @@
 
     async function generatePDF() {
         let pdf = new MakePDF(mast.data);
-
         await pdf.init(); // ✅ Initialize QR code first
         await pdf.run();
     }
-
-
-
 </script>
 
 <Layout>
@@ -353,8 +344,10 @@
             </div>
 
             <div class="column has-text-right has-text-left-mobile">
-
-                <a href="/pdm/engineering/profiles_table" class="button is-link is-light">
+                <a
+                    href="/pdm/engineering/profiles_table"
+                    class="button is-link is-light"
+                >
                     <span class="icon is-small">
                         <Table size="16" />
                     </span>
@@ -614,7 +607,9 @@
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Extended Height</p>
-                        <p class="title mb-0">{mast.data.props.extendedHeight}</p>
+                        <p class="title mb-0">
+                            {mast.data.props.extendedHeight}
+                        </p>
                         <p class="heading">mm</p>
                     </div>
                 </div>
@@ -639,7 +634,9 @@
 
                 <div class="level-item has-text-centered">
                     <div>
-                        <p class="heading mb-0">Lifted Mass / Total Mast Mass</p>
+                        <p class="heading mb-0">
+                            Lifted Mass / Total Mast Mass
+                        </p>
                         <p class="title mb-0">
                             {mast.data.weights.lifted_mass.toFixed(0)} / {mast.data.weights.total_mast_mass.toFixed(
                                 0,
@@ -651,131 +648,102 @@
             </nav>
         </div>
 
+        <div class="card has-background-white-ter p-4">
+            <header class="card-header">
+                <nav class="navbar">
+                    <div id="navbarBasicExample" class="navbar-menu">
+                        <div class="navbar-start">
+                            <button
+                                class="navbar-item is-light is-inverted"
+                                onclick={() => toggleTab("Loads")}
+                                id="tabLoads"
+                            >
+                                <span class="icon"
+                                    ><WeightTilde size="16" color="red" /></span
+                                >
+                                <span>Loads</span>
+                            </button>
 
+                            <button
+                                class="navbar-item is-light is-inverted"
+                                onclick={() => toggleTab("BM")}
+                                id="tabBM"
+                            >
+                                <span class="icon"
+                                    ><ChartLine size="16" color="red" /></span
+                                >
+                                <span>Moments</span>
+                            </button>
 
-<nav class="navbar is-warning"  aria-label="main navigation">
+                            <button
+                                class="navbar-item is-light is-inverted"
+                                onclick={() => toggleTab("Deflection")}
+                                id="tabDeflection"
+                            >
+                                <span class="icon"
+                                    ><ChartSpline size="16" color="red" /></span
+                                >
+                                <span>Deflections</span>
+                            </button>
 
+                            <button
+                                class="navbar-item is-light is-inverted"
+                                onclick={() => toggleTab("Extended")}
+                                id="tabExtended"
+                            >
+                                <span class="icon"
+                                    ><ArrowUpNarrowWide
+                                        size="16"
+                                        color="red"
+                                    /></span
+                                >
+                                <span>Extended</span>
+                            </button>
 
-  <div id="navbarBasicExample" class="navbar-menu">
-    <div class="navbar-start">
-        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("BM")} id="tabBM">
-            <span class="icon"><ChartLine size="16" color="red" /></span>
-            <span>Bending Moments</span>
-        </button>
+                            <button
+                                class="navbar-item is-light is-inverted"
+                                onclick={() => toggleTab("Nested")}
+                                id="tabNested"
+                            >
+                                <span class="icon"
+                                    ><ArrowDownNarrowWide
+                                        size="16"
+                                        color="red"
+                                    /></span
+                                >
+                                <span>Nested</span>
+                            </button>
 
-        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("Deflection")} id="tabBM">
-            <span class="icon"><ChartSpline size="16" color="red" /></span>
-            <span>Deflections</span>
-        </button>
+                            <button
+                                class="navbar-item is-light is-inverted"
+                                onclick={() => toggleTab("Torque")}
+                                id="tabTorque"
+                            >
+                                <span class="icon"
+                                    ><Wrench size="16" color="red" /></span
+                                >
+                                <span>Torque/Power</span>
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+            </header>
 
-        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("Loads")} id="tabBM">
-            <span class="icon"><WeightTilde size="16" color="red" /></span>
-            <span>Loads</span>
-        </button>
+            <!-- EMPTY DV FOR WIDTH CALCULATON -->
+            <div class="container mt-6" id="fixedWidth"></div>
 
-        <button class="navbar-item is-light is-inverted" onclick={() => toggleTab("BM")} id="tabBM">
-            <span class="icon"><ChartLine size="16" color="red" /></span>
-            <span>Bending Moments</span>
-        </button>
-
-    </div>
-
-
-  </div>
-</nav>
-
-
-
-
-
-
-
-
-
-
-        <div class="card p-4" id="aaaa">
-            <div class="buttons">
-                <button
-                    class="button is-light is-inverted"
-                    onclick={() => toggleTab("BM")}
-                    id="tabBM"
-                >
-                    <span class="icon">
-                        <ChartLine size="16" color="red" />
-                    </span>
-                    <span>Bending Moments</span>
-                </button>
-
-                <button
-                    class="button is-light is-inverted"
-                    onclick={() => toggleTab("Deflection")}
-                    id="tabDeflection"
-                >
-                    <span class="icon">
-                        <ChartSpline size="16" color="red" />
-                    </span>
-                    <span>Deflection</span>
-                </button>
-
-                <button
-                    class="button is-light"
-                    onclick={() => toggleTab("Loads")}
-                    id="tabLoads"
-                >
-                    <span class="icon">
-                        <WeightTilde size="16" color="red" />
-                    </span>
-                    <span>Loads</span>
-                </button>
-
-                <button
-                    class="button is-light"
-                    onclick={() => toggleTab("Extended")}
-                    id="tabExtended"
-                >
-                    <span class="icon">
-                        <ArrowUpNarrowWide size="16" color="red" />
-                    </span>
-                    <span>Extended Position</span>
-                </button>
-
-                <button
-                    class="button is-light"
-                    onclick={() => toggleTab("Nested")}
-                    id="tabNested"
-                >
-                    <span class="icon">
-                        <ArrowDownNarrowWide size="16" color="red" />
-                    </span>
-                    <span>Nested Position</span>
-                </button>
-
-                <button
-                    class="button is-light"
-                    onclick={() => toggleTab("Torque")}
-                    id="tabTorque"
-                >
-                    <span class="icon">
-                        <Wrench size="16" color="red" />
-                    </span>
-                    <span>Torque/Power</span>
-                </button>
-            </div>
-
-            <div class="container" id="fixedWidth"></div>
+            <!-- LOADS DIAGRAM -->
+            <div class="container" id="divLoads"></div>
 
             <!-- BENDING MOMENT DIAGRAM -->
-            <div class="container" id="divBM">
+            <div class="container is-hidden" id="divBM">
                 <canvas bind:this={chartCanvas}></canvas>
             </div>
 
             <!-- DEFLECTION DIAGRAM -->
-            <div class="container" id="divDeflection">
+            <div class="container is-hidden" id="divDeflection">
                 <canvas bind:this={chartDeflection}></canvas>
             </div>
-
-            <!-- LOADS DIAGRAM -->
-            <div class="container is-hidden" id="divLoads"></div>
 
             <!-- EXTENDED DIAGRAM -->
             <div class="container is-hidden" id="divExtended"></div>
@@ -836,13 +804,17 @@
                                     <tbody>
                                         <tr>
                                             <th>Selected Motor Power</th>
-                                            <td>{mast.data.power.motor_power} kW</td>
+                                            <td
+                                                >{mast.data.power.motor_power} kW</td
+                                            >
                                         </tr>
 
                                         <tr>
                                             <th>Selected Motor Maximum Speed</th
                                             >
-                                            <td>{mast.data.power.motor_rpm} RPM</td>
+                                            <td
+                                                >{mast.data.power.motor_rpm} RPM</td
+                                            >
                                         </tr>
 
                                         <tr>
@@ -860,7 +832,10 @@
                                                 Total Driveline Speed Reduction
                                                 Ratio
                                             </th>
-                                            <td>{mast.data.power.gearbox_ratio}</td>
+                                            <td
+                                                >{mast.data.power
+                                                    .gearbox_ratio}</td
+                                            >
                                         </tr>
 
                                         <tr>
@@ -972,7 +947,4 @@
             ></button>
         </div>
     </section>
-
-
-
 </Layout>
