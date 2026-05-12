@@ -42,7 +42,7 @@ class ConfiguratorController extends Controller
     public $params = [
         "base_adapter_height" => 50,
         "payload_adapter_height" => 15,
-        "head_height" => 42,
+        "head_height" => 55,
         "material" => "6063",
         "tube_length" => 2000,
         "start_tube_no" => 13,

@@ -172,7 +172,6 @@ export const config = {
             channel_number: 8,
         },
 
-
         {
             no: 19,
             od: 440.4,
@@ -202,6 +201,47 @@ export const config = {
             inertia_mm4: 283695878.24,
             channel_number: 8,
         },
+
+        {
+            no: 22,
+            od: 518.4,
+            id: 506,
+            thk: 6.2,
+            area_mm2: 10425.07,
+            inertia_mm4:  341863661.87,
+            channel_number: 8,
+        },
+
+        {
+            no: 23,
+            od: 545.2,
+            id: 532.4,
+            thk: 6.4,
+            area_mm2: 11281.83,
+            inertia_mm4: 409386775.15,
+            channel_number: 8,
+        },
+
+        {
+            no: 24,
+            od: 572.4,
+            id: 559.2,
+            thk: 6.6,
+            area_mm2: 12180.32 ,
+            inertia_mm4:  487401601.14,
+            channel_number: 8,
+        },
+
+        {
+            no: 25,
+            od: 600,
+            id: 586.4,
+            thk: 6.8,
+            area_mm2: 13121.27,
+            inertia_mm4: 577143452.27,
+            channel_number: 8,
+        },
+
     ],
 
     terrain_category: [
@@ -290,15 +330,33 @@ export const config = {
             efficiency: 0.85,
             mass_kg: 5,
         },
+
         {
-            id: 2,
+            id: 3,
+            name: "i 1:12",
+            gear_ratio: 12,
+            efficiency: 0.75,
+            mass_kg: 7,
+        },
+
+        {
+            id: 4,
+            name: "i 1:18",
+            gear_ratio: 18,
+            efficiency: 0.75,
+            mass_kg: 7,
+        },
+
+
+        {
+            id: 5,
             name: "i 1:24",
             gear_ratio: 24,
             efficiency: 0.75,
             mass_kg: 7,
         },
         {
-            id: 3,
+            id: 6,
             name: "i 1:60",
             gear_ratio: 60,
             efficiency: 0.65,

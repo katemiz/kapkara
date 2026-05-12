@@ -21,7 +21,7 @@ export class MastGeometry {
         this.windLoadOnPayload();
         this.estimateMastMass();
         this.torqueRequired();
-        ///this.getMastMass();
+        this.getMastMass();
 
         //console.log("Mast Geometry Data", this.data);
 

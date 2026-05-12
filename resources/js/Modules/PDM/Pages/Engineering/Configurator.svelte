@@ -41,7 +41,9 @@
         if (!chartCanvas) return;
 
         const ctx = chartCanvas.getContext("2d");
-        let min_EI = data.params.tubes.at(-1).M_EI["0"];
+        //let min_EI = data.params.tubes.at(-1).M_EI["0"];
+
+        let min_EI = Math.min(...data.params.tubes.map(item => item.M_EI));
 
         const chartData = {
             labels: Object.keys(data.props.total_moments),
@@ -334,7 +336,7 @@
 </script>
 
 <Layout>
-    <section class="section content">
+    <section class="section ">
         <div class="columns">
             <div class="column is-10">
                 <Title
@@ -366,6 +368,10 @@
                 </button>
             </div>
         </div>
+
+        <Title
+            title="[{$form.end_tube_no - $form.start_tube_no + 1}] Sections"
+        />
 
         <form onsubmit={submit} novalidate id="genericForm" class="my-6">
             <div class="fixed-grid has-4-cols">
@@ -648,86 +654,88 @@
             </nav>
         </div>
 
-        <div class="card has-background-white-ter p-4">
-            <header class="card-header">
-                <nav class="navbar">
-                    <div id="navbarBasicExample" class="navbar-menu">
-                        <div class="navbar-start">
-                            <button
-                                class="navbar-item is-light is-inverted"
-                                onclick={() => toggleTab("Loads")}
-                                id="tabLoads"
-                            >
-                                <span class="icon"
-                                    ><WeightTilde size="16" color="red" /></span
-                                >
-                                <span>Loads</span>
-                            </button>
 
-                            <button
-                                class="navbar-item is-light is-inverted"
-                                onclick={() => toggleTab("BM")}
-                                id="tabBM"
-                            >
-                                <span class="icon"
-                                    ><ChartLine size="16" color="red" /></span
-                                >
-                                <span>Moments</span>
-                            </button>
+        <nav class="navbar has-background-info-light mb-2 mt-6">
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+                    <button
+                        class="navbar-item "
+                        onclick={() => toggleTab("Loads")}
+                        id="tabLoads"
+                    >
+                        <span class="icon"
+                            ><WeightTilde size="16" color="blue" /></span
+                        >
+                        <span>Loads</span>
+                    </button>
 
-                            <button
-                                class="navbar-item is-light is-inverted"
-                                onclick={() => toggleTab("Deflection")}
-                                id="tabDeflection"
-                            >
-                                <span class="icon"
-                                    ><ChartSpline size="16" color="red" /></span
-                                >
-                                <span>Deflections</span>
-                            </button>
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("BM")}
+                        id="tabBM"
+                    >
+                        <span class="icon"
+                            ><ChartLine size="16" color="blue" /></span
+                        >
+                        <span>Moments</span>
+                    </button>
 
-                            <button
-                                class="navbar-item is-light is-inverted"
-                                onclick={() => toggleTab("Extended")}
-                                id="tabExtended"
-                            >
-                                <span class="icon"
-                                    ><ArrowUpNarrowWide
-                                        size="16"
-                                        color="red"
-                                    /></span
-                                >
-                                <span>Extended</span>
-                            </button>
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("Deflection")}
+                        id="tabDeflection"
+                    >
+                        <span class="icon"
+                            ><ChartSpline size="16" color="blue" /></span
+                        >
+                        <span>Deflections</span>
+                    </button>
 
-                            <button
-                                class="navbar-item is-light is-inverted"
-                                onclick={() => toggleTab("Nested")}
-                                id="tabNested"
-                            >
-                                <span class="icon"
-                                    ><ArrowDownNarrowWide
-                                        size="16"
-                                        color="red"
-                                    /></span
-                                >
-                                <span>Nested</span>
-                            </button>
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("Extended")}
+                        id="tabExtended"
+                    >
+                        <span class="icon"
+                            ><ArrowUpNarrowWide
+                                size="16"
+                                color="blue"
+                            /></span
+                        >
+                        <span>Extended</span>
+                    </button>
 
-                            <button
-                                class="navbar-item is-light is-inverted"
-                                onclick={() => toggleTab("Torque")}
-                                id="tabTorque"
-                            >
-                                <span class="icon"
-                                    ><Wrench size="16" color="red" /></span
-                                >
-                                <span>Torque/Power</span>
-                            </button>
-                        </div>
-                    </div>
-                </nav>
-            </header>
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("Nested")}
+                        id="tabNested"
+                    >
+                        <span class="icon"
+                            ><ArrowDownNarrowWide
+                                size="16"
+                                color="blue"
+                            /></span
+                        >
+                        <span>Nested</span>
+                    </button>
+
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("Torque")}
+                        id="tabTorque"
+                    >
+                        <span class="icon"
+                            ><Wrench size="16" color="blue" /></span
+                        >
+                        <span>Torque/Power</span>
+                    </button>
+                </div>
+
+            </div>
+        </nav>
+
+
+        <div class="card p-4">
 
             <!-- EMPTY DV FOR WIDTH CALCULATON -->
             <div class="container mt-6" id="fixedWidth"></div>
