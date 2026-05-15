@@ -157,20 +157,19 @@
     }
 
     function drawDeflectionChart(data) {
-        console.log(data);
+
         if (!chartDeflection) return;
 
-        const mast_tip_z = "Z" + data.props.extendedHeight;
+        const sortedCurve = [...data.deflections.curve].sort((a, b) => a.height - b.height);
         const max_deflection = data.deflections.at_mast_tip;
-
         const ctx = chartDeflection.getContext("2d");
 
         const chartData = {
-            labels: data.deflections.curve.map((point) => point.height),
+            labels: sortedCurve.map((point) => point.height),
             datasets: [
                 {
                     label: "Deflection (mm)",
-                    data: data.deflections.curve.map(
+                    data: sortedCurve.map(
                         (point) => point.deflection,
                     ),
                     borderColor: "#D7263D",
@@ -261,6 +260,7 @@
         motor_id: params?.motor_id ?? "",
         gearbox_id: params?.gearbox_id ?? "",
     });
+
 
     // If you need the form to update when the 'params' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:

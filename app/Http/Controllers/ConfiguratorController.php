@@ -65,6 +65,28 @@ class ConfiguratorController extends Controller
     {
         $this->setZOffset();
 
+        if ( isset($request["qr"]) ) {
+            $p = explode('-',$request["qr"]);
+
+            //dd($p);
+
+            $this->params["start_tube_no"] = (int) $p["0"];
+            $this->params["end_tube_no"] = (int) $p["1"];
+            $this->params["overlap"] = (int) $p["2"];
+            $this->params["base_adapter_height"] = (int) $p["3"];
+            $this->params["payload_adapter_height"] = (int) $p["4"];
+            $this->params["sail_area"] = (float) $p["5"];
+            $this->params["wind_speed"] = (int) $p["6"];
+            $this->params["head_height"] =(int)  $p["7"];
+            $this->params["tube_length"] =(int)  $p["8"];
+            $this->params["terrain_category"] = $p["9"];
+            $this->params["x_offset"] = (int) $p["10"];
+            $this->params["z_offset"] = (int) $p["11"];
+            $this->params["payload_mass"] = $p["12"];
+            $this->params["motor_id"] = (int) $p["13"];
+            $this->params["gearbox_id"] = (int) $p["14"];
+        }
+
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
 
             "per_page" => config("pagination.per_page"),

@@ -11,20 +11,21 @@ export class MastGeometry {
             "loads": {},
             "weights": {},
             "props": {},
+            "beam":[]
         };
+
+        console.log("Mast Geometry Data", this.data);
 
         this.setDependentProps();
         this.setMastTubes();
         this.setMastHeights();
         this.setZPositions();
+        this.setBeamProps();
         this.windLoadsOnTubes();
         this.windLoadOnPayload();
         this.estimateMastMass();
         this.torqueRequired();
         this.getMastMass();
-
-        //console.log("Mast Geometry Data", this.data);
-
     }
 
 
@@ -125,9 +126,40 @@ export class MastGeometry {
                     tube.state_name = "bottom_section";
                 }
 
-
                 this.data.params.tubes.push(tube);
             }
+        });
+    }
+
+    setBeamProps() {
+
+        let z_top, z_bottom;
+
+        this.data.params.tubes.forEach((tube,index) => {
+
+            if ( index === 0) {
+                // if top
+                z_top = this.data.props.extendedHeight;
+                z_bottom = this.data.params.tubes[index+1].extended_zt;
+
+            } else if ( this.data.params.tubes.length === index + 1) {
+                // if bottom
+                z_bottom = 0;
+                z_top = tube.extended_zt;
+
+            } else {
+                // in the middle
+                z_top = z_bottom
+                z_bottom = this.data.params.tubes[index+1].extended_zt;
+            }
+
+            this.data.beam.push({
+                "no":tube.no,
+                "z_top":z_top,
+                "z_bottom": z_bottom,
+                "ei":tube.EI_Nm2
+            });
+
         });
     }
 
@@ -406,6 +438,7 @@ export class MastGeometry {
                 this.data.params.tubes[i].force_coefficient *
                 this.data.params.tubes[i].peak_velocity_pressure_qp *
                 this.data.params.tubes[i].reference_area;
+
         });
     }
 
@@ -548,7 +581,7 @@ export class MastGeometry {
                 total_mass += tube.mass;
             }
 
-            console.log("Tube Mass", i, tube.mass, "Lifted Mass", lifted_mass, "Total Mass", total_mass);
+            //console.log("Tube Mass", i, tube.mass, "Lifted Mass", lifted_mass, "Total Mass", total_mass);
 
             breakdown.all_tubes_mass += tube.mass;
 

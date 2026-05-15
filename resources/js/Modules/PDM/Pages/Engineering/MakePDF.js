@@ -2,8 +2,6 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "svg2pdf.js";
 
-
-
 import QRCode from "qrcode";
 
 export default class MakePDF {
@@ -32,11 +30,30 @@ export default class MakePDF {
         };
 
         this.productNaming();
+
+        this.guying_note = `(*) As a general rule of thumb, guying radius should be equal to extended mast height for optimal stability. Guying radius, number of guying and at which tubes guying to be fixed should be evaluated per payload, stability requirements and available space. Please contact Masttech for detailed guying recommendations.`
+
+        this.qr =
+            data.params.start_tube_no + '-' +
+            data.params.end_tube_no + '-' +
+            data.params.overlap + '-' +
+            data.params.base_adapter_height + '-' +
+            data.params.payload_adapter_height + '-' +
+            data.params.sail_area + '-' +
+            data.params.wind_speed + '-' +
+            data.params.head_height + '-' +
+            data.params.tube_length + '-' +
+            data.params.terrain_category + '-' +
+            data.params.x_offset + '-' +
+            data.params.z_offset + '-' +
+            data.params.payload_mass + '-' +
+            data.params.motor_id + '-' +
+            data.params.gearbox_id;
     }
 
     // Pre-generate QR code  and images before running
     async init() {
-        this.qrCodeImage = await QRCode.toDataURL("this.data.qr", {
+        this.qrCodeImage = await QRCode.toDataURL(this.qr, {
             width: 160,
             margin: 1,
         });
@@ -46,10 +63,23 @@ export default class MakePDF {
         );
 
         this.bigLogo = await this.getImageData("/images/PDM/masttech-big.png");
+
+        let icon01 = await this.getImageData("/images/PDM/payload.png");
+        let icon02 = await this.getImageData("/images/PDM/deflection.png");
+        let icon03 = await this.getImageData("/images/PDM/lock.png");
+        let icon04 = await this.getImageData("/images/PDM/power.png");
+        let icon05 = await this.getImageData("/images/PDM/height.png");
+
+        this.props = [
+            { icon: icon01, text: ['Increased Payload Capacity', 'UHD - up to 550 kg '] },
+            { icon: icon02, text: ['Aluminium Stiffened Profiles', 'Low twist and deflection'] },
+            { icon: icon03, text: ['Power Screw Driven', 'AC/DC Motor'] },
+            { icon: icon04, text: ['Automatic','Mechanical Locks'] },
+            { icon: icon04, text: ['Heights Up To', '25m'] },
+        ]
     }
 
     async run() {
-        this
         this.coverPage();
         this.specificationsPage();
         await this.svgPage("Extended");
@@ -82,32 +112,31 @@ export default class MakePDF {
         this.pdf.setFontSize(8);
         this.pdf.text(this.image_warning, 207, 294, { angle: 90 });
 
-        // QR CODE
+        // QR CODE AND LINK
         this.addQrCode();
 
         // SMALL ICONS AND EXPLANATIONS
-
         let y = 110;
 
         this.pdf.setFontSize(14);
 
-        // for (const [key, element] of Object.entries(this.props)) {
-        //     this.pdf.setFillColor(255, 255, 255);
+        for (const [key, element] of Object.entries(this.props)) {
+            this.pdf.setFillColor(255, 255, 255);
 
-        //     this.pdf.rect(this.mx, y, this.config.imgS, this.config.imgS, "F");
-        //     // this.pdf.addImage(
-        //     //     document.getElementById(element.name),
-        //     //     "PNG",
-        //     //     this.mx + this.config.imgS * 0.15,
-        //     //     y + this.config.imgS * 0.15,
-        //     //     this.config.imgS * 0.7,
-        //     //     this.config.imgS * 0.7,
-        //     // );
-        //     // this.pdf.text(element.text, this.mx + this.config.imgS * 1.2, y, {
-        //     //     baseline: "top",
-        //     // });
-        //     // y = y + this.config.gap;
-        // }
+            this.pdf.rect(this.mx, y, 12, 12, "F");
+            this.pdf.addImage(
+                element.icon,
+                "PNG",
+                this.mx+2,
+                y+2,
+                8,
+                8,
+            );
+            this.pdf.text(element.text, this.mx + 16, y, {
+                baseline: "top",
+            });
+            y = y + 20;
+        }
 
         //MASTTECH BIG LOGO
         this.pdf.addImage(
@@ -124,6 +153,12 @@ export default class MakePDF {
 
         this.pdf.addPage("a4", "portrait");
         this.HeaderFooter(state + " View");
+
+        if (state === 'Extended') {
+            //this.pdf.text(this.guying_note, this.mx, this.pageHeight * 0.27 + 10);
+
+            this.pdf.text(this.pdf.splitTextToSize(this.guying_note, this.pageWidth - 2 * this.mx), this.mx, 240);
+        }
 
         document.getElementById("div" + state).classList.remove("is-hidden");
 
@@ -177,7 +212,7 @@ export default class MakePDF {
         this.HeaderFooter("Specifications");
 
         const props = [
-            ["Maximum Payload Capacity", this.data.params.payload_weight, "kg"],
+            ["Maximum Payload Capacity", this.data.params.payload_mass, "kg"],
             ["Extended Height", this.data.props.extendedHeight, "mm"],
             ["Nested Height", this.data.props.nestedHeight, "mm"],
             ["Number of Sections", this.data.params.noOfTubes, ""],
@@ -208,9 +243,9 @@ export default class MakePDF {
                 "Nm",
             ],
             [
-                "Total Driveline Speed Reduction Ratio",
+                "Total Driveline Reduction Ratio, i",
                 this.data.power.gearbox_ratio.toFixed(0),
-                "RPM",
+                "",
             ],
             [
                 "Screw Speed, Rotational",
@@ -238,13 +273,31 @@ export default class MakePDF {
                 this.qrCodeImage,
                 "PNG",
                 this.mx,
-                this.my + 2,
+                this.mx,
                 this.qrs,
                 this.qrs,
             );
-            this.pdf.link(this.mx, this.my + 2, this.qrs, this.qrs, {
-                url: this.data.qr,
+
+
+
+            const baseUrl = window.location.origin;
+            const fullUrl = new URL('/pdm/engineering/configurator', baseUrl);
+
+            fullUrl.searchParams.set('qr', this.qr);
+
+            this.pdf.link(this.mx, this.mx, this.qrs, this.qrs, {
+                url: fullUrl.toString(),
             });
+
+
+            // this.pdf.link(this.mx, this.mx, this.qrs, this.qrs, {
+            //     url: '/pdm/engineering/configurator?qr='+this.qr,
+            // });
+
+        //this.pdf.link(this.mx, this.my, this.qrs, this.qrs, { url: 'https://example.com' });
+
+
+
         } else {
             console.error("QR code not initialized. Call init() first.");
         }
