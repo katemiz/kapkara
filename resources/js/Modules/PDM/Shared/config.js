@@ -282,7 +282,6 @@ export const config = {
     air_density: 1.25,
     dynamic_viscosity_mu: 15e-6,
     drag_coefficient_Cd: 1.5,
-    tip_deflection_percentage: 2,
     alum_6063_density: 2704, // kg/m³
     alum_6063_E: 70e9, // Pa
     alum_6063_yield_strength: 170e6, // Pa

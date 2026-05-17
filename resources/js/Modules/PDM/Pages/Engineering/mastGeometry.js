@@ -13,7 +13,7 @@ export class MastGeometry {
             beam: [],
         };
 
-        console.log("Mast Geometry Data", this.data);
+        //console.log("Mast Geometry Data", this.data);
 
         this.setDependentProps();
         this.setMastTubes();

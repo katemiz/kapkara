@@ -67,7 +67,7 @@ export class SvgDraw {
         this.MX = 20;
         this.MY = 20;
 
-        let wDiv = document.getElementById("fixedWidth")
+        let wDiv = document.getElementById("fixedWidth");
 
         this.svgWidth =
             wDiv.clientWidth -
@@ -280,9 +280,8 @@ export class SvgDraw {
         this.drawLine(cg_x, y, cg_x, 0, "dimension"); // Force Line
         this.drawArrow(cg_x, y, "Down"); // Force Arrow
 
-
         this.drawText(
-            cg_x+4,
+            cg_x + 4,
             10,
             (this.data.params.payload_mass * 9.81).toFixed(0) + " N",
             "start",
@@ -301,7 +300,8 @@ export class SvgDraw {
         let y =
             this.svgHeight -
             this.MY -
-            this.scale * (this.data.props.side_adapter_z + 0.5 * side_support_height);
+            this.scale *
+                (this.data.props.side_adapter_z + 0.5 * side_support_height);
 
         let w = this.scale * side_support_width * 1.5;
         let h = this.scale * side_support_height;
@@ -309,7 +309,9 @@ export class SvgDraw {
         this.drawRectangle(x, y, w, h, "side_adapter");
         this.drawCircle(
             this.vcline_x,
-            this.svgHeight - this.MY - this.data.props.side_adapter_z * this.scale,
+            this.svgHeight -
+                this.MY -
+                this.data.props.side_adapter_z * this.scale,
             2,
             "side",
         );
@@ -320,12 +322,32 @@ export class SvgDraw {
             x,
             y,
             0.5 * w,
-            this.scale * (this.data.props.side_adapter_z + 0.5 * side_support_height),
+            this.scale *
+                (this.data.props.side_adapter_z + 0.5 * side_support_height),
             "side_adapter",
         );
+
+        // Reaction Force, Arrow and Value
+        y =
+            this.svgHeight -
+            this.MY -
+            this.data.props.side_adapter_z * this.scale;
+        this.drawLine(
+            this.vcline_x,
+            y,
+            this.vcline_x + 0.5 * side_support_height,
+            y,
+            "reaction",
+        ); // Force Line
+        this.drawArrow(this.vcline_x, y, "Left"); // Force Arrow
+
+        this.drawText(
+            this.vcline_x + 0.5 * side_support_height,
+            y - 3,
+            this.data.props.reaction_force_at_side_adapter.toFixed(0) + " N",
+            "end",
+        ); // Weight Value Text
     }
-
-
 
     drawGuyings() {
         let ax1, ay1, ax2, ay2, ax3, ay3;
@@ -377,6 +399,11 @@ export class SvgDraw {
                 line.setAttribute("stroke-width", "1");
                 break;
 
+            case "reaction":
+                line.setAttribute("stroke", "#1B98E0");
+                line.setAttribute("stroke-width", "2");
+                break;
+
             default:
                 line.setAttribute("stroke", "blue");
                 line.setAttribute("stroke-width", "2");
@@ -397,6 +424,14 @@ export class SvgDraw {
         let x3 = x1;
         let y3 = y1 + 2 * arrow_height;
 
+        let arr = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "path",
+        );
+
+        arr.setAttribute("fill", "#d81e5b");
+        arr.setAttribute("stroke-width", "1");
+
         if (direction === "Down") {
             x1 = x;
             x2 = x + arrow_height;
@@ -406,14 +441,20 @@ export class SvgDraw {
             y3 = y - arrow_width;
         }
 
-        let arr = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-        );
+        if (direction === "Left") {
+            x1 = x;
+            x2 = x + 1.4 * arrow_width;
+            x3 = x + 1.4 * arrow_width;
+            y1 = y;
+            y2 = y + 1.4 * arrow_height;
+            y3 = y - 1.4 * arrow_height;
+
+            arr.setAttribute("fill", "#1B98E0");
+            arr.setAttribute("stroke-width", "2");
+        }
 
         arr.setAttribute("d", `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} Z`);
-        arr.setAttribute("fill", "#d81e5b");
-        arr.setAttribute("stroke-width", "1");
+
         this.svg.appendChild(arr);
     }
 

@@ -295,14 +295,14 @@
         // We "touch" mast to ensure this effect re-runs when form changes
         const _mast = mast;
 
+        deflection.run();
+        drawBMChart(deflection.data);
+        drawDeflectionChart(deflection.data);
+
         // Chart and SVG should update whenever form changes and mast recalculates
         svgDraw.svgDraw("Loads");
         svgDraw.svgDraw("Extended");
         svgDraw.svgDraw("Nested");
-
-        deflection.run();
-        drawBMChart(deflection.data);
-        drawDeflectionChart(deflection.data);
     });
 
     let mast = $derived(new MastGeometry($form, config));

@@ -22,6 +22,8 @@ export default class MastDeflection {
         this.findSideAdapterReaction();
 
         this.findBeamMoments();
+
+        this.findSideReaction();
     }
 
     findSideAdapterReaction() {
@@ -113,7 +115,7 @@ export default class MastDeflection {
                 this.data.props.allowed_tip_deflection_mm
             ) / 1000; // Convert to Nm
 
-        console.log("Class : Buraya mast ağırlığı da eklenecek)");
+        //console.log("Class : Buraya mast ağırlığı da eklenecek)");
 
         // Total Tip Moment - Constant throughout the mast
         this.data.props.payload.total_tip_moment_Nm =
@@ -212,11 +214,11 @@ export default class MastDeflection {
         // Find Reaction Force at Side Adapter
         // def = PL^3/(3EI)
         // P = 3EI*deflection/(L^3)
-        this.data.props.reaction_force_at_side_adapter =
-            (3 *
-                this.data.params.tubes.at(-1).EI_Nm2 *
-                this.data.deflections["at_side_adapter"]) /
-            Math.pow(this.data.props.side_adapter_z / 1000, 3);
+        // this.data.props.reaction_force_at_side_adapter =
+        //     (3 *
+        //         this.data.params.tubes.at(-1).EI_Nm2 *
+        //         this.data.deflections["at_side_adapter"]) /
+        //     Math.pow(this.data.props.side_adapter_z / 1000, 3);
 
         this.data.params.tubes.forEach((tube, i) => {
             //console.log("DDDDDD",tube)
@@ -327,12 +329,12 @@ export default class MastDeflection {
                 section.z_bottom +
                 Math.floor((section.z_top - section.z_bottom) / 2);
 
-            console.log(
-                "point_in_between",
-                point_in_between,
-                section.z_top,
-                section.z_bottom,
-            );
+            // console.log(
+            //     "point_in_between",
+            //     point_in_between,
+            //     section.z_top,
+            //     section.z_bottom,
+            // );
 
             this.data.deflection_data[section.z_top] =
                 this.findDeflectionAtGivenPoint2(section.z_top);
@@ -348,7 +350,7 @@ export default class MastDeflection {
         //
         this.getMaxMinReferenceDeflections();
 
-        console.log("CURVE", this.data.deflection_data);
+        // console.log("CURVE", this.data.deflection_data);
         return true;
     }
 
@@ -568,15 +570,15 @@ export default class MastDeflection {
                     mei_interpolated =
                         m * (z - section.z_top) + section.m_ei_top;
 
-                    console.log(
-                        "burada olmalı",
-                        m,
-                        z,
-                        section.z_top,
-                        section.m_ei_top,
-                        mei_interpolated,
-                        z - section.z_top,
-                    );
+                    // console.log(
+                    //     "burada olmalı",
+                    //     m,
+                    //     z,
+                    //     section.z_top,
+                    //     section.m_ei_top,
+                    //     mei_interpolated,
+                    //     z - section.z_top,
+                    // );
                 }
 
                 if (section.m_ei_bottom > section.m_ei_top) {
@@ -604,12 +606,12 @@ export default class MastDeflection {
 
                 xbar = (z - cg) / 1000; // m
 
-                console.log(
-                    "z, xbar",
-                    z,
-                    xbar,
-                    this.getMomentAreaCG(half_section),
-                );
+                // console.log(
+                //     "z, xbar",
+                //     z,
+                //     xbar,
+                //     this.getMomentAreaCG(half_section),
+                // );
 
                 moment_area =
                     -0.5 *
@@ -627,4 +629,20 @@ export default class MastDeflection {
     }
 
     getMaxMinReferenceDeflections() {}
+
+    findSideReaction() {
+        let side_deflection =
+            this.data.deflection_data[this.data.props.side_adapter_z] / 1000; // in m
+
+        let length = this.data.props.side_adapter_z;
+
+        let ei = this.data.beam.at(-1).ei;
+
+        let side_reaction =
+            (side_deflection * 3 * ei) / Math.pow(length / 1000, 3);
+
+        this.data.props.reaction_force_at_side_adapter = side_reaction;
+
+        console.log("SIDE REACTION", ei, side_reaction, side_deflection);
+    }
 }
