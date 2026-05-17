@@ -7,8 +7,12 @@ export default class MastDeflection {
 
     setAllowedTipDeflection() {
         // Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
+        //
+        // this.data.params.tip_deflection_percentage is a number like 25,50,75,100 ; should be diveded by 100
+        //
         this.data.props.allowed_tip_deflection_mm =
-            (this.data.config.tip_deflection_percentage *
+            (0.01 *
+                this.data.params.tip_deflection_percentage *
                 this.data.props.extendedHeight) /
             100; // mm
     }
@@ -191,7 +195,7 @@ export default class MastDeflection {
                 [z_mei_end]: total_moments[z_mei_end] / tube.EI_Nm2,
             };
 
-           // this.findDeflectionAtGivenPoint(z_mei_end)
+            // this.findDeflectionAtGivenPoint(z_mei_end)
         });
 
         this.data.params.deflections = {};
@@ -200,11 +204,10 @@ export default class MastDeflection {
             this.findDeflectionAtGivenPoint(this.data.props.side_adapter_z);
 
         // Find deflection at payload location
-/*         this.data.deflections["at_mast_tip"] = this.findDeflectionAtGivenPoint(
+        /*         this.data.deflections["at_mast_tip"] = this.findDeflectionAtGivenPoint(
             this.data.props.extendedHeight,
         );
  */
-
 
         // Find Reaction Force at Side Adapter
         // def = PL^3/(3EI)
@@ -215,32 +218,23 @@ export default class MastDeflection {
                 this.data.deflections["at_side_adapter"]) /
             Math.pow(this.data.props.side_adapter_z / 1000, 3);
 
-
-
         this.data.params.tubes.forEach((tube, i) => {
-
             //console.log("DDDDDD",tube)
 
-            this.findDeflectionAtGivenPoint(z_mei_end)
+            this.findDeflectionAtGivenPoint(z_mei_end);
         });
-
     }
 
-
-
-
-
     findBeamMoments() {
-
         const zBeamValues = [];
 
         this.calculateMastTopMoments();
 
         this.data.params.tubes.forEach((tube, i) => {
-
             if (i === 0) {
                 this.data.beam[i].tip_load = this.data.props.payload.wind_load;
-                this.data.beam[i].tip_moment = this.data.props.payload.total_tip_moment_Nm;
+                this.data.beam[i].tip_moment =
+                    this.data.props.payload.total_tip_moment_Nm;
                 this.data.beam[i].z_tip = this.data.props.extendedHeight;
                 zBeamValues.push(this.data.props.extendedHeight);
             } else {
@@ -256,106 +250,109 @@ export default class MastDeflection {
 
             this.data.beam[i].moment_top = 0;
             this.data.beam[i].moment_bottom = 0;
-
         });
 
         zBeamValues.push(0);
 
-        //console.log("zBeamValues", zBeamValues);
-
-
-
-
-
-
         let moment;
-        let moment_top;
-        let moment_bottom;
-
         let force;
-
-        let internal_moments = {}
-
+        let internal_moments = {};
 
         zBeamValues.forEach((z) => {
             internal_moments[z] = 0;
         });
 
         this.data.beam.forEach((section, i) => {
-
-
-
-
             force = section.wind_load;
 
             zBeamValues.forEach((z) => {
-
-                moment = force * (z - section.z_wind_load) / 1000;
-
+                moment = (force * (z - section.z_wind_load)) / 1000;
                 if (moment > 0) {
                     moment = 0;
                 }
-
                 //console.log("yük,z,moment", force, z, section.z_wind_load, moment)
                 internal_moments[z] += moment;
             });
-
-
-
-
-
-
-
-
         });
-
 
         // Add tip force and moment
         const tipForce = this.data.props.payload.wind_load;
         const tipZ = this.data.props.extendedHeight;
 
         zBeamValues.forEach((z) => {
-            let moment = tipForce * (z - tipZ) / 1000;
+            let moment = (tipForce * (z - tipZ)) / 1000;
             if (moment > 0) {
                 moment = 0;
             }
 
             internal_moments[z] += moment;
 
-            console.log("yük, z, moment 222", tipForce, z, tipZ, moment)
-
+            //console.log("yük, z, moment 222", tipForce, z, tipZ, moment);
         });
 
-        console.log("internal_moments 222", internal_moments);
-
-
+        //console.log("internal_moments 222", internal_moments);
 
         const tipMoment = this.data.props.payload.total_tip_moment_Nm;
 
-
         Object.entries(internal_moments).forEach(([z, moment]) => {
-            console.log("önceki moment", internal_moments[z], "added moment", tipMoment, "yeni moment", internal_moments[z] + tipMoment);
+            // console.log(
+            //     "önceki moment",
+            //     internal_moments[z],
+            //     "added moment",
+            //     tipMoment,
+            //     "yeni moment",
+            //     internal_moments[z] + tipMoment,
+            // );
             internal_moments[z] += tipMoment;
         });
 
-
+        this.data.deflection_data = { 0: 0 };
 
         this.data.beam.forEach((section, i) => {
             section.moment_top = internal_moments[section.z_top];
             section.moment_bottom = internal_moments[section.z_bottom];
             section.m_ei_top = section.moment_top / section.ei;
             section.m_ei_bottom = section.moment_bottom / section.ei;
-            section.moment_area = (section.z_top - section.z_bottom) * (section.m_ei_top + section.m_ei_bottom) / 2000;
+            section.moment_area =
+                (0.5 *
+                    (section.z_top - section.z_bottom) *
+                    (section.m_ei_top + section.m_ei_bottom)) /
+                1000;
         });
 
-        console.log("beam with moments", this.data.beam);
+        let point_in_between;
 
+        this.data.beam.forEach((section, i) => {
+            point_in_between =
+                section.z_bottom +
+                Math.floor((section.z_top - section.z_bottom) / 2);
+
+            console.log(
+                "point_in_between",
+                point_in_between,
+                section.z_top,
+                section.z_bottom,
+            );
+
+            this.data.deflection_data[section.z_top] =
+                this.findDeflectionAtGivenPoint2(section.z_top);
+
+            this.data.deflection_data[point_in_between] =
+                this.findDeflectionAtGivenPoint2(point_in_between);
+        });
+
+        this.data.deflection_data[this.data.props.side_adapter_z] =
+            this.findDeflectionAtGivenPoint2(this.data.props.side_adapter_z);
+
+        // console.log("beam with moments", this.data.beam);
+        //
+        this.getMaxMinReferenceDeflections();
+
+        console.log("CURVE", this.data.deflection_data);
         return true;
     }
 
-
     calculateMastTopMoments() {
-
         // TIP MOMENT AND FOCE CALCULATION
         // Z-Offset Moment Calculation
         // Add moment caused by z_offset shift of payload wind load from the top of the mast to the payload center of pressure
@@ -396,8 +393,30 @@ export default class MastDeflection {
         // });
     }
 
+    getMomentAreaCG(section) {
+        let delta_z = Math.abs(section.z_top - section.z_bottom);
 
+        let area1 = Math.abs(delta_z * section.m_ei_top); // Rectangle
+        let area2 = Math.abs(
+            0.5 * delta_z * (section.m_ei_bottom - section.m_ei_top),
+        ); // Triangle
 
+        if (section.m_ei_top >= section.m_ei_bottom) {
+            return (
+                (0.5 * delta_z * area1 + (delta_z * area2) / 3) /
+                (area1 + area2)
+            );
+        }
+
+        if (section.m_ei_bottom > section.m_ei_top) {
+            return (
+                (0.5 * delta_z * area1 + (2 * delta_z * area2) / 3) /
+                (area1 + area2)
+            );
+        }
+
+        alert("Something fishy!");
+    }
 
     findDeflectionAtGivenPoint(height) {
         let mei_start_z, mei_end_z;
@@ -498,4 +517,114 @@ export default class MastDeflection {
 
         return deflection;
     }
+
+    findDeflectionAtGivenPoint2(z) {
+        let deflection = 0;
+        let xbar;
+        let m;
+        let delta_z;
+        let delta_mei;
+        let mei_interpolated;
+        let moment_area;
+
+        //console.log("Deflection function runnng", z);
+
+        this.data.beam.forEach((section, i) => {
+            if (z >= section.z_top) {
+                this.data.beam[i].z_section_cg =
+                    section.z_bottom + this.getMomentAreaCG(section); // mm
+
+                // console.log(
+                //     "eeee",
+                //     section.z_bottom,
+                //     this.getMomentAreaCG(section),
+                //     this.data.beam[i].z_section_cg,
+                // );
+
+                xbar = (z - this.data.beam[i].z_section_cg) / 1000; // m
+                deflection += xbar * section.moment_area;
+
+                // console.log("section", section);
+                // console.log(
+                //     "AAAAA z,z_bottom,i,cg,marea,fun",
+                //     z,
+                //     section.z_bottom,
+                //     i,
+                //     this.data.beam[i].z_section_cg,
+                //     section.moment_area,
+                //     this.getMomentAreaCG(section),
+                // );
+            }
+
+            if ((z < section.z_top) & (z > section.z_bottom)) {
+                // console.log("z < z_top BBBB", z, i);
+
+                delta_z = Math.abs(section.z_top - section.z_bottom);
+                delta_mei = Math.abs(section.m_ei_top - section.m_ei_bottom);
+
+                m = delta_mei / delta_z;
+
+                if (section.m_ei_top >= section.m_ei_bottom) {
+                    mei_interpolated =
+                        m * (z - section.z_top) + section.m_ei_top;
+
+                    console.log(
+                        "burada olmalı",
+                        m,
+                        z,
+                        section.z_top,
+                        section.m_ei_top,
+                        mei_interpolated,
+                        z - section.z_top,
+                    );
+                }
+
+                if (section.m_ei_bottom > section.m_ei_top) {
+                    mei_interpolated =
+                        -m * (z - section.z_top) + section.m_ei_top;
+                }
+
+                let half_section = {
+                    z_top: z,
+                    z_bottom: section.z_bottom,
+                    m_ei_bottom: section.m_ei_bottom,
+                    m_ei_top: mei_interpolated,
+                };
+
+                // console.log(
+                //     "mei interpolated",
+                //     half_section,
+                //     z,
+                //     i,
+                //     mei_interpolated,
+                // );
+                //
+
+                let cg = section.z_bottom + this.getMomentAreaCG(half_section); // mm
+
+                xbar = (z - cg) / 1000; // m
+
+                console.log(
+                    "z, xbar",
+                    z,
+                    xbar,
+                    this.getMomentAreaCG(half_section),
+                );
+
+                moment_area =
+                    -0.5 *
+                    (Math.abs(mei_interpolated + section.m_ei_bottom) *
+                        Math.abs(z - section.z_bottom));
+
+                deflection += (xbar * moment_area) / 1000;
+            }
+
+            // console.log("ara deflection deeri", deflection, i, z);
+        });
+
+        //console.log("Deflection at z : FUNCTOON END", z, 1000 * deflection);
+        return 1000 * deflection; // mm
+    }
+
+    getMaxMinReferenceDeflections() {}
 }

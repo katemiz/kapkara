@@ -56,6 +56,7 @@ class ConfiguratorController extends Controller
         "payload_mass" => 300,
         "motor_id" => 1,
         "gearbox_id" => 1,
+        "tip_deflection_percentage" => 75,
     ];
 
     /**
@@ -65,8 +66,8 @@ class ConfiguratorController extends Controller
     {
         $this->setZOffset();
 
-        if ( isset($request["qr"]) ) {
-            $p = explode('-',$request["qr"]);
+        if (isset($request["qr"])) {
+            $p = explode("-", $request["qr"]);
 
             //dd($p);
 
@@ -77,8 +78,8 @@ class ConfiguratorController extends Controller
             $this->params["payload_adapter_height"] = (int) $p["4"];
             $this->params["sail_area"] = (float) $p["5"];
             $this->params["wind_speed"] = (int) $p["6"];
-            $this->params["head_height"] =(int)  $p["7"];
-            $this->params["tube_length"] =(int)  $p["8"];
+            $this->params["head_height"] = (int) $p["7"];
+            $this->params["tube_length"] = (int) $p["8"];
             $this->params["terrain_category"] = $p["9"];
             $this->params["x_offset"] = (int) $p["10"];
             $this->params["z_offset"] = (int) $p["11"];
@@ -88,9 +89,8 @@ class ConfiguratorController extends Controller
         }
 
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
-
             "per_page" => config("pagination.per_page"),
-            "filters" => $request->only(["search"]),    // 'filters' sends the search term back to Svelte so the input stays filled
+            "filters" => $request->only(["search"]), // 'filters' sends the search term back to Svelte so the input stays filled
             "params" => $this->params,
             "supportFixedData" => $this->supportFixedData,
             "materials" => Material::query()
@@ -106,11 +106,13 @@ class ConfiguratorController extends Controller
         ]);
     }
 
-    public function setZOffset() {
-        $this->params["z_offset"] = round(1000 * sqrt($this->params["sail_area"])/2,0);
+    public function setZOffset()
+    {
+        $this->params["z_offset"] = round(
+            (1000 * sqrt($this->params["sail_area"])) / 2,
+            0,
+        );
     }
-
-
 
     /**
      * Show the form for creating a new question.

@@ -43,7 +43,7 @@
         const ctx = chartCanvas.getContext("2d");
         //let min_EI = data.params.tubes.at(-1).M_EI["0"];
 
-        let min_EI = Math.min(...data.params.tubes.map(item => item.M_EI));
+        let min_EI = Math.min(...data.params.tubes.map((item) => item.M_EI));
 
         const chartData = {
             labels: Object.keys(data.props.total_moments),
@@ -157,11 +157,17 @@
     }
 
     function drawDeflectionChart(data) {
-
         if (!chartDeflection) return;
 
-        const sortedCurve = [...data.deflections.curve].sort((a, b) => a.height - b.height);
-        const max_deflection = data.deflections.at_mast_tip;
+        // 1. Objeyi [height, deflection] çiftlerinden oluşan bir diziye çevirip yüksekliğe göre sıralıyoruz
+        const sortedCurve = Object.entries(data.deflection_data)
+            .map(([height, deflection]) => ({
+                height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
+                deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
+            }))
+            .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
+
+        const max_deflection = data.deflection_data;
         const ctx = chartDeflection.getContext("2d");
 
         const chartData = {
@@ -169,12 +175,11 @@
             datasets: [
                 {
                     label: "Deflection (mm)",
-                    data: sortedCurve.map(
-                        (point) => point.deflection,
-                    ),
+                    data: sortedCurve.map((point) => point.deflection),
                     borderColor: "#D7263D",
                     // ... styles
                     yAxisID: "y",
+                    tension: 0.35,
                 },
             ],
         };
@@ -259,8 +264,8 @@
         payload_mass: params?.payload_mass ?? "",
         motor_id: params?.motor_id ?? "",
         gearbox_id: params?.gearbox_id ?? "",
+        tip_deflection_percentage: params?.tip_deflection_percentage ?? "",
     });
-
 
     // If you need the form to update when the 'params' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
@@ -283,6 +288,7 @@
                 payload_mass: params.payload_mass,
                 motor_id: params.motor_id,
                 gearbox_id: params.gearbox_id,
+                tip_deflection_percentage: params.tip_deflection_percentage,
             });
         }
 
@@ -336,7 +342,7 @@
 </script>
 
 <Layout>
-    <section class="section ">
+    <section class="section">
         <div class="columns">
             <div class="column is-10">
                 <Title
@@ -603,6 +609,22 @@
                             required={true}
                         />
                     </div>
+
+                    <div class="cell">
+                        <FormSelect
+                            {form}
+                            name="tip_deflection_percentage"
+                            label="Tip Deflection Percentage"
+                            placeholder="Select Percentage"
+                            options={config.tip_deflection_percentages.map(
+                                (percentage) => ({
+                                    value: percentage.id,
+                                    label: `${percentage.name}`,
+                                }),
+                            )}
+                            required={true}
+                        />
+                    </div>
                 </div>
             </div>
         </form>
@@ -654,12 +676,11 @@
             </nav>
         </div>
 
-
         <nav class="navbar has-background-info-light mb-2 mt-6">
             <div id="navbarBasicExample" class="navbar-menu">
                 <div class="navbar-start">
                     <button
-                        class="navbar-item "
+                        class="navbar-item"
                         onclick={() => toggleTab("Loads")}
                         id="tabLoads"
                     >
@@ -697,10 +718,7 @@
                         id="tabExtended"
                     >
                         <span class="icon"
-                            ><ArrowUpNarrowWide
-                                size="16"
-                                color="blue"
-                            /></span
+                            ><ArrowUpNarrowWide size="16" color="blue" /></span
                         >
                         <span>Extended</span>
                     </button>
@@ -730,13 +748,10 @@
                         <span>Torque/Power</span>
                     </button>
                 </div>
-
             </div>
         </nav>
 
-
         <div class="card p-4">
-
             <!-- EMPTY DV FOR WIDTH CALCULATON -->
             <div class="container mt-6" id="fixedWidth"></div>
 

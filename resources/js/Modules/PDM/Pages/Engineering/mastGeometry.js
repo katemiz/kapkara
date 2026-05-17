@@ -1,17 +1,16 @@
-import Chart from "chart.js/auto";
+//import Chart from "chart.js/auto";
 
 export class MastGeometry {
     constructor(params, config) {
-
         this.data = {
-            "params": JSON.parse(JSON.stringify(params)),
-            "config": config,
-            "power": {},
-            "deflections": {},
-            "loads": {},
-            "weights": {},
-            "props": {},
-            "beam":[]
+            params: JSON.parse(JSON.stringify(params)),
+            config: config,
+            power: {},
+            deflections: {},
+            loads: {},
+            weights: {},
+            props: {},
+            beam: [],
         };
 
         console.log("Mast Geometry Data", this.data);
@@ -28,7 +27,6 @@ export class MastGeometry {
         this.getMastMass();
     }
 
-
     setCircularArea(tube) {
         return Math.PI * tube.od * tube.thk;
     }
@@ -43,16 +41,17 @@ export class MastGeometry {
     }
 
     setDependentProps() {
-
         this.data.params.noOfTubes =
             this.data.params.end_tube_no - this.data.params.start_tube_no + 1;
 
         switch (this.data.params.material) {
             // Aluminum
             default:
-                this.data.params.tube_material_density = this.data.config.alum_6063_density; // kg/m³
+                this.data.params.tube_material_density =
+                    this.data.config.alum_6063_density; // kg/m³
                 this.data.params.tube_material_e = this.data.config.alum_6063_E; // Pa
-                this.data.params.tube_yield_strength = this.data.config.alum_6063_yield_strength; // Pa
+                this.data.params.tube_yield_strength =
+                    this.data.config.alum_6063_yield_strength; // Pa
                 this.data.params.tube_ultimate_strength =
                     this.data.config.alum_6063_ultimate_strength; // Pa
                 break;
@@ -71,7 +70,8 @@ export class MastGeometry {
                 tube.material_density = this.data.params.tube_material_density;
                 tube.material_e = this.data.params.tube_material_e;
                 tube.yield_strength = this.data.params.tube_yield_strength;
-                tube.ultimate_strength = this.data.params.tube_ultimate_strength;
+                tube.ultimate_strength =
+                    this.data.params.tube_ultimate_strength;
 
                 // Calculate circular area for comparison
                 tube.circularArea = this.setCircularArea(tube);
@@ -132,34 +132,29 @@ export class MastGeometry {
     }
 
     setBeamProps() {
-
         let z_top, z_bottom;
 
-        this.data.params.tubes.forEach((tube,index) => {
-
-            if ( index === 0) {
+        this.data.params.tubes.forEach((tube, index) => {
+            if (index === 0) {
                 // if top
                 z_top = this.data.props.extendedHeight;
-                z_bottom = this.data.params.tubes[index+1].extended_zt;
-
-            } else if ( this.data.params.tubes.length === index + 1) {
+                z_bottom = this.data.params.tubes[index + 1].extended_zt;
+            } else if (this.data.params.tubes.length === index + 1) {
                 // if bottom
                 z_bottom = 0;
                 z_top = tube.extended_zt;
-
             } else {
                 // in the middle
-                z_top = z_bottom
-                z_bottom = this.data.params.tubes[index+1].extended_zt;
+                z_top = z_bottom;
+                z_bottom = this.data.params.tubes[index + 1].extended_zt;
             }
 
             this.data.beam.push({
-                "no":tube.no,
-                "z_top":z_top,
-                "z_bottom": z_bottom,
-                "ei":tube.EI_Nm2
+                no: tube.no,
+                z_top: z_top,
+                z_bottom: z_bottom,
+                ei: tube.EI_Nm2,
             });
-
         });
     }
 
@@ -188,11 +183,15 @@ export class MastGeometry {
         this.data.params.tubes.forEach((tube, index) => {
             if (index === 0) {
                 // Extended State
-                ezt = this.data.props.extendedHeight - this.data.params.payload_adapter_height;
+                ezt =
+                    this.data.props.extendedHeight -
+                    this.data.params.payload_adapter_height;
                 ezb = ezt - this.data.params.tube_length;
 
                 // Nested State
-                nzt = this.data.props.nestedHeight - this.data.params.payload_adapter_height;
+                nzt =
+                    this.data.props.nestedHeight -
+                    this.data.params.payload_adapter_height;
                 nzb = nzt - this.data.params.tube_length;
             } else {
                 // Extended State
@@ -214,7 +213,8 @@ export class MastGeometry {
         // Side Adapter
         const lastTube = this.data.params.tubes.at(-1);
 
-        this.data.props.side_adapter_z = lastTube.extended_zt - this.data.params.overlap / 2;
+        this.data.props.side_adapter_z =
+            lastTube.extended_zt - this.data.params.overlap / 2;
     }
 
     windLoadsOnTubes() {
@@ -246,7 +246,8 @@ export class MastGeometry {
 
         this.data.params.tubes.forEach((tube, i) => {
             if (i != this.data.params.noOfTubes - 1) {
-                exposed_length = this.data.params.tube_length - this.data.params.overlap; // mm
+                exposed_length =
+                    this.data.params.tube_length - this.data.params.overlap; // mm
 
                 this.data.params.tubes[i].wind_load_z =
                     tube.extended_zt - exposed_length / 2;
@@ -290,7 +291,10 @@ export class MastGeometry {
             // Turbulence Intensity
             this.data.params.tubes[i].turbulence_intensity_TI =
                 1.0 /
-                (1.0 * Math.log(this.data.params.tubes[i].max_height / terrain.z0));
+                (1.0 *
+                    Math.log(
+                        this.data.params.tubes[i].max_height / terrain.z0,
+                    ));
 
             // Basic Velocity Pressure
             // Basic Velocity Pressure Formula: q = 0.5 * ρ * V^2
@@ -363,14 +367,18 @@ export class MastGeometry {
             } else {
                 this.data.params.tubes[i].end_effect_factor =
                     0.698573 +
-                    0.001977401 * this.data.params.tubes[i].effective_slenderness +
+                    0.001977401 *
+                        this.data.params.tubes[i].effective_slenderness +
                     0.00008741341 *
                         Math.pow(
                             this.data.params.tubes[i].effective_slenderness,
                             2,
                         ) -
                     0.00000103591 *
-                        Math.pow(this.data.params.tubes[i].effective_slenderness, 3); // For slenderness greater than 10
+                        Math.pow(
+                            this.data.params.tubes[i].effective_slenderness,
+                            3,
+                        ); // For slenderness greater than 10
             }
 
             // Force Coefficient without End Effect
@@ -386,7 +394,8 @@ export class MastGeometry {
                     (1 +
                         0.4 *
                             Math.log10(
-                                this.data.params.tubes[i].reynolds_number_Re / 1e6,
+                                this.data.params.tubes[i].reynolds_number_Re /
+                                    1e6,
                             ));
 
             if (this.data.params.tubes[i].reynolds_number_Re < 1.8e5) {
@@ -438,7 +447,6 @@ export class MastGeometry {
                 this.data.params.tubes[i].force_coefficient *
                 this.data.params.tubes[i].peak_velocity_pressure_qp *
                 this.data.params.tubes[i].reference_area;
-
         });
     }
 
@@ -457,7 +465,8 @@ export class MastGeometry {
         };
 
         this.data.props.payload.wind_load_z =
-            this.data.props.extendedHeight + Math.sqrt(this.data.params.sail_area * 1e6) / 2;
+            this.data.props.extendedHeight +
+            Math.sqrt(this.data.params.sail_area * 1e6) / 2;
 
         this.data.props.payload.wind_load =
             0.5 *
@@ -526,8 +535,9 @@ export class MastGeometry {
     getLiftingTorque() {
         this.data.power.lifting_torque =
             this.data.power.motor_torque *
-            this.data.config.gearboxes.find((g) => g.id === this.data.params.gearbox_id)
-                ?.gear_ratio;
+            this.data.config.gearboxes.find(
+                (g) => g.id === this.data.params.gearbox_id,
+            )?.gear_ratio;
     }
 
     getScrewSpeed() {
@@ -535,44 +545,34 @@ export class MastGeometry {
             (g) => g.id === this.data.params.gearbox_id,
         )?.gear_ratio;
 
-        this.data.power.screw_rpm = this.data.power.motor_rpm / this.data.power.gearbox_ratio;
+        this.data.power.screw_rpm =
+            this.data.power.motor_rpm / this.data.power.gearbox_ratio;
         this.data.power.vertical_speed =
             (this.data.power.screw_rpm * this.data.config.screw_lead) / 1000; // Convert RPM to m/min
     }
 
-
-
-
-
-
-
-
-
-
     getMastMass() {
-
         let lifted_mass = 0;
         let total_mass = 0;
 
         let breakdown = {
-            "all_tubes_mass": 0,
-            "fixed_top_flange_mass": 0,
-            "ice_breaker_mass": 0,
-            "screw_nut_frame_mass": 0,
-            "lower_key_guides_mass": 0,
-            "upper_key_guides_mass": 0,
-            "euler_fixer_mass": 0,
-            "payload_interface_mass": 0,
-            "lock_stopper_mass": 0,
-            "lock_key_mass": 0,
-            "lock_mechanism_mass": 0,
-            "welded_bottom_structure_mass": 0,
-            "motor_mass": 0,
-            "gearbox_mass": 0,
-        }
+            all_tubes_mass: 0,
+            fixed_top_flange_mass: 0,
+            ice_breaker_mass: 0,
+            screw_nut_frame_mass: 0,
+            lower_key_guides_mass: 0,
+            upper_key_guides_mass: 0,
+            euler_fixer_mass: 0,
+            payload_interface_mass: 0,
+            lock_stopper_mass: 0,
+            lock_key_mass: 0,
+            lock_mechanism_mass: 0,
+            welded_bottom_structure_mass: 0,
+            motor_mass: 0,
+            gearbox_mass: 0,
+        };
 
         this.data.params.tubes.forEach((tube, i) => {
-
             // TUBE PROFILES WEIGHT CALCULATION
             if (tube.state_name === "bottom_section") {
                 total_mass += tube.mass;
@@ -587,88 +587,131 @@ export class MastGeometry {
 
             // FIXED TOP FLANGE WEIGHT CALCULATION
             if (tube.state_name === "bottom_section") {
-                total_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+                total_mass +=
+                    this.data.config.weights.fixed_top_flange["C" + tube.no];
             } else {
-                lifted_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
-                total_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+                lifted_mass +=
+                    this.data.config.weights.fixed_top_flange["C" + tube.no];
+                total_mass +=
+                    this.data.config.weights.fixed_top_flange["C" + tube.no];
             }
 
-            breakdown.fixed_top_flange_mass += this.data.config.weights.fixed_top_flange["C" + tube.no];
+            breakdown.fixed_top_flange_mass +=
+                this.data.config.weights.fixed_top_flange["C" + tube.no];
 
             // ICE BREAKER WEIGHT CALCULATION
-            if (tube.state_name !== "top_section" && tube.state_name !== "bottom_section") {
-                total_mass += this.data.config.weights.ice_breaker["C" + tube.no];
-                lifted_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+            if (
+                tube.state_name !== "top_section" &&
+                tube.state_name !== "bottom_section"
+            ) {
+                total_mass +=
+                    this.data.config.weights.ice_breaker["C" + tube.no];
+                lifted_mass +=
+                    this.data.config.weights.ice_breaker["C" + tube.no];
             }
 
-            breakdown.ice_breaker_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+            breakdown.ice_breaker_mass +=
+                this.data.config.weights.ice_breaker["C" + tube.no];
 
             if (tube.state_name === "bottom_section") {
-                total_mass += this.data.config.weights.ice_breaker["C" + tube.no];
+                total_mass +=
+                    this.data.config.weights.ice_breaker["C" + tube.no];
             }
 
             // SCREW AND NUT FRAME WEIGHT CALCULATION
             if (tube.state_name !== "bottom_section") {
-                total_mass += this.data.config.weights.screw_nut_frame["C" + tube.no].assy;
-                lifted_mass += this.data.config.weights.screw_nut_frame["C" + tube.no].assy;
+                total_mass +=
+                    this.data.config.weights.screw_nut_frame["C" + tube.no]
+                        .assy;
+                lifted_mass +=
+                    this.data.config.weights.screw_nut_frame["C" + tube.no]
+                        .assy;
             }
 
             // LOWER KEY GUIDES WEIGHT CALCULATION
             if (tube.state_name !== "bottom_section") {
-                total_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
-                lifted_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
-                breakdown.lower_key_guides_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
+                total_mass +=
+                    this.data.config.weights.lower_key_guides_each *
+                    tube.channel_number;
+                lifted_mass +=
+                    this.data.config.weights.lower_key_guides_each *
+                    tube.channel_number;
+                breakdown.lower_key_guides_mass +=
+                    this.data.config.weights.lower_key_guides_each *
+                    tube.channel_number;
             } else {
-                total_mass += this.data.config.weights.lower_key_guides_each * tube.channel_number;
+                total_mass +=
+                    this.data.config.weights.lower_key_guides_each *
+                    tube.channel_number;
             }
 
             // UPPER KEY GUIDES WEIGHT CALCULATION
             if (tube.state_name !== "top_section") {
-                total_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
-                lifted_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
-                breakdown.upper_key_guides_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
+                total_mass +=
+                    this.data.config.weights.upper_key_guides_each *
+                    tube.channel_number;
+                lifted_mass +=
+                    this.data.config.weights.upper_key_guides_each *
+                    tube.channel_number;
+                breakdown.upper_key_guides_mass +=
+                    this.data.config.weights.upper_key_guides_each *
+                    tube.channel_number;
             } else {
-                total_mass += this.data.config.weights.upper_key_guides_each * tube.channel_number;
+                total_mass +=
+                    this.data.config.weights.upper_key_guides_each *
+                    tube.channel_number;
             }
 
             // EULER FIXER WEIGHT CALCULATION
             if (tube.state_name === "top_section") {
-                total_mass += this.data.config.weights.euler_fixer["C" + tube.no];
-                lifted_mass += this.data.config.weights.euler_fixer["C" + tube.no];
-                breakdown.euler_fixer_mass += this.data.config.weights.euler_fixer["C" + tube.no];
+                total_mass +=
+                    this.data.config.weights.euler_fixer["C" + tube.no];
+                lifted_mass +=
+                    this.data.config.weights.euler_fixer["C" + tube.no];
+                breakdown.euler_fixer_mass +=
+                    this.data.config.weights.euler_fixer["C" + tube.no];
             }
 
             // PAYLOAD INTERFACE WEIGHT CALCULATION
             if (tube.state_name === "top_section") {
-                total_mass += this.data.config.weights.payload_interface["C" + tube.no];
-                lifted_mass += this.data.config.weights.payload_interface["C" + tube.no];
-                breakdown.payload_interface_mass += this.data.config.weights.payload_interface["C" + tube.no];
+                total_mass +=
+                    this.data.config.weights.payload_interface["C" + tube.no];
+                lifted_mass +=
+                    this.data.config.weights.payload_interface["C" + tube.no];
+                breakdown.payload_interface_mass +=
+                    this.data.config.weights.payload_interface["C" + tube.no];
             }
 
             // LOCK STOPPER (ON TUBES) WEIGHT CALCULATION
             if (tube.state_name !== "bottom_section") {
                 total_mass += this.data.config.weights.lock_stopper_each * 2;
                 lifted_mass += this.data.config.weights.lock_stopper_each * 2;
-                breakdown.lock_stopper_mass += this.data.config.weights.lock_stopper_each * 2;
+                breakdown.lock_stopper_mass +=
+                    this.data.config.weights.lock_stopper_each * 2;
             }
 
             // LOCK KEYS WEIGHT CALCULATION
             if (tube.state_name !== "bottom_section") {
                 total_mass += this.data.config.weights.lock_key_each * 2;
                 lifted_mass += this.data.config.weights.lock_key_each * 2;
-                breakdown.lock_key_mass += this.data.config.weights.lock_key_each * 2;
+                breakdown.lock_key_mass +=
+                    this.data.config.weights.lock_key_each * 2;
             }
 
             // LOCK MECHANISM WEIGHT CALCULATION
             if (tube.state_name !== "bottom_section") {
                 total_mass += this.data.config.weights.lock_mechanism_each * 2;
                 lifted_mass += this.data.config.weights.lock_mechanism_each * 2;
-                breakdown.lock_mechanism_mass += this.data.config.weights.lock_mechanism_each * 2;
+                breakdown.lock_mechanism_mass +=
+                    this.data.config.weights.lock_mechanism_each * 2;
             }
 
             // WELDED BOTTOM STRUCTURE WEIGHT CALCULATION
             if (tube.state_name === "bottom_section") {
-                total_mass += this.data.config.weights.welded_bottom_structure["C" + tube.no];
+                total_mass +=
+                    this.data.config.weights.welded_bottom_structure[
+                        "C" + tube.no
+                    ];
 
                 // MOTOR AND GEARBOX WEIGHT CALCULATION
                 total_mass += this.data.config.motors.find(
@@ -691,20 +734,4 @@ export class MastGeometry {
         this.data.weights.total_mast_mass = total_mass;
         this.data.weights.breakdown = breakdown;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
