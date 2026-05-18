@@ -7,7 +7,7 @@ import path from 'path';
 
 export default defineConfig({
 
-    base: '/',
+
 
     plugins: [
         laravel({

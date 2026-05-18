@@ -1,2 +1,0 @@
-import{m as l,t as g,n as i,c as u,g as b,o as n,q as s,k as d,r as m,v as f}from"./app-2OHIUscR.js";import{s as r}from"./attributes-mWPln7O6.js";var h=d("<button>TR</button> <button>EN</button>",1);function _(c){let t=m(!0);var e=h(),a=l(e),o=b(a,2);g(()=>{r(a,1,`button is-ghost ${s(t)?"is-hidden":""}`),r(o,1,`button is-ghost ${s(t)?"":"is-hidden"}`)}),i("click",a,()=>n(t,!s(t))),i("click",o,()=>n(t,!s(t))),u(c,e)}f(["click"]);export{_ as L};
-//# sourceMappingURL=LangSwitch-ayqi1vtx.js.map

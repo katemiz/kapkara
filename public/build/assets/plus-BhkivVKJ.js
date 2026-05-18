@@ -1,0 +1,2 @@
+import{p as n,w as d,x as c,m as l,c as i,d as m,z as u,y as h}from"./app-Cu8iSdyu.js";import{I as f,s as $}from"./users-jmC6LtQp.js";function P(o,s){n(s,!0);let t=u(s,["$$slots","$$events","$$legacy"]);const a=[["path",{d:"M5 12h14"}],["path",{d:"M12 5v14"}]];f(o,d({name:"plus"},()=>t,{get iconNode(){return a},children:(p,v)=>{var e=c(),r=l(e);$(r,()=>s.children??h),i(p,e)},$$slots:{default:!0}})),m()}export{P};
+//# sourceMappingURL=plus-BhkivVKJ.js.map
