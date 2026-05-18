@@ -38,6 +38,11 @@ export default defineConfig({
         },
     },
 
+    // Temporaly enable for debugging
+    build: {
+        sourcemap: true
+    }
+
 
 });
 

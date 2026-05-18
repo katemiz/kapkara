@@ -1,1 +1,2 @@
 import{m as f,c as s,g as a,k as e}from"./app-Cu8iSdyu.js";import{s as n}from"./slot-CkZ3EDC8.js";import d from"./NavBar-Baf2JLzf.js";import l from"./Footer-Cg0peDnq.js";import"./attributes-BCQOVpHP.js";import"./users-jmC6LtQp.js";import"./config-C8gfWgZB.js";import"./KapkaraIcon-BaD0lZGj.js";import"./user-OK5i9urY.js";var v=e("<!> <!> <!>",1);function B(m,i){var o=v(),r=f(o);d(r,{});var t=a(r,2);n(t,i,"default",{});var p=a(t,2);l(p,{}),s(m,o)}export{B as default};
+//# sourceMappingURL=Layout-BGi-u8KO.js.map
