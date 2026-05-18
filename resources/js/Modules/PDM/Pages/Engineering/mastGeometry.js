@@ -23,8 +23,8 @@ export class MastGeometry {
         this.windLoadsOnTubes();
         this.windLoadOnPayload();
         this.estimateMastMass();
-        this.torqueRequired();
         this.getMastMass();
+        this.torqueRequired();
     }
 
     setCircularArea(tube) {
@@ -489,13 +489,15 @@ export class MastGeometry {
 
     torqueRequired() {
         // Torque Required to Extend the Mast
-        let torque, torque_required_to_extend_mast_Nm;
-        let load = this.data.params.payload_mass * 9.81; // N
+        let torque;
+
+        let load = (this.data.params.payload_mass + this.data.weights.lifted_mass) * 9.81; // N
 
         let thread_angle = Math.atan(
             this.data.config.screw_lead /
                 (Math.PI * this.data.config.screw_nominal_diameter),
         ); // Thread angle in degrees
+
         let secant = 1 / Math.cos(thread_angle);
 
         torque =

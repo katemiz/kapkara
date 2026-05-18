@@ -1,5 +1,8 @@
 import Plotly from 'plotly.js-dist';
 
+    import Chart from "chart.js/auto";
+
+
 export class Gauss {
 
 
@@ -27,11 +30,11 @@ export class Gauss {
     }
 
 
-    DoRandom() {
+    DoRandom(boxNo) {
 
         let durum = 0;
 
-        for (let i = 0; i < this.boxNo - 1; i++) {
+        for (let i = 0; i < boxNo - 1; i++) {
 
             if (Math.random() < 0.5) {
                 durum = durum - 1;
@@ -48,20 +51,42 @@ export class Gauss {
 
 
 
-    RunProgram() {
+    RunProgram(boxNo, cycleNo) {
 
-        this.Initialize();
+        this.gauss = {};
 
-        let start = performance.now();
+        for (let i = 1; i <= cycleNo; i++) {
 
-        for (let i = 1; i <= this.cycleNo; i++) {
-            this.DoRandom()
+
+
+
+            let durum = 0;
+
+            for (let i = 0; i < boxNo - 1; i++) {
+
+                if (Math.random() < 0.5) {
+                    durum = durum - 1;
+                } else {
+                    durum = durum + 1;
+                }
+            }
+
+            durum = durum / 2;
+
+            gauss[durum] = this.gauss[durum] + 1
+
+
+
+
+
+
+
+
+
+
         }
 
-        let end = performance.now();
-        let time = end - start;
-
-        this.DoChart(time);
+        return gauss;
     }
 
 
@@ -130,4 +155,129 @@ export class Gauss {
 
         this.RunProgram();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    drawDeflectionChart(data) {
+
+        if (!chartDeflection) return;
+
+        // 1. Objeyi [height, deflection] çiftlerinden oluşan bir diziye çevirip yüksekliğe göre sıralıyoruz
+        const sortedCurve = Object.entries(data.deflection_data)
+            .map(([height, deflection]) => ({
+                height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
+                deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
+            }))
+            .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
+
+        const max_deflection = data.deflection_data;
+        const ctx = chartDeflection.getContext("2d");
+
+        const chartData = {
+            labels: sortedCurve.map((point) => point.height),
+            datasets: [
+                {
+                    label: "Deflection (mm)",
+                    data: sortedCurve.map((point) => point.deflection),
+                    borderColor: "#D7263D",
+                    // ... styles
+                    yAxisID: "y",
+                    tension: 0.35,
+                },
+            ],
+        };
+
+        if (chartDeflectionInstance) {
+            // Update existing chart
+            chartDeflectionInstance.data = chartData;
+            chartDeflectionInstance.options.scales.y.min = 1.2 * max_deflection;
+            chartDeflectionInstance.update("none"); // 'none' for performance, or omit for animation
+        } else {
+            // Initialize chart
+            chartDeflectionInstance = new Chart(ctx, {
+                type: "line",
+                data: chartData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: "linear",
+                            display: true,
+                            title: {
+                                display: true,
+                                text: "Mast Height, z [mm]",
+                                color: "#666",
+                                font: {
+                                    size: 14,
+                                    weight: "bold",
+                                },
+                            },
+                        },
+                        y: {
+                            type: "linear",
+                            display: true,
+                            position: "left",
+                            title: {
+                                display: true,
+                                text: "Deflection, [mm]",
+                                color: "#666",
+                                font: {
+                                    size: 14,
+                                    weight: "bold",
+                                },
+                            },
+                            // Useful if you want the negative values to stay consistent
+                            beginAtZero: false,
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bending Moment and M/EI Diagram",
+                        },
+
+                        tooltip: {},
+                    },
+                },
+            });
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

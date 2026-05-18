@@ -50,8 +50,8 @@ Route::name("pages.")->group(function () {
 
 // 3. FunStuff Group (Prefixed)
 Route::prefix("funstuff")->group(function () {
-    Route::get("/", fn() => Inertia::render("FunStuff/Index"));
-    Route::get("/gauss", fn() => Inertia::render("FunStuff/Gauss"));
+    Route::get("/", fn() => Inertia::render("Modules/Base/Pages/FunStuff/Index"));
+    Route::get("/gauss", fn() => Inertia::render("Modules/Base/Pages/FunStuff/Gauss"));
 });
 
 // 4. Question Resource Routes

@@ -1,4 +1,4 @@
-import Chart from "chart.js/auto";
+//import Chart from "chart.js/auto";
 
 export default class MastDeflection {
     constructor(data) {
@@ -7,15 +7,15 @@ export default class MastDeflection {
 
     setAllowedTipDeflection() {
         // Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
-        //
         // this.data.params.tip_deflection_percentage is a number like 25,50,75,100 ; should be diveded by 100
-        //
+
         this.data.props.allowed_tip_deflection_mm =
             (0.01 *
                 this.data.params.tip_deflection_percentage *
                 this.data.props.extendedHeight) /
             100; // mm
     }
+
 
     run() {
         this.setAllowedTipDeflection();
@@ -26,9 +26,11 @@ export default class MastDeflection {
         this.findSideReaction();
     }
 
+
     findSideAdapterReaction() {
         this.findRootMomentWoSideAdapterReaction();
     }
+
 
     findRootMomentWoSideAdapterReaction() {
         let root_moment = 0; // Initialize root moment for each tube
@@ -196,8 +198,6 @@ export default class MastDeflection {
                 [z_mei_start]: total_moments[z_mei_start] / tube.EI_Nm2,
                 [z_mei_end]: total_moments[z_mei_end] / tube.EI_Nm2,
             };
-
-            // this.findDeflectionAtGivenPoint(z_mei_end)
         });
 
         this.data.params.deflections = {};
@@ -205,27 +205,13 @@ export default class MastDeflection {
         this.data.deflections["at_side_adapter"] =
             this.findDeflectionAtGivenPoint(this.data.props.side_adapter_z);
 
-        // Find deflection at payload location
-        /*         this.data.deflections["at_mast_tip"] = this.findDeflectionAtGivenPoint(
-            this.data.props.extendedHeight,
-        );
- */
-
-        // Find Reaction Force at Side Adapter
-        // def = PL^3/(3EI)
-        // P = 3EI*deflection/(L^3)
-        // this.data.props.reaction_force_at_side_adapter =
-        //     (3 *
-        //         this.data.params.tubes.at(-1).EI_Nm2 *
-        //         this.data.deflections["at_side_adapter"]) /
-        //     Math.pow(this.data.props.side_adapter_z / 1000, 3);
-
         this.data.params.tubes.forEach((tube, i) => {
             //console.log("DDDDDD",tube)
 
             this.findDeflectionAtGivenPoint(z_mei_end);
         });
     }
+
 
     findBeamMoments() {
         const zBeamValues = [];
@@ -297,14 +283,6 @@ export default class MastDeflection {
         const tipMoment = this.data.props.payload.total_tip_moment_Nm;
 
         Object.entries(internal_moments).forEach(([z, moment]) => {
-            // console.log(
-            //     "önceki moment",
-            //     internal_moments[z],
-            //     "added moment",
-            //     tipMoment,
-            //     "yeni moment",
-            //     internal_moments[z] + tipMoment,
-            // );
             internal_moments[z] += tipMoment;
         });
 
@@ -329,13 +307,6 @@ export default class MastDeflection {
                 section.z_bottom +
                 Math.floor((section.z_top - section.z_bottom) / 2);
 
-            // console.log(
-            //     "point_in_between",
-            //     point_in_between,
-            //     section.z_top,
-            //     section.z_bottom,
-            // );
-
             this.data.deflection_data[section.z_top] =
                 this.findDeflectionAtGivenPoint2(section.z_top);
 
@@ -353,6 +324,7 @@ export default class MastDeflection {
         // console.log("CURVE", this.data.deflection_data);
         return true;
     }
+
 
     calculateMastTopMoments() {
         // TIP MOMENT AND FOCE CALCULATION
@@ -373,27 +345,24 @@ export default class MastDeflection {
 
         // Moment Caused by Deflection of the Mast under Wind Load
         // Add moment caused by x_offset shift of payload mass load from the centerline of the mast to the payload center of gravity due to deflection of the mast under wind load, limited to a maximum of tip_deflection_percentage % of the extended height of the mast
+
+        // Payload mast is increased by %20 of total lifted mast weight
         this.data.props.payload.tip_moment_due_deflection_Nm =
             -(
                 9.81 *
-                this.data.params.payload_mass *
+                (this.data.params.payload_mass + 0.2 *this.data.weights.lifted_mass) *
                 this.data.props.allowed_tip_deflection_mm
             ) / 1000; // Convert to Nm
 
-        console.log("Class : Buraya mast ağırlığı da eklenecek)");
+        //console.log("Class : Buraya mast ağırlığı da eklenecek)");
 
         // Total Tip Moment - Constant throughout the mast
         this.data.props.payload.total_tip_moment_Nm =
             this.data.props.payload.tip_moment_due_z_offset_Nm +
             this.data.props.payload.tip_moment_due_x_offset_Nm +
             this.data.props.payload.tip_moment_due_deflection_Nm;
-
-        // this.data.beam.force_moments.push({
-        //     "z" : this.data.props.extendedHeight,
-        //     "ext_force" : this.data.props.payload.wind_load,
-        //     "ext_moment" : this.data.props.payload.total_tip_moment_Nm
-        // });
     }
+
 
     getMomentAreaCG(section) {
         let delta_z = Math.abs(section.z_top - section.z_bottom);
@@ -643,6 +612,6 @@ export default class MastDeflection {
 
         this.data.props.reaction_force_at_side_adapter = side_reaction;
 
-        console.log("SIDE REACTION", ei, side_reaction, side_deflection);
+        //console.log("SIDE REACTION", ei, side_reaction, side_deflection);
     }
 }

@@ -819,7 +819,9 @@
                         </tr>
 
                         <tr>
-                            <th>Minimum Torque Required to Extend Mast</th>
+                            <th>Minimum Torque Required to Extend Mast<br>
+                                <span class="has-text-weight-normal has-text-success">[with {mast.data.weights.lifted_mass.toFixed(0)} kg Lifted Mass]</span>
+                            </th>
                             <td>
                                 <table
                                     class="table is-fullwidth is-striped mt-2"

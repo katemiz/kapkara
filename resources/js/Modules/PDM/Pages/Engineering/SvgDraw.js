@@ -195,7 +195,7 @@ export class SvgDraw {
 
                 start_x = this.vcline_x - force_line_strength;
 
-                this.drawLine(start_x, y, this.vcline_x, y, "dimension"); // Force Line
+                this.drawLine(start_x, y, this.vcline_x, y, "arrow-line"); // Force Line
                 this.drawText(
                     start_x,
                     y - 4,
@@ -256,7 +256,7 @@ export class SvgDraw {
 
         let cg_x = this.vcline_x + this.scale * this.data.params.x_offset;
 
-        this.drawLine(cg_x - force_line_strength, y, cg_x, y, "dimension"); // Force Line
+        this.drawLine(cg_x - force_line_strength, y, cg_x, y, "arrow-line"); // Force Line
         this.drawText(
             cg_x - force_line_strength,
             y - 4,
@@ -277,7 +277,7 @@ export class SvgDraw {
         this.drawCircle(cg_x, y, 6, "cg");
 
         // Weight
-        this.drawLine(cg_x, y, cg_x, 0, "dimension"); // Force Line
+        this.drawLine(cg_x, y, cg_x, 0, "arrow-line"); // Force Line
         this.drawArrow(cg_x, y, "Down"); // Force Arrow
 
         this.drawText(
@@ -327,26 +327,28 @@ export class SvgDraw {
             "side_adapter",
         );
 
+        if (this.drawType === 'Loads') {
         // Reaction Force, Arrow and Value
-        y =
-            this.svgHeight -
-            this.MY -
-            this.data.props.side_adapter_z * this.scale;
-        this.drawLine(
-            this.vcline_x,
-            y,
-            this.vcline_x + 0.5 * side_support_height,
-            y,
-            "reaction",
-        ); // Force Line
-        this.drawArrow(this.vcline_x, y, "Left"); // Force Arrow
+            y =
+                this.svgHeight -
+                this.MY -
+                this.data.props.side_adapter_z * this.scale;
+            this.drawLine(
+                this.vcline_x,
+                y,
+                this.vcline_x + 0.5 * side_support_height,
+                y,
+                "reaction",
+            ); // Force Line
+            this.drawArrow(this.vcline_x, y, "Left"); // Force Arrow
 
-        this.drawText(
-            this.vcline_x + 0.5 * side_support_height,
-            y - 3,
-            this.data.props.reaction_force_at_side_adapter.toFixed(0) + " N",
-            "end",
-        ); // Weight Value Text
+            this.drawText(
+                this.vcline_x + 0.5 * side_support_height,
+                y - 3,
+                -this.data.props.reaction_force_at_side_adapter.toFixed(0) + " N",
+                "end",
+            ); // Reaction Force Value Text
+        }
     }
 
     drawGuyings() {
@@ -374,10 +376,6 @@ export class SvgDraw {
         line.setAttribute("y2", y2);
 
         switch (type) {
-            case "arrow-line":
-                line.setAttribute("stroke", "#d81e5b");
-                line.setAttribute("stroke-width", "1");
-                break;
 
             case "ground":
                 line.setAttribute("stroke", "#5f6b08");
@@ -394,13 +392,19 @@ export class SvgDraw {
                 line.setAttribute("stroke-width", "0.4");
                 break;
 
+            case "arrow-line":
+                line.setAttribute("stroke", "#d81e5b");
+                line.setAttribute("stroke-width", "0.4");
+                break;
+
+
             case "guying":
                 line.setAttribute("stroke", "grey");
                 line.setAttribute("stroke-width", "1");
                 break;
 
             case "reaction":
-                line.setAttribute("stroke", "#1B98E0");
+                line.setAttribute("stroke", "#70163C");
                 line.setAttribute("stroke-width", "2");
                 break;
 
@@ -449,7 +453,7 @@ export class SvgDraw {
             y2 = y + 1.4 * arrow_height;
             y3 = y - 1.4 * arrow_height;
 
-            arr.setAttribute("fill", "#1B98E0");
+            arr.setAttribute("fill", "#70163C");
             arr.setAttribute("stroke-width", "2");
         }
 
