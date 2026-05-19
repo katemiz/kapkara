@@ -17,23 +17,25 @@
 
     let { crequest = null, isEdit = false, supportFixedData } = $props();
 
+    const crequestFresh = { ...(() => crequest)() };
+
     // 1. Initialize the Inertia Form
     let form = useForm({
-        title: crequest?.title ?? "",
-        description: crequest?.description ?? "",
-        crFiles: crequest?.docFiles ?? null,
-        status: crequest?.status ?? 1,
+        title: crequestFresh?.title ?? "",
+        description: crequestFresh?.description ?? "",
+        crFiles: crequestFresh?.docFiles ?? null,
+        status: crequestFresh?.status ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (document && isEdit) {
+        if (crequestFresh && isEdit) {
             $form.defaults({
-                title: crequest.title,
-                description: crequest.description,
-                crFiles: crequest.docFiles,
-                status: crequest.status,
+                title: crequestFresh.title,
+                description: crequestFresh.description,
+                crFiles: crequestFresh.docFiles,
+                status: crequestFresh.status,
             });
         }
     });

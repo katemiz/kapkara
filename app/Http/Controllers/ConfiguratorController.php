@@ -91,7 +91,7 @@ class ConfiguratorController extends Controller
         return Inertia::render("Modules/PDM/Pages/Engineering/Configurator", [
             "per_page" => config("pagination.per_page"),
             "filters" => $request->only(["search"]), // 'filters' sends the search term back to Svelte so the input stays filled
-            "params" => $this->params,
+            "params1" => $this->params,
             "supportFixedData" => $this->supportFixedData,
             "materials" => Material::query()
                 ->when($request->input("search"), function ($query, $search) {

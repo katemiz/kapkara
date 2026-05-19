@@ -21,29 +21,31 @@
 
     let { material = null, isEdit = false, supportFixedData } = $props();
 
+    const material2 = { ...(() => material)() };
+
     // 1. Initialize the Inertia Form
     let form = useForm({
-        materialCategory: material?.category ?? "",
-        materialForm: material?.form ?? "",
-        materialName: material?.description ?? "",
-        materialSpecification: material?.specification ?? "",
-        materialFiles: material?.materialFiles ?? null,
-        materialNotes: material?.remarks ?? "",
-        materialIsActive: material?.is_active ?? 1,
+        materialCategory: material2?.category ?? "",
+        materialForm: material2?.form ?? "",
+        materialName: material2?.description ?? "",
+        materialSpecification: material2?.specification ?? "",
+        materialFiles: material2?.materialFiles ?? null,
+        materialNotes: material2?.remarks ?? "",
+        materialIsActive: material2?.is_active ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (material && isEdit) {
+        if (material2 && isEdit) {
             $form.defaults({
-                materialCategory: material.category,
-                materialForm: material.form,
-                materialName: material.description,
-                materialSpecification: material.specification,
-                materialFiles: material.files,
-                materialNotes: material.remarks,
-                materialIsActive: material.is_active,
+                materialCategory: material2.category,
+                materialForm: material2.form,
+                materialName: material2.description,
+                materialSpecification: material2.specification,
+                materialFiles: material2.files,
+                materialNotes: material2.remarks,
+                materialIsActive: material2.is_active,
             });
         }
     });

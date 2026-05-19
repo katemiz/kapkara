@@ -17,14 +17,16 @@
 
     let { document = null, isEdit = false, supportFixedData } = $props();
 
+    const doc = { ...(() => document)() };
+
     // 1. Initialize the Inertia Form
     let form = useForm({
-        doc_type: document?.doc_type ?? "",
-        document_no: document?.document_no ?? "",
-        description: document?.description ?? "",
-        docFiles: document?.docFiles ?? null,
-        remarks: document?.remarks ?? "",
-        status: document?.status ?? 1,
+        doc_type: doc?.doc_type ?? "",
+        document_no: doc?.document_no ?? "",
+        description: doc?.description ?? "",
+        docFiles: doc?.docFiles ?? null,
+        remarks: doc?.remarks ?? "",
+        status: doc?.status ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes

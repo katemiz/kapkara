@@ -34,7 +34,9 @@
     let chartInstance;
     let chartDeflectionInstance;
 
-    let { params, isEdit = false, supportFixedData } = $props();
+    let { params1, isEdit = false, supportFixedData } = $props();
+
+    const params = { ...(() => params1)() };
 
     // Function to update/create the chart
     function drawBMChart(data) {
@@ -819,8 +821,14 @@
                         </tr>
 
                         <tr>
-                            <th>Minimum Torque Required to Extend Mast<br>
-                                <span class="has-text-weight-normal has-text-success">[with {mast.data.weights.lifted_mass.toFixed(0)} kg Lifted Mass]</span>
+                            <th
+                                >Minimum Torque Required to Extend Mast<br />
+                                <span
+                                    class="has-text-weight-normal has-text-success"
+                                    >[with {mast.data.weights.lifted_mass.toFixed(
+                                        0,
+                                    )} kg Lifted Mass]</span
+                                >
                             </th>
                             <td>
                                 <table

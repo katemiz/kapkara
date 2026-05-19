@@ -21,13 +21,15 @@
         changeRequests,
     } = $props();
 
+    const crequest = { ...(() => ecn)() };
+
     // 1. Initialize the Inertia Form
     let form = useForm({
-        change_request_id: ecn?.change_request_id ?? null,
-        title: ecn?.title ?? "",
-        description: ecn?.description ?? "",
-        ecnFiles: ecn?.ecnFiles ?? null,
-        status: ecn?.status ?? 1,
+        change_request_id: crequest?.change_request_id ?? null,
+        title: crequest?.title ?? "",
+        description: crequest?.description ?? "",
+        ecnFiles: crequest?.ecnFiles ?? null,
+        status: crequest?.status ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes

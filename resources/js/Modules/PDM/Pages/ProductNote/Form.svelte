@@ -21,27 +21,29 @@
 
     let { product_note = null, isEdit = false, supportFixedData } = $props();
 
+    const pnote = { ...(() => product_note)() };
+
     // 1. Initialize the Inertia Form
     let form = useForm({
-        pnCategory: product_note?.category ?? "",
-        description_tr: product_note?.description_tr ?? "",
-        description_en: product_note?.description_en ?? "",
-        pnFiles: product_note?.pnFiles ?? null,
-        pnNotes: product_note?.remarks ?? "",
-        productNoteIsActive: product_note?.is_active ?? 1,
+        pnCategory: pnote?.category ?? "",
+        description_tr: pnote?.description_tr ?? "",
+        description_en: pnote?.description_en ?? "",
+        pnFiles: pnote?.pnFiles ?? null,
+        pnNotes: pnote?.remarks ?? "",
+        productNoteIsActive: pnote?.is_active ?? 1,
     });
 
     // If you need the form to update when the 'Product Note' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (product_note && isEdit) {
+        if (pnote && isEdit) {
             $form.defaults({
-                pnCategory: product_note.category,
-                description_tr: product_note.description_tr,
-                description_en: product_note.description_en,
-                pnFiles: product_note.pnFiles,
-                pnNotes: product_note.remarks,
-                productNoteIsActive: product_note.is_active,
+                pnCategory: pnote.category,
+                description_tr: pnote.description_tr,
+                description_en: pnote.description_en,
+                pnFiles: pnote.pnFiles,
+                pnNotes: pnote.remarks,
+                productNoteIsActive: pnote.is_active,
             });
         }
     });

@@ -21,27 +21,29 @@
 
     let { standard = null, isEdit = false, supportFixedData } = $props();
 
+    const standardFresh = { ...(() => standard)() };
+
     // 1. Initialize the Inertia Form
     let form = useForm({
-        organisation: standard?.organisation ?? "",
-        standard_number: standard?.standard_number ?? "",
-        description: standard?.description ?? "",
-        stdFiles: standard?.stdFiles ?? null,
-        remarks: standard?.remarks ?? "",
-        isActive: standard?.is_active ?? 1,
+        organisation: standardFresh?.organisation ?? "",
+        standard_number: standardFresh?.standard_number ?? "",
+        description: standardFresh?.description ?? "",
+        stdFiles: standardFresh?.stdFiles ?? null,
+        remarks: standardFresh?.remarks ?? "",
+        isActive: standardFresh?.is_active ?? 1,
     });
 
     // If you need the form to update when the 'material' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (standard && isEdit) {
+        if (standardFresh && isEdit) {
             $form.defaults({
-                organisation: standard.organisation,
-                standard_number: standard.standard_number,
-                description: standard.description,
-                stdFiles: standard.stdFiles,
-                remarks: standard.remarks,
-                isActive: standard.is_active,
+                organisation: standardFresh.organisation,
+                standard_number: standardFresh.standard_number,
+                description: standardFresh.description,
+                stdFiles: standardFresh.stdFiles,
+                remarks: standardFresh.remarks,
+                isActive: standardFresh.is_active,
             });
         }
     });
@@ -49,8 +51,8 @@
     let organisations = $derived(
         supportFixedData.organisation.map((cat) => ({
             value: cat.value,
-            label: cat["value"] + ' - ' + cat["description"],
-        }))
+            label: cat["value"] + " - " + cat["description"],
+        })),
     );
 
     function submit(e) {
@@ -110,10 +112,7 @@
             route_name="pdm/standard"
         />
 
-
-
         <form onsubmit={submit} novalidate id="genericForm">
-
             <FormSelect
                 {form}
                 name="organisation"
@@ -139,9 +138,6 @@
                 required={true}
             />
 
-
-
-
             <div class="fixed-grid has-2-cols">
                 <div class="grid">
                     <div class="cell">
@@ -166,19 +162,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             <div class="field">
                 <label class="label" for="ed">Notes/Comments/Remarks</label>
