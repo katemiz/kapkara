@@ -317,10 +317,6 @@ export default class MastDeflection {
         this.data.deflection_data[this.data.props.side_adapter_z] =
             this.findDeflectionAtGivenPoint2(this.data.props.side_adapter_z);
 
-        // console.log("beam with moments", this.data.beam);
-        //
-        this.getMaxMinReferenceDeflections();
-
         // console.log("CURVE", this.data.deflection_data);
         return true;
     }
@@ -597,7 +593,6 @@ export default class MastDeflection {
         return 1000 * deflection; // mm
     }
 
-    getMaxMinReferenceDeflections() {}
 
     findSideReaction() {
         let side_deflection =
@@ -613,5 +608,30 @@ export default class MastDeflection {
         this.data.props.reaction_force_at_side_adapter = side_reaction;
 
         //console.log("SIDE REACTION", ei, side_reaction, side_deflection);
+    }
+
+
+
+
+    findMaxMinRefDeflections() {
+
+        this.data.props.tubesMaxRef = {}
+        this.data.props.tubesMinRef = {}
+
+
+        this.data.beam.tubes.forEach((tube,i) => {
+            const deflection = this.getDeflection(tube.z);
+            if (i === 0) {
+                this.data.props.tubesMaxRef = { ...tube, deflection };
+                this.data.props.tubesMinRef = { ...tube, deflection };
+            } else {
+                if (deflection > this.data.props.tubesMaxRef.deflection) {
+                    this.data.props.tubesMaxRef = { ...tube, deflection };
+                }
+                if (deflection < this.data.props.tubesMinRef.deflection) {
+                    this.data.props.tubesMinRef = { ...tube, deflection };
+                }
+            }
+        });
     }
 }

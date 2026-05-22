@@ -15,6 +15,7 @@
 
     import Chart from "chart.js/auto";
 
+
     import {
         Braces,
         FileText,
@@ -34,7 +35,10 @@
     let chartInstance;
     let chartDeflectionInstance;
 
-    let { params1, isEdit = false, supportFixedData } = $props();
+    let chartSFBM;
+    let chartSFBMInstance;
+
+    let { params1, isEdit = false } = $props();
 
     const params = { ...(() => params1)() };
 
@@ -242,6 +246,91 @@
         }
     }
 
+
+    function drawSFBM() {
+
+        let myChart = Chart.getChart("dene");
+if (myChart) {
+  myChart.destroy();
+}
+
+        const ctx = chartSFBM.getContext("2d");
+
+
+        const data = {
+            labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'],
+            datasets: [
+                {
+                label: 'Dataset',
+                data: {count: 6, min: -100, max: 100},
+                borderColor: "red",
+                fill: false,
+                stepped: true,
+                }
+            ]
+        }
+
+
+        const config = {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            interaction: {
+            intersect: false,
+            axis: 'x'
+            },
+            plugins: {
+            title: {
+                display: true,
+                text: (ctx) => 'Step ' + ctx.chart.data.datasets[0].stepped + ' Interpolation',
+            }
+            }
+        }
+        };
+
+
+
+
+
+
+
+
+
+
+
+        if (chartSFBMInstance) {
+            // Update existing chart
+            chartSFBMInstance.data = config;
+            //chartDeflectionInstance.options.scales.y.min = 1.2 * max_deflection;
+            chartSFBMInstance.update("none"); // 'none' for performance, or omit for animation
+        } else {
+
+
+            chartSFBMInstance = new Chart(ctx, {
+                    type: "line",
+                    data: config.data,
+                    options: config.options,
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
     let showJson = $state(false);
 
     function toggle() {
@@ -305,6 +394,8 @@
         svgDraw.svgDraw("Loads");
         svgDraw.svgDraw("Extended");
         svgDraw.svgDraw("Nested");
+
+        drawSFBM();
     });
 
     let mast = $derived(new MastGeometry($form, config));
@@ -979,5 +1070,18 @@
                 onclick={toggle}
             ></button>
         </div>
+
+
+
+
+        <!-- SFBM DIAGRAM -->
+        <div class="container p-6 has-background-light" id="sfbm">
+            <canvas bind:this={chartSFBM} id="dene"></canvas>
+        </div>
+
+
+
+
+
     </section>
 </Layout>

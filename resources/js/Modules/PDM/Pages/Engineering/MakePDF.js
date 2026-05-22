@@ -92,7 +92,7 @@ export default class MakePDF {
         this.product_family = 'MTNX';
         this.product_family_name = 'MTNX';
         this.image_warning = "Image shown in cover page is for illustration purposes only.";
-        this.product_code = Math.ceil(this.data.props.extendedHeight / 1000) + this.product_family + "-" + (this.data.props.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
+        this.product_code = Math.round(this.data.props.extendedHeight / 1000, 0) + this.product_family + "-" + (this.data.props.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
     }
 
     coverPage() {

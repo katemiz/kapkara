@@ -53,7 +53,7 @@ class ConfiguratorController extends Controller
         "sail_area" => 1.2,
         "x_offset" => 100,
         "z_offset" => null,
-        "payload_mass" => 300,
+        "payload_mass" => 400,
         "motor_id" => 1,
         "gearbox_id" => 1,
         "tip_deflection_percentage" => 75,
