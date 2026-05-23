@@ -1,0 +1,15 @@
+import { aE as create_text, ay as block, aG as HEAD_EFFECT, aH as EFFECT_PRESERVED } from "./app-Dy2KnI5v.js";
+function head(hash, render_fn) {
+  var anchor;
+  {
+    anchor = document.head.appendChild(create_text());
+  }
+  try {
+    block(() => render_fn(anchor), HEAD_EFFECT | EFFECT_PRESERVED);
+  } finally {
+  }
+}
+export {
+  head as h
+};
+//# sourceMappingURL=svelte-head-CaBkEOy0.js.map

@@ -1,2 +1,0 @@
-import{p,w as c,x as i,m as d,c as m,d as h,z as l,y as f}from"./app-rGkyepkb.js";import{I as u,s as $}from"./users-lGE-7cbq.js";function x(o,s){p(s,!0);let r=l(s,["$$slots","$$events","$$legacy"]);const t=[["path",{d:"m9 18 6-6-6-6"}]];u(o,c({name:"chevron-right"},()=>r,{get iconNode(){return t},children:(a,g)=>{var e=i(),n=d(e);$(n,()=>s.children??f),m(a,e)},$$slots:{default:!0}})),h()}export{x as C};
-//# sourceMappingURL=chevron-right-BONFluv4.js.map

@@ -41,10 +41,19 @@ export default defineConfig({
         },
     },
 
-    // Temporaly enable for debugging
+
+    // Temporaly enable for debuggingphp artisan optimize:clear
+    // ADD THIS TEMPORARY BUILD SECTION:
     build: {
-        sourcemap: true
+        sourcemap: true,      // Generates .js.map files so browser maps back to original .svelte code
+        minify: false,        // Keeps function names intact (won't rename 'submit' to 'a')
+        terserOptions: {
+            mangle: false     // Extra security to ensure variables don't change names
+        }
     }
+
+
+
 
 
 });
