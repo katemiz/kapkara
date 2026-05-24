@@ -27,7 +27,6 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 // });
 
 
-
 createInertiaApp({
     resolve: (name) => {
         const pages = import.meta.glob([
@@ -35,28 +34,54 @@ createInertiaApp({
             './Modules/**/*.svelte'
         ]);
 
-        // 1. Clean the incoming name (strip any leading dots or slashes)
+        // 1. Standardize path slashes and clean up name strings
         const cleanName = name.replace(/^(\.\/|\/)/, '');
 
-        // 2. Try an exact match approach first
-        let targetPath = `./${cleanName}.svelte`;
-        let importFunction = pages[targetPath];
+        // Define potential structural permutations matching your architecture
+        const pathsToTry = [
+            `./${cleanName}.svelte`,                     // Exact matching path rule
+            `./Modules/${cleanName}.svelte`,             // Fallback for missing module prefix
+            `./Pages/${cleanName}.svelte`                // Fallback for core framework components
+        ];
 
-        // 3. Fallback: If not found, search the manifest keys dynamically 
-        // to find which one matches your module path pattern
-        if (!importFunction) {
-            const keys = Object.keys(pages);
-            const match = keys.find(key => key.endsWith(`${cleanName}.svelte`));
-            if (match) {
-                importFunction = pages[match];
+        // 2. Iterate through predictable exact paths first
+        let importFunction = null;
+        for (const path of pathsToTry) {
+            if (pages[path]) {
+                importFunction = pages[path];
+                break;
             }
         }
 
-        // 4. Ultimate safety fallback error
+        // 3. Smart Fallback Matcher: Scans matching segments from end to start 
         if (!importFunction) {
-            console.error(`Requested Name: "${name}" -> Looked for target path: "${targetPath}"`);
-            console.error('Available keys in Vite manifest:', Object.keys(pages));
-            throw new Error(`Inertia Page component not found for path: "${name}".`);
+            const keys = Object.keys(pages);
+
+            // Check if cleanName matches a structural path trailing ending
+            importFunction = pages[keys.find(key => key.endsWith(`${cleanName}.svelte`))];
+
+            if (!importFunction) {
+                // Handle mixed nesting differences where "Pages/" might be injected or missing
+                // Example: If Laravel passes 'Modules/PDM/Home' but file is './Modules/PDM/Pages/Home.svelte'
+                const parts = cleanName.split('/');
+                if (parts.length >= 2) {
+                    const moduleName = parts[0]; // e.g. "Modules" or specific module code name
+                    const leafName = parts.slice(1).join('/'); // remaining paths
+
+                    const structuralMatch = keys.find(key =>
+                        key.includes(moduleName) && key.endsWith(`${parts[parts.length - 1]}.svelte`)
+                    );
+                    if (structuralMatch) importFunction = pages[structuralMatch];
+                }
+            }
+        }
+
+        // 4. Runtime debugging protection if configuration loses asset paths completely
+        if (!importFunction) {
+            console.error(`Inertia requested view name: "${name}"`);
+            console.error('Attempted exact lookups:', pathsToTry);
+            console.error('Compiled production manifest paths:', Object.keys(pages));
+            throw new Error(`Inertia Page component not found for route path matching: "${name}".`);
         }
 
         return typeof importFunction === 'function' ? importFunction() : importFunction;
