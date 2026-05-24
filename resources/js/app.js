@@ -30,27 +30,33 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 createInertiaApp({
     resolve: (name) => {
-        // 1. Tell Vite to map out all pages across standard Pages and nested Module subdirectories
         const pages = import.meta.glob([
             './Pages/**/*.svelte',
             './Modules/**/*.svelte'
         ]);
 
-        // 2. Check if the name passed from Laravel already contains the path block prefix
-        let targetPath = '';
-        if (name.startsWith('Modules/') || name.startsWith('Pages/')) {
-            targetPath = `./${name}.svelte`;
-        } else {
-            // Fallback default lookup map if you pass only "page1" without directory namespaces
-            targetPath = `./Pages/${name}.svelte`;
+        // 1. Clean the incoming name (strip any leading dots or slashes)
+        const cleanName = name.replace(/^(\.\/|\/)/, '');
+
+        // 2. Try an exact match approach first
+        let targetPath = `./${cleanName}.svelte`;
+        let importFunction = pages[targetPath];
+
+        // 3. Fallback: If not found, search the manifest keys dynamically 
+        // to find which one matches your module path pattern
+        if (!importFunction) {
+            const keys = Object.keys(pages);
+            const match = keys.find(key => key.endsWith(`${cleanName}.svelte`));
+            if (match) {
+                importFunction = pages[match];
+            }
         }
 
-        // 3. Resolve the component dynamic importer function
-        const importFunction = pages[targetPath];
-
+        // 4. Ultimate safety fallback error
         if (!importFunction) {
+            console.error(`Requested Name: "${name}" -> Looked for target path: "${targetPath}"`);
             console.error('Available keys in Vite manifest:', Object.keys(pages));
-            throw new Error(`Inertia Page component not found for path: "${targetPath}".`);
+            throw new Error(`Inertia Page component not found for path: "${name}".`);
         }
 
         return typeof importFunction === 'function' ? importFunction() : importFunction;
