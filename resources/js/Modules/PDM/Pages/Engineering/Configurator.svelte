@@ -443,7 +443,7 @@
         />
 
         <form novalidate id="genericForm" class="my-6">
-            <div class="fixed-grid has-4-cols">
+            <div class="fixed-grid has-4-cols has-1-cols-mobile">
                 <div class="grid">
                     <div class="cell">
                         <FormSelect
@@ -456,6 +456,7 @@
                                 label: `MT-${String(tube.no).padStart(2, "0")} ... Dia ${tube.od}`,
                             }))}
                             required={true}
+                            class="is-fullwidth"
                         />
                     </div>
 
@@ -470,6 +471,7 @@
                                 label: `MT-${String(tube.no).padStart(2, "0")} ... Dia ${tube.od}`,
                             }))}
                             required={true}
+                            class="is-fullwidth"
                         />
                     </div>
 
@@ -503,7 +505,7 @@
                 </div>
             </div>
 
-            <div class="fixed-grid has-4-cols">
+            <div class="fixed-grid has-4-cols has-1-cols-mobile">
                 <div class="grid">
                     <div class="cell">
                         <FormInput
@@ -564,12 +566,13 @@
                                 }),
                             )}
                             required={true}
+                            class="is-fullwidth"
                         />
                     </div>
                 </div>
             </div>
 
-            <div class="fixed-grid has-4-cols">
+            <div class="fixed-grid has-4-cols has-1-cols-mobile">
                 <div class="grid">
                     <div class="cell">
                         <FormInput
@@ -629,7 +632,7 @@
                 </div>
             </div>
 
-            <div class="fixed-grid has-4-cols">
+            <div class="fixed-grid has-4-cols has-1-cols-mobile">
                 <div class="grid">
                     <div class="cell">
                         <FormInput
@@ -656,6 +659,7 @@
                                 label: `${motor.name} (${motor.max_speed_rpm} RPM)`,
                             }))}
                             required={true}
+                            class="is-fullwidth"
                         />
                     </div>
 
@@ -670,6 +674,7 @@
                                 label: `${gearbox.name}`,
                             }))}
                             required={true}
+                            class="is-fullwidth"
                         />
                     </div>
 
@@ -686,6 +691,7 @@
                                 }),
                             )}
                             required={true}
+                            class="is-fullwidth"
                         />
                     </div>
                 </div>

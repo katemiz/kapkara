@@ -213,12 +213,68 @@ export default class MastDeflection {
     }
 
 
+
+
+    findForcesMomentsAtControlPoints() {
+
+        /*
+        Control Points are :
+        - Top of the mast
+        - Bottom of the mast
+        - Side adapter location
+        - Wind load location
+        - Each tube location (Section change point)
+        */
+
+        this.data.control_points = {
+
+
+            // Top of the mast
+            [this.data.props.extendedHeight]: {
+                "ext_force": -this.data.props.payload.wind_load,
+                "ext_moment": this.data.props.payload.total_tip_moment_Nm,
+                "int_reaction": 0,
+                "int_moment": 0
+            },
+
+        };
+
+        // Tubes wind load
+        this.data.params.tubes.forEach((tube, i) => {
+            this.data.control_points[tube.wind_load_z] = {
+                "ext_force": -tube.wind_load,
+                "ext_moment": 0,
+                "int_reaction": 0,
+                "int_moment": 0
+            };
+        });
+
+        // Bottom of the mast
+        this.data.control_points[0] = {
+            "ext_force": 0,
+            "ext_moment": 0,
+            "int_reaction": 0,
+            "int_moment": 0
+        };
+
+        // Side Adapter
+        this.data.control_points[this.data.props.side_adapter_z] = {
+            "ext_force": 0,
+            "ext_moment": 0,
+            "int_reaction": 0,
+            "int_moment": 0
+        };
+    }
+
+
     findBeamMoments() {
         const zBeamValues = [];
 
         this.calculateMastTopMoments();
+        this.findForcesMomentsAtControlPoints();
 
         this.data.params.tubes.forEach((tube, i) => {
+
             if (i === 0) {
                 this.data.beam[i].tip_load = this.data.props.payload.wind_load;
                 this.data.beam[i].tip_moment =
@@ -227,6 +283,12 @@ export default class MastDeflection {
                 zBeamValues.push(this.data.props.extendedHeight);
             } else {
                 zBeamValues.push(tube.extended_zt);
+            }
+
+            zBeamValues.push(tube.wind_load_z);
+
+            if (tube.no === this.data.params.tubes.at(-1).no) {
+                zBeamValues.push(this.data.props.side_adapter_z);
             }
 
             this.data.beam.map((section) => {
@@ -238,6 +300,8 @@ export default class MastDeflection {
 
             this.data.beam[i].moment_top = 0;
             this.data.beam[i].moment_bottom = 0;
+            this.data.beam[i].moment_at_wind_load = 0;
+
         });
 
         zBeamValues.push(0);
@@ -278,7 +342,7 @@ export default class MastDeflection {
             //console.log("yük, z, moment 222", tipForce, z, tipZ, moment);
         });
 
-        //console.log("internal_moments 222", internal_moments);
+        console.log("zBeamValues", zBeamValues);
 
         const tipMoment = this.data.props.payload.total_tip_moment_Nm;
 
@@ -346,7 +410,7 @@ export default class MastDeflection {
         this.data.props.payload.tip_moment_due_deflection_Nm =
             -(
                 9.81 *
-                (this.data.params.payload_mass + 0.2 *this.data.weights.lifted_mass) *
+                (this.data.params.payload_mass + 0.2 * this.data.weights.lifted_mass) *
                 this.data.props.allowed_tip_deflection_mm
             ) / 1000; // Convert to Nm
 
@@ -422,12 +486,12 @@ export default class MastDeflection {
                         mei_height =
                             mei_start -
                             ((mei_start - mei_end) * (height - mei_start_z)) /
-                                (mei_end_z - mei_start_z);
+                            (mei_end_z - mei_start_z);
                     } else {
                         mei_height =
                             mei_start +
                             ((mei_end - mei_start) * (height - mei_start_z)) /
-                                (mei_end_z - mei_start_z);
+                            (mei_end_z - mei_start_z);
                     }
 
                     mei_end = mei_height;
@@ -619,7 +683,7 @@ export default class MastDeflection {
         this.data.props.tubesMinRef = {}
 
 
-        this.data.beam.tubes.forEach((tube,i) => {
+        this.data.beam.tubes.forEach((tube, i) => {
             const deflection = this.getDeflection(tube.z);
             if (i === 0) {
                 this.data.props.tubesMaxRef = { ...tube, deflection };
