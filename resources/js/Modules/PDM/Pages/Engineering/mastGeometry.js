@@ -498,6 +498,8 @@ export class MastGeometry {
                 (Math.PI * this.data.config.screw_nominal_diameter),
         ); // Thread angle in degrees
 
+        console.log("thread_angle", thread_angle)
+
         let secant = 1 / Math.cos(thread_angle);
 
         torque =

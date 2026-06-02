@@ -14,6 +14,8 @@ export default class MastDeflection {
                 this.data.params.tip_deflection_percentage *
                 this.data.props.extendedHeight) /
             100; // mm
+
+        //console.log("Allowed Tip Deflection:", this.data.props.allowed_tip_deflection_mm);
     }
 
 
@@ -228,7 +230,6 @@ export default class MastDeflection {
 
         this.data.control_points = {
 
-
             // Top of the mast
             [this.data.props.extendedHeight]: {
                 "ext_force": -this.data.props.payload.wind_load,
@@ -264,14 +265,120 @@ export default class MastDeflection {
             "int_reaction": 0,
             "int_moment": 0
         };
+
+        // Remaing Top Points of Each Tube
+        this.data.params.tubes.forEach((tube, i) => {
+
+            if (i > 0) {
+            this.data.control_points[tube.extended_zt] = {
+                "ext_force": 0,
+                "ext_moment": 0,
+                "int_reaction": 0,
+                "int_moment": 0
+            };
+            }
+        });
+
+
+
     }
 
 
     findBeamMoments() {
+
+        console.log("findBeamMoments");
         const zBeamValues = [];
 
         this.calculateMastTopMoments();
         this.findForcesMomentsAtControlPoints();
+
+        let all_control_point_heights = Object.keys(this.data.control_points).map(Number);
+
+        // Sum All Moments Due To Wind Loads at Each Control Point
+        Object.entries(this.data.control_points).forEach(([z, point]) => {
+
+            let root_moment = point.ext_force * z / 1000; // Nm
+
+            all_control_point_heights.forEach((height) => {
+
+                let moment_at_point = Math.abs(point.ext_force) * height /1000 + root_moment;
+
+                if (moment_at_point > 0) {
+                    moment_at_point = 0
+                }
+
+                this.data.control_points[height].int_moment += moment_at_point;
+            });
+        });
+
+        // Add Top Moment value to all control points
+        all_control_point_heights.forEach((height) => {
+            this.data.control_points[height].int_moment += this.data.props.payload.total_tip_moment_Nm;
+        });
+
+
+        this.data.sections = [];
+
+
+
+        this.data.params.tubes.forEach((tube, i) => {
+
+            this.data.sections[i] = {};
+
+            // console.log(`all_control_point_heights: ${all_control_point_heights}`)
+            // console.log(`tube: ${tube}`,tube)
+            // console.log(`i: ${i}`)
+
+            all_control_point_heights.forEach((height) => {
+
+                let lower_tube_extended_zt = this.data.params.tubes[i + 1]?.extended_zt || 0;
+
+                if (height <= tube.extended_zt && height >= lower_tube_extended_zt) {
+
+                    const controlPoint = { ...this.data.control_points[height] };
+
+                    this.data.sections[i][height] = controlPoint;
+                    this.data.sections[i][height].EI_Nm2 = tube.EI_Nm2;
+                    this.data.sections[i][height].M_EI = controlPoint.int_moment / tube.EI_Nm2;
+
+                    // console.log(`ARADA [ ${i} ] [ ${height} ] : ${tube.EI_Nm2}`,this.data.sections[i][height].EI_Nm2 )
+                }
+            });
+
+
+            // Top Tube
+            if (i === 0) {
+                this.data.sections[i][this.data.props.extendedHeight] = this.data.control_points[this.data.props.extendedHeight];
+                this.data.sections[i][this.data.props.extendedHeight].EI_Nm2 = tube.EI_Nm2;
+                this.data.sections[i][this.data.props.extendedHeight].M_EI = this.data.sections[i][this.data.props.extendedHeight].int_moment / tube.EI_Nm2;
+                //console.log(`Heihgt 0 iken : ${height}, Tube : ${i}, EI : ${tube.EI_Nm2}`)
+            }
+
+            // Bottom Tube
+            if (tube.no === this.data.params.tubes.at(-1).no) {
+                this.data.sections[i][0] = this.data.control_points[0];
+                this.data.sections[i][0].EI_Nm2 = tube.EI_Nm2;
+                this.data.sections[i][0].M_EI = this.data.sections[i][0].int_moment / tube.EI_Nm2;
+            }
+
+
+            // console.log(`********************************\n\n\n`)
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         this.data.params.tubes.forEach((tube, i) => {
 
@@ -342,7 +449,7 @@ export default class MastDeflection {
             //console.log("yük, z, moment 222", tipForce, z, tipZ, moment);
         });
 
-        console.log("zBeamValues", zBeamValues);
+        //console.log("zBeamValues", zBeamValues);
 
         const tipMoment = this.data.props.payload.total_tip_moment_Nm;
 
@@ -421,6 +528,11 @@ export default class MastDeflection {
             this.data.props.payload.tip_moment_due_z_offset_Nm +
             this.data.props.payload.tip_moment_due_x_offset_Nm +
             this.data.props.payload.tip_moment_due_deflection_Nm;
+
+        // console.log("Total Tip Moment 1:", this.data.props.payload.tip_moment_due_z_offset_Nm);
+        // console.log("Total Tip Moment 2:", this.data.props.payload.tip_moment_due_x_offset_Nm);
+        // console.log("Total Tip Moment 3:", this.data.props.payload.tip_moment_due_deflection_Nm);
+
     }
 
 

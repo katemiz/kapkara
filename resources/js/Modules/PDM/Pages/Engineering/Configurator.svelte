@@ -46,32 +46,39 @@
         if (!chartCanvas) return;
 
         const ctx = chartCanvas.getContext("2d");
-        //let min_EI = data.params.tubes.at(-1).M_EI["0"];
 
-        let min_EI = Math.min(...data.params.tubes.map((item) => item.M_EI));
+        const all_M_EI_values = Object.values(data.sections).flatMap(section =>
+            Object.values(section).map(metrics => metrics.M_EI)
+        );
+
+        const min_EI = Math.min(...all_M_EI_values);
 
         const chartData = {
-            labels: Object.keys(data.props.total_moments),
+            labels: Object.keys(data.control_points).map(Number),
             datasets: [
                 {
                     label: "Bending Moments (Nm)",
-                    data: Object.values(data.props.total_moments),
+                    data: Object.values(data.control_points).map((point) => point.int_moment),
                     borderColor: "#D7263D",
-                    // ... styles
                     yAxisID: "y",
                 },
-                ...data.params.tubes.map((tube) => ({
-                    label: `M/EI S${tube.no}`,
-                    data: Object.entries(tube.M_EI)
-                        .map(([z, value]) => ({ x: parseFloat(z), y: value }))
-                        .sort((a, b) => a.x - b.x),
-                    // ... styles
-                    borderColor: "#02182B",
-                    backgroundColor: "rgb(1, 151, 246, 0.1)",
-                    fill: true,
-                    opacity: 0.3,
-                    yAxisID: "y1",
-                })),
+                // Correctly mapping the nested sections data
+                ...Object.entries(data.sections).map(([sectionIndex, sectionData]) => {
+                    return {
+                        label: `M/EI S${sectionIndex}`,
+                        // Convert the sub-keys (3550, 4300, etc.) into x, and extract M_EI for y
+                        data: Object.entries(sectionData)
+                            .map(([xValue, metrics]) => ({
+                                x: parseFloat(xValue),
+                                y: metrics.M_EI
+                            }))
+                            .sort((a, b) => a.x - b.x), // Keeps the line rendering left-to-right
+                        borderColor: "#02182B",
+                        backgroundColor: "rgba(1, 151, 246, 0.1)",
+                        fill: true,
+                        yAxisID: "y1",
+                    };
+                }),
             ],
         };
 
@@ -245,61 +252,6 @@
         }
     }
 
-    function drawSFBM() {
-        let myChart = Chart.getChart("dene");
-        if (myChart) {
-            myChart.destroy();
-        }
-
-        const ctx = chartSFBM.getContext("2d");
-
-        const data = {
-            labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6"],
-            datasets: [
-                {
-                    label: "Dataset",
-                    data: { count: 6, min: -100, max: 100 },
-                    borderColor: "red",
-                    fill: false,
-                    stepped: true,
-                },
-            ],
-        };
-
-        const config = {
-            type: "line",
-            data: data,
-            options: {
-                responsive: true,
-                interaction: {
-                    intersect: false,
-                    axis: "x",
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: (ctx) =>
-                            "Step " +
-                            ctx.chart.data.datasets[0].stepped +
-                            " Interpolation",
-                    },
-                },
-            },
-        };
-
-        if (chartSFBMInstance) {
-            // Update existing chart
-            chartSFBMInstance.data = config;
-            //chartDeflectionInstance.options.scales.y.min = 1.2 * max_deflection;
-            chartSFBMInstance.update("none"); // 'none' for performance, or omit for animation
-        } else {
-            chartSFBMInstance = new Chart(ctx, {
-                type: "line",
-                data: config.data,
-                options: config.options,
-            });
-        }
-    }
 
     let showJson = $state(false);
 
@@ -364,8 +316,6 @@
         svgDraw.svgDraw("Loads");
         svgDraw.svgDraw("Extended");
         svgDraw.svgDraw("Nested");
-
-        drawSFBM();
     });
 
     let mast = $derived(new MastGeometry($form, config));
@@ -1047,9 +997,5 @@
             ></button>
         </div>
 
-        <!-- SFBM DIAGRAM -->
-        <div class="container p-6 has-background-light" id="sfbm">
-            <canvas bind:this={chartSFBM} id="dene"></canvas>
-        </div>
     </section>
 </Layout>
