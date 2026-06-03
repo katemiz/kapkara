@@ -328,7 +328,7 @@ export class SvgDraw {
         );
 
         if (this.drawType === 'Loads') {
-        // Reaction Force, Arrow and Value
+            // Reaction Force, Arrow and Value
             y =
                 this.svgHeight -
                 this.MY -
@@ -345,10 +345,24 @@ export class SvgDraw {
             this.drawText(
                 this.vcline_x + 0.5 * side_support_height,
                 y - 3,
-                -this.data.props.reaction_force_at_side_adapter.toFixed(0) + " N",
+                this.data.props.reaction_force_at_side_adapter.toFixed(0) + " N",
                 "end",
             ); // Reaction Force Value Text
+
+
+            // Floor Interface Loads
+            let ratio = this.data.props.reaction_force_at_bottom_interface / this.data.props.reaction_force_at_side_adapter;
+            y = this.svgHeight - this.MY;
+
+            let line_length = 0.5 *ratio * side_support_height;
+
+            this.drawLine(this.vcline_x, y, this.vcline_x - line_length, y, "reaction");
+            this.drawArrow(this.vcline_x, y, "Right");
+            this.drawText(this.vcline_x - line_length, y - 3, this.data.props.reaction_force_at_bottom_interface.toFixed(0) + " N", "start");
         }
+
+
+
     }
 
     drawGuyings() {
