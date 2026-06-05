@@ -54,14 +54,46 @@
         const min_EI = Math.min(...all_M_EI_values);
 
         const chartData = {
-            labels: Object.keys(data.control_points).map(Number),
+            //labels: Object.keys(data.control_points).map(Number),
             datasets: [
+
+
+
+
+
+
+
+
+
+
+
                 {
-                    label: "Bending Moments (Nm)",
-                    data: Object.values(data.control_points).map((point) => point.int_moment),
+                    label: "w/o Side Adapter (Nm)",
+                    //data: Object.values(data.control_points).map((point) => point.int_moment),
+
+                    data: Object.entries(data.control_points).map(([key, point]) => ({
+                        x: parseInt(key),
+                        y: point.int_moment
+                    })),
+
+
                     borderColor: "#D7263D",
                     yAxisID: "y",
                 },
+
+                {
+                    label: "w/ Side Adapter (Nm)",
+                    //data: Object.values(data.control_points2).map((point) => point.int_moment),
+
+                    data: Object.entries(data.control_points2).map(([key, point]) => ({
+                        x: parseInt(key),
+                        y: point.int_moment
+                    })),
+                    borderColor: "#8FB339",
+                    yAxisID: "y",
+                },
+
+
                 // Correctly mapping the nested sections data
                 ...Object.entries(data.sections).map(([sectionIndex, sectionData]) => {
                     return {
@@ -172,28 +204,50 @@
         if (!chartDeflection) return;
 
         // 1. Objeyi [height, deflection] çiftlerinden oluşan bir diziye çevirip yüksekliğe göre sıralıyoruz
-        const sortedCurve = Object.entries(data.deflection_data)
+        const deflectionWOAdapter = Object.entries(data.deflection_data)
             .map(([height, deflection]) => ({
                 height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
                 deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
             }))
             .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
 
+
+        const deflectionWAdapter = Object.entries(data.deflection_data2)
+            .map(([height, deflection]) => ({
+                height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
+                deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
+            }))
+            .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
+
+
         const max_deflection = data.deflection_data;
         const ctx = chartDeflection.getContext("2d");
 
         const chartData = {
-            labels: sortedCurve.map((point) => point.height),
             datasets: [
-                {
-                    label: "Deflection (mm)",
-                    data: sortedCurve.map((point) => point.deflection),
-                    borderColor: "#D7263D",
-                    // ... styles
-                    yAxisID: "y",
-                    tension: 0.35,
-                },
-            ],
+                    {
+                        label: "Deflection w/o Side Adapter (mm)",
+                        // 2. Map directly to { x, y } coordinates
+                        data: deflectionWOAdapter.map((point) => ({
+                            x: point.height,
+                            y: point.deflection
+                        })),
+                        borderColor: "#D7263D",
+                        yAxisID: "y",
+                        tension: 0.35,
+                    },
+                    {
+                        label: "Deflection w/ Side Adapter (mm)",
+                        // 3. Map this dataset to its own independent { x, y } coordinates
+                        data: deflectionWAdapter.map((point) => ({
+                            x: point.height,
+                            y: point.deflection
+                        })),
+                        borderColor: "#8FB339",
+                        yAxisID: "y",
+                        tension: 0.35,
+                    },
+                ],
         };
 
         if (chartDeflectionInstance) {

@@ -16,6 +16,11 @@ export default class MastDeflection {
 
 
     run() {
+
+        this.data.props.mei_data = {};
+        this.data.props.mei_data2 = {};
+
+
         this.setAllowedTipDeflection();
         this.findBeamMoments();
         this.findSideReaction();
@@ -85,6 +90,35 @@ export default class MastDeflection {
     }
 
 
+
+
+
+    findForcesMomentsAtControlPoints2() {
+
+        /*
+        This is valid for configuration with side adapter only,
+        and only differs on z locations less than side adapter Z
+        */
+
+        this.data.control_points2 = structuredClone(this.data.control_points);
+
+        let root_moment = this.data.props.reaction_force_at_side_adapter * this.data.props.side_adapter_z / 1000;
+
+        // At Z0 and wind load z on fixed tube, substract moment caused by side adapter reaction force
+        this.data.control_points2[0].int_moment += root_moment;
+
+        let additional_moment_at_wind_load_z = this.data.props.reaction_force_at_side_adapter * (this.data.props.side_adapter_z - this.data.params.tubes.at(-1).wind_load_z) /1000;
+
+        this.data.control_points2[this.data.params.tubes.at(-1).wind_load_z].int_moment += additional_moment_at_wind_load_z;
+    }
+
+
+
+
+
+
+
+
     findBeamMoments() {
 
         this.calculateMastTopMoments();
@@ -148,11 +182,65 @@ export default class MastDeflection {
             }
         });
 
-        this.data.deflection_data = {};
+        //this.data.deflection_data = {};
 
-        this.findDeflectionAtGivenPoint2();
+        this.findAllDeflections(false); // w/o side adapter
         return true;
     }
+
+
+
+    findBeamMoments2() {
+
+        /*
+        This is valid for configuration with side adapter only,
+        */
+
+        let all_control_point_heights = Object.keys(this.data.control_points2).map(Number);
+
+        this.data.sections2 = [];
+
+        this.data.params.tubes.forEach((tube, i) => {
+
+            this.data.sections2[i] = {};
+
+            all_control_point_heights.forEach((height) => {
+
+                let lower_tube_extended_zt = this.data.params.tubes[i + 1]?.extended_zt || 0;
+
+                if (height <= tube.extended_zt && height >= lower_tube_extended_zt) {
+
+                    const controlPoint = { ...this.data.control_points2[height] };
+                    this.data.sections2[i][height] = controlPoint;
+                    this.data.sections2[i][height].EI_Nm2 = tube.EI_Nm2;
+                    this.data.sections2[i][height].M_EI = controlPoint.int_moment / tube.EI_Nm2;
+                }
+            });
+
+            // Top Tube
+            if (i === 0) {
+                this.data.sections2[i][this.data.props.extendedHeight] = this.data.control_points2[this.data.props.extendedHeight];
+                this.data.sections2[i][this.data.props.extendedHeight].EI_Nm2 = tube.EI_Nm2;
+                this.data.sections2[i][this.data.props.extendedHeight].M_EI = this.data.sections2[i][this.data.props.extendedHeight].int_moment / tube.EI_Nm2;
+            }
+
+            // Bottom Tube
+            if (tube.no === this.data.params.tubes.at(-1).no) {
+                this.data.sections2[i][0] = this.data.control_points2[0];
+                this.data.sections2[i][0].EI_Nm2 = tube.EI_Nm2;
+                this.data.sections2[i][0].M_EI = this.data.sections2[i][0].int_moment / tube.EI_Nm2;
+            }
+        });
+
+        //this.data.deflection_data2 = {};
+
+
+        this.findAllDeflections(true); // with side adapter
+        return true;
+    }
+
+
+
 
 
     calculateMastTopMoments() {
@@ -224,182 +312,181 @@ export default class MastDeflection {
     }
 
 
-    findDeflectionAtGivenPoint(height) {
-        let mei_start_z, mei_end_z;
-        let mei_start, mei_end, mei_height;
+    findAllDeflections(is_with_side_adapter = false) {
 
-        let moment_area, xbar;
-        let delta_z, delta_m;
-        let deflection = 0;
+        let control_points,
+            sections,
+            deflection_data = {};
 
-        this.data.deflections["Z" + height] = [];
+        if (is_with_side_adapter) {
+            control_points = structuredClone(this.data.control_points2);
+            sections = structuredClone(this.data.sections2);
 
-        // Moment-Area Method
-        // M/EI Diagram Area * xbar
+            let inflection_z = Object.values(sections).at(-1)[0].int_moment * this.data.params.tubes.at(-1).wind_load_z / ( Object.values(sections).at(-1)[0].int_moment + Math.abs(Object.values(sections).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment))
+            console.log('inflection_z', inflection_z)
 
-        this.data.params.tubes.forEach((tube, i) => {
-            xbar = 0;
-
-            //console.log("MEI", tube.M_EI);
-
-            const data = tube.M_EI;
-            const keys = Object.keys(data);
-
-            mei_start_z = keys[0];
-            mei_end_z = keys[1];
-
-            mei_start = data[mei_start_z];
-            mei_end = data[mei_end_z];
-
-            if (height > mei_start_z) {
-                if (height < mei_end_z) {
-                    // Use All Area between mei_start and height
-                    // ------------------------------------------------
-
-                    // Find M/EI corresponding to height
-                    if (mei_end < mei_start) {
-                        mei_height =
-                            mei_start -
-                            ((mei_start - mei_end) * (height - mei_start_z)) /
-                            (mei_end_z - mei_start_z);
-                    } else {
-                        mei_height =
-                            mei_start +
-                            ((mei_end - mei_start) * (height - mei_start_z)) /
-                            (mei_end_z - mei_start_z);
-                    }
-
-                    mei_end = mei_height;
-                    mei_end_z = height;
-                }
-
-                // Find Moment-Area
-                delta_z = mei_end_z - mei_start_z;
-                delta_m = Math.abs(mei_end - mei_start);
-
-                moment_area = ((mei_start + mei_end) * delta_z) / 2;
-
-                // xbar calculation (from left side)
-                if (mei_end > mei_start) {
-                    xbar =
-                        (delta_z * (mei_start + (2 * delta_m) / 3)) /
-                        (mei_start + mei_end);
-                } else {
-                    xbar =
-                        (delta_z * (mei_start + (1 * delta_m) / 3)) /
-                        (mei_end + mei_start);
-                }
-
-                // Since xbar is from left, xba needs to be corrected
-                // wrt deflection point : height
-
-                xbar = height - mei_start_z - xbar;
-
-                // Deflection calculation
-                deflection += xbar * moment_area * 1e-3; //
-
-                this.data.deflections["Z" + height].push({
-                    tube_no: tube.no,
-                    z_start: mei_end_z,
-                    z_end: mei_end_z,
-                    xbar: xbar,
-                    moment_area: moment_area,
-                    deflection: deflection,
-                    height: height,
-                });
-
-                //console.log("counter", tube.no);
+            control_points[inflection_z.toFixed(0)] = {
+                ext_force: 0,
+                ext_moment: 0,
+                int_reaction: 0,
+                int_moment: 0,
+                EI_Nm2: this.data.params.tubes.at(-1).EI_Nm2,
+                M_EI: 0
             }
 
-            //console.log("CORRECTED xbar, moment_area", xbar, moment_area);
-        });
+            sections[Object.keys(sections).length -1][inflection_z.toFixed(0)] = {
+                ext_force: 0,
+                ext_moment: 0,
+                int_reaction: 0,
+                int_moment: 0,
+                EI_Nm2: this.data.params.tubes.at(-1).EI_Nm2,
+                M_EI: 0
+            }
 
-        this.data.deflections.curve.push({
-            height: height,
-            deflection: deflection,
-        });
+        } else {
+            control_points = structuredClone(this.data.control_points);
+            sections = structuredClone(this.data.sections);
+        }
 
-        //console.log("Deflection at height", height, "is", deflection, "mm");
-
-        return deflection;
-    }
-
-
-    findDeflectionAtGivenPoint2() {
-
-        let all_control_point_heights = Object.keys(this.data.control_points).map(Number);
+        let all_control_point_heights = Object.keys(control_points).map(Number);
 
         const pairs = all_control_point_heights.slice(0, -1).map((val, index) => {
             return [val, all_control_point_heights[index + 1]];
         });
 
-        this.data.props.mei_data = {};
+        console.log("Pairs", pairs)
+
+
 
         pairs.forEach((pair,key) => {
 
             let z_start = pair[0];
             let z_end = pair[1];
-            this.data.sections.forEach((section, i) => {
+
+            sections.forEach((section, i) => {
                 if (Object.keys(section).map(Number).includes(z_start) && Object.keys(section).map(Number).includes(z_end)) {
+
+                    //console.log("z_start, z_end", z_start, z_end)
 
                     let mei_start = section[z_start].M_EI;
                     let mei_end = section[z_end].M_EI;
                     let mei_area = 0.5 * (mei_start + mei_end) * (z_end - z_start) / 1000; 
 
                     // Area CG Calculation
-                    let cg_rectangle, cg_triangle, xbar, area_rectangle,area_triangle,area_total;
+                    let cg_rectangle, cg_triangle, xbar_z, area_rectangle,area_triangle,area_total;
 
                     cg_rectangle = z_start + (z_end - z_start) / 2;
 
-                    if (mei_start < mei_end) {
-                        cg_triangle = z_start + 1 * (z_end - z_start) / 3;
-                        area_rectangle = mei_end * (z_end - z_start);
-                        area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start);
+                    if (mei_start <= 0 && mei_end <= 0) {
 
-                    } else {
-                        cg_triangle = z_start + 2 * (z_end - z_start) / 3;
-                        area_rectangle = mei_start * (z_end - z_start);
-                        area_triangle = 0.5 * (mei_end - mei_start) * (z_end - z_start);
+                        if (mei_start < mei_end) {
+                            cg_triangle = z_start + 1 * (z_end - z_start) / 3;
+                            area_rectangle = mei_end * (z_end - z_start);
+                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start);
+                        }
+
+                        if (mei_start > mei_end) {
+                            cg_triangle = z_start + 2 * (z_end - z_start) / 3;
+                            area_rectangle = mei_start * (z_end - z_start);
+                            area_triangle = 0.5 * (mei_end - mei_start) * (z_end - z_start);
+                        }
+                    }
+
+                    if (mei_start >= 0 && mei_end >= 0) {
+
+                        if (mei_start > mei_end) {
+                            cg_triangle = z_start + 1 * (z_end - z_start) / 3;
+                            area_rectangle = mei_start * (z_end - z_start);
+                            area_triangle = 0.5 * (mei_end - mei_start) * (z_end - z_start);
+                        }
+
+                        if (mei_start < mei_end) {
+                            cg_triangle = z_start + 2 * (z_end - z_start) / 3;
+                            area_rectangle = mei_end * (z_end - z_start);
+                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start);
+                        }
                     }
 
                     area_total = area_rectangle + area_triangle;
-                    xbar = (area_rectangle * cg_rectangle + area_triangle * cg_triangle) / area_total;
+                    xbar_z = (area_rectangle * cg_rectangle + area_triangle * cg_triangle) / area_total;
 
-                    this.data.props.mei_data[key] = {
+                    let ozellik = {
                         mei_area: mei_area,
                         mei_start: mei_start,
                         mei_end: mei_end,
                         z_start: z_start,
                         z_end: z_end,
-                        xbar: xbar,
+                        xbar_z: xbar_z,
                         mei_area_rectangle: area_rectangle,
                         mei_area_triangle: area_triangle,
                     };
-                }
+
+
+                    if (is_with_side_adapter) {
+                        this.data.props.mei_data2[key] = ozellik;
+                    } else {
+                        this.data.props.mei_data[key] = ozellik;
+                    }
+                } 
             });
         });
 
+
         // Find All Deflections at all Control Points
-        Object.keys(this.data.control_points).forEach((key) => {
-            this.findDeflectionAtControlPoint(parseFloat(key));
+        Object.keys(control_points).forEach((key) => {
+            deflection_data[parseFloat(key)] = this.findDeflectionAtControlPoint(parseFloat(key),is_with_side_adapter);
         });
+
+
+
+        if (is_with_side_adapter) {
+            this.data.control_points2 = control_points;
+            this.data.sections2 = sections;
+            this.data.deflection_data2 = deflection_data;
+
+            //console.log("With side adapter", this.data.deflection_data2);
+        } else {
+            this.data.control_points = control_points;
+            this.data.sections = sections;
+            this.data.deflection_data = deflection_data;
+            
+            //console.log("Without side adapter", this.data.deflection_data);
+        }
 
         return true;
     }
 
 
-    findDeflectionAtControlPoint(z){
+    findDeflectionAtControlPoint(z, is_with_side_adapter = false){
 
-        let deflection = 0;
+        let deflection = 0, deflection_value;
 
-        Object.values(this.data.props.mei_data).forEach((section) => {
+        console.log(`Z: ${z}, is_with_side_adapter: ${is_with_side_adapter}\n*********************`);
+
+        Object.values(is_with_side_adapter ? this.data.props.mei_data2 : this.data.props.mei_data).forEach((section) => {
             if (section.z_end <= z ) {
-                deflection += (z-section.xbar) * section.mei_area;
+
+
+
+                deflection_value = (z - section.xbar_z) * section.mei_area;
+                deflection += deflection_value;
+
+                section.MEI_area_arm = z-section.xbar_z;
+                section.deflection_increment = deflection_value;
+                section.deflection_total = deflection;
+
+
+                if (is_with_side_adapter && z <= 1800) {
+                    //console.log(`deflection: ${deflection}, z: ${z}, section.xbar_z: ${section.xbar_z}`);
+                    console.log(`deflection value: ${deflection_value.toFixed(3)}, section.mei_area: ${section.mei_area.toFixed(5)}, area_arm ${section.MEI_area_arm.toFixed(1)} xbar_z ${section.xbar_z}`);
+
+                }
             }
         });
 
-        this.data.deflection_data[z] = deflection.toFixed(3);
-        return true;        
+        console.log(` Total deflection at ${z}: ${deflection} \n\n\n`);
+        
+        return deflection.toFixed(3);
     }
 
 
@@ -427,27 +514,57 @@ export default class MastDeflection {
         });
 
         this.data.props.reaction_force_at_bottom_interface = this.data.props.reaction_force_at_side_adapter + total_external_force;
+
+        this.repeatCalculationfWithSideReaction();
     }
 
 
-    findMaxMinRefDeflections() {
+    repeatCalculationfWithSideReaction() {
 
-        this.data.props.tubesMaxRef = {}
-        this.data.props.tubesMinRef = {}
+        this.findForcesMomentsAtControlPoints2();
+        this.findBeamMoments2(true);
 
-        this.data.beam.tubes.forEach((tube, i) => {
-            const deflection = this.getDeflection(tube.z);
-            if (i === 0) {
-                this.data.props.tubesMaxRef = { ...tube, deflection };
-                this.data.props.tubesMinRef = { ...tube, deflection };
-            } else {
-                if (deflection > this.data.props.tubesMaxRef.deflection) {
-                    this.data.props.tubesMaxRef = { ...tube, deflection };
-                }
-                if (deflection < this.data.props.tubesMinRef.deflection) {
-                    this.data.props.tubesMinRef = { ...tube, deflection };
-                }
-            }
-        });
+        return true;
+
+        let root_moment = this.data.props.reaction_force_at_side_adapter * this.data.props.side_adapter_z / 1000;
+
+        let m = -this.data.props.reaction_force_at_side_adapter;
+
+        //this.data.sections2 = { ...this.data.sections };
+
+        this.data.sections2 = structuredClone(this.data.sections);
+
+
+
+        // At Z0 and wind load z on fixed tube, substract moment caused by side adapter reaction force
+        Object.values(this.data.sections2).at(-1)[0].int_moment += root_moment;
+
+        let additional_moment_at_wind_load_z = this.data.props.reaction_force_at_side_adapter * (this.data.props.side_adapter_z - this.data.params.tubes.at(-1).wind_load_z) /1000;
+
+        Object.values(this.data.sections2).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment += additional_moment_at_wind_load_z;
+
+        console.log('fixed_tube', this.data.params.tubes.at(-1).wind_load_z)
+        console.log('additional_moment_at_wind_load_z', additional_moment_at_wind_load_z)
+
+        // Find deflection inflection point Z
+
+        let inflection_z = Object.values(this.data.sections2).at(-1)[0].int_moment * this.data.params.tubes.at(-1).wind_load_z / ( Object.values(this.data.sections2).at(-1)[0].int_moment + Math.abs(Object.values(this.data.sections2).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment))
+        console.log('inflection_z', inflection_z)
+
+        // total moment at inflection point Z is ZERO
+
+        let mei_start = Object.values(this.data.sections2).at(-1)[0].int_moment / this.data.params.tubes.at(-1).EI_Nm2;
+
+        let xbar_z = 2 * inflection_z / 3;
+
+        let deflection_at_inflection_z = xbar_z * inflection_z * mei_start / 2; // mm
+
+        console.log('deflection_at_inflection_z', xbar_z, inflection_z, mei_start, deflection_at_inflection_z)
+
+        return true;
+
     }
+
+
+
 }
