@@ -2,18 +2,18 @@
 
 export class MastGeometry {
     constructor(params, config) {
+
+
         this.data = {
             params: JSON.parse(JSON.stringify(params)),
             config: config,
             power: {},
-            deflections: {},
-            loads: {},
             weights: {},
             props: {},
             beam: [],
         };
 
-        //console.log("Mast Geometry Data", this.data);
+        console.log("incoming params", params);
 
         this.setDependentProps();
         this.setMastTubes();
@@ -315,7 +315,7 @@ export class MastGeometry {
             // Wind Velocity Formula: Vp = sqrt(2 * qp / ρ)
             this.data.params.tubes[i].wind_velocity_Vp_at_qp = Math.sqrt(
                 (2 * this.data.params.tubes[i].peak_velocity_pressure_qp) /
-                    this.data.config.air_density,
+                this.data.config.air_density,
             ); // Wind velocity in m/s corresponding to peak velocity pressure
 
             // Reynolds Number
@@ -368,17 +368,17 @@ export class MastGeometry {
                 this.data.params.tubes[i].end_effect_factor =
                     0.698573 +
                     0.001977401 *
-                        this.data.params.tubes[i].effective_slenderness +
+                    this.data.params.tubes[i].effective_slenderness +
                     0.00008741341 *
-                        Math.pow(
-                            this.data.params.tubes[i].effective_slenderness,
-                            2,
-                        ) -
+                    Math.pow(
+                        this.data.params.tubes[i].effective_slenderness,
+                        2,
+                    ) -
                     0.00000103591 *
-                        Math.pow(
-                            this.data.params.tubes[i].effective_slenderness,
-                            3,
-                        ); // For slenderness greater than 10
+                    Math.pow(
+                        this.data.params.tubes[i].effective_slenderness,
+                        3,
+                    ); // For slenderness greater than 10
             }
 
             // Force Coefficient without End Effect
@@ -391,12 +391,12 @@ export class MastGeometry {
                     Math.log10(
                         10 * this.data.params.tubes[i].equivalent_roughness_k_b,
                     )) /
-                    (1 +
-                        0.4 *
-                            Math.log10(
-                                this.data.params.tubes[i].reynolds_number_Re /
-                                    1e6,
-                            ));
+                (1 +
+                    0.4 *
+                    Math.log10(
+                        this.data.params.tubes[i].reynolds_number_Re /
+                        1e6,
+                    ));
 
             if (this.data.params.tubes[i].reynolds_number_Re < 1.8e5) {
                 // For Reynolds number less than 1.8e5, use a different formula
@@ -495,10 +495,10 @@ export class MastGeometry {
 
         let thread_angle = Math.atan(
             this.data.config.screw_lead /
-                (Math.PI * this.data.config.screw_nominal_diameter),
+            (Math.PI * this.data.config.screw_nominal_diameter),
         ); // Thread angle in degrees
 
-        console.log("thread_angle", thread_angle)
+        //console.log("thread_angle", thread_angle)
 
         let secant = 1 / Math.cos(thread_angle);
 
@@ -508,13 +508,13 @@ export class MastGeometry {
                 this.data.config.screw_nominal_diameter *
                 (this.data.config.screw_lead +
                     Math.PI *
-                        this.data.config.screw_coefficient_of_friction *
-                        this.data.config.screw_nominal_diameter *
-                        secant)) /
+                    this.data.config.screw_coefficient_of_friction *
+                    this.data.config.screw_nominal_diameter *
+                    secant)) /
             (Math.PI * this.data.config.screw_nominal_diameter -
                 this.data.config.screw_coefficient_of_friction *
-                    this.data.config.screw_lead *
-                    secant) /
+                this.data.config.screw_lead *
+                secant) /
             1000; // Convert to Nm
 
         this.data.power.torque_required_to_extend_mast_Nm = torque;
@@ -714,7 +714,7 @@ export class MastGeometry {
             if (tube.state_name === "bottom_section") {
                 total_mass +=
                     this.data.config.weights.welded_bottom_structure[
-                        "C" + tube.no
+                    "C" + tube.no
                     ];
 
                 // MOTOR AND GEARBOX WEIGHT CALCULATION

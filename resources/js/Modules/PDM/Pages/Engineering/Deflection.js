@@ -107,7 +107,7 @@ export default class MastDeflection {
         // At Z0 and wind load z on fixed tube, substract moment caused by side adapter reaction force
         this.data.control_points2[0].int_moment += root_moment;
 
-        let additional_moment_at_wind_load_z = this.data.props.reaction_force_at_side_adapter * (this.data.props.side_adapter_z - this.data.params.tubes.at(-1).wind_load_z) /1000;
+        let additional_moment_at_wind_load_z = this.data.props.reaction_force_at_side_adapter * (this.data.props.side_adapter_z - this.data.params.tubes.at(-1).wind_load_z) / 1000;
 
         this.data.control_points2[this.data.params.tubes.at(-1).wind_load_z].int_moment += additional_moment_at_wind_load_z;
     }
@@ -133,7 +133,7 @@ export default class MastDeflection {
 
             all_control_point_heights.forEach((height) => {
 
-                let moment_at_point = Math.abs(point.ext_force) * height /1000 + root_moment;
+                let moment_at_point = Math.abs(point.ext_force) * height / 1000 + root_moment;
 
                 if (moment_at_point > 0) {
                     moment_at_point = 0
@@ -322,7 +322,7 @@ export default class MastDeflection {
             control_points = structuredClone(this.data.control_points2);
             sections = structuredClone(this.data.sections2);
 
-            let inflection_z = Object.values(sections).at(-1)[0].int_moment * this.data.params.tubes.at(-1).wind_load_z / ( Object.values(sections).at(-1)[0].int_moment + Math.abs(Object.values(sections).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment))
+            let inflection_z = Object.values(sections).at(-1)[0].int_moment * this.data.params.tubes.at(-1).wind_load_z / (Object.values(sections).at(-1)[0].int_moment + Math.abs(Object.values(sections).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment))
             console.log('inflection_z', inflection_z)
 
             control_points[inflection_z.toFixed(0)] = {
@@ -334,7 +334,7 @@ export default class MastDeflection {
                 M_EI: 0
             }
 
-            sections[Object.keys(sections).length -1][inflection_z.toFixed(0)] = {
+            sections[Object.keys(sections).length - 1][inflection_z.toFixed(0)] = {
                 ext_force: 0,
                 ext_moment: 0,
                 int_reaction: 0,
@@ -354,11 +354,7 @@ export default class MastDeflection {
             return [val, all_control_point_heights[index + 1]];
         });
 
-        console.log("Pairs", pairs)
-
-
-
-        pairs.forEach((pair,key) => {
+        pairs.forEach((pair, key) => {
 
             let z_start = pair[0];
             let z_end = pair[1];
@@ -370,10 +366,10 @@ export default class MastDeflection {
 
                     let mei_start = section[z_start].M_EI;
                     let mei_end = section[z_end].M_EI;
-                    let mei_area = 0.5 * (mei_start + mei_end) * (z_end - z_start) / 1000; 
+                    let mei_area = 0.5 * (mei_start + mei_end) * (z_end - z_start) / 1000;
 
                     // Area CG Calculation
-                    let cg_rectangle, cg_triangle, xbar_z, area_rectangle,area_triangle,area_total;
+                    let cg_rectangle, cg_triangle, xbar_z, area_rectangle, area_triangle, area_total;
 
                     cg_rectangle = z_start + (z_end - z_start) / 2;
 
@@ -427,14 +423,14 @@ export default class MastDeflection {
                     } else {
                         this.data.props.mei_data[key] = ozellik;
                     }
-                } 
+                }
             });
         });
 
 
         // Find All Deflections at all Control Points
         Object.keys(control_points).forEach((key) => {
-            deflection_data[parseFloat(key)] = this.findDeflectionAtControlPoint(parseFloat(key),is_with_side_adapter);
+            deflection_data[parseFloat(key)] = this.findDeflectionAtControlPoint(parseFloat(key), is_with_side_adapter);
         });
 
 
@@ -449,7 +445,7 @@ export default class MastDeflection {
             this.data.control_points = control_points;
             this.data.sections = sections;
             this.data.deflection_data = deflection_data;
-            
+
             //console.log("Without side adapter", this.data.deflection_data);
         }
 
@@ -457,21 +453,21 @@ export default class MastDeflection {
     }
 
 
-    findDeflectionAtControlPoint(z, is_with_side_adapter = false){
+    findDeflectionAtControlPoint(z, is_with_side_adapter = false) {
 
         let deflection = 0, deflection_value;
 
         console.log(`Z: ${z}, is_with_side_adapter: ${is_with_side_adapter}\n*********************`);
 
         Object.values(is_with_side_adapter ? this.data.props.mei_data2 : this.data.props.mei_data).forEach((section) => {
-            if (section.z_end <= z ) {
+            if (section.z_end <= z) {
 
 
 
                 deflection_value = (z - section.xbar_z) * section.mei_area;
                 deflection += deflection_value;
 
-                section.MEI_area_arm = z-section.xbar_z;
+                section.MEI_area_arm = z - section.xbar_z;
                 section.deflection_increment = deflection_value;
                 section.deflection_total = deflection;
 
@@ -485,7 +481,7 @@ export default class MastDeflection {
         });
 
         console.log(` Total deflection at ${z}: ${deflection} \n\n\n`);
-        
+
         return deflection.toFixed(3);
     }
 
@@ -523,43 +519,6 @@ export default class MastDeflection {
 
         this.findForcesMomentsAtControlPoints2();
         this.findBeamMoments2(true);
-
-        return true;
-
-        let root_moment = this.data.props.reaction_force_at_side_adapter * this.data.props.side_adapter_z / 1000;
-
-        let m = -this.data.props.reaction_force_at_side_adapter;
-
-        //this.data.sections2 = { ...this.data.sections };
-
-        this.data.sections2 = structuredClone(this.data.sections);
-
-
-
-        // At Z0 and wind load z on fixed tube, substract moment caused by side adapter reaction force
-        Object.values(this.data.sections2).at(-1)[0].int_moment += root_moment;
-
-        let additional_moment_at_wind_load_z = this.data.props.reaction_force_at_side_adapter * (this.data.props.side_adapter_z - this.data.params.tubes.at(-1).wind_load_z) /1000;
-
-        Object.values(this.data.sections2).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment += additional_moment_at_wind_load_z;
-
-        console.log('fixed_tube', this.data.params.tubes.at(-1).wind_load_z)
-        console.log('additional_moment_at_wind_load_z', additional_moment_at_wind_load_z)
-
-        // Find deflection inflection point Z
-
-        let inflection_z = Object.values(this.data.sections2).at(-1)[0].int_moment * this.data.params.tubes.at(-1).wind_load_z / ( Object.values(this.data.sections2).at(-1)[0].int_moment + Math.abs(Object.values(this.data.sections2).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment))
-        console.log('inflection_z', inflection_z)
-
-        // total moment at inflection point Z is ZERO
-
-        let mei_start = Object.values(this.data.sections2).at(-1)[0].int_moment / this.data.params.tubes.at(-1).EI_Nm2;
-
-        let xbar_z = 2 * inflection_z / 3;
-
-        let deflection_at_inflection_z = xbar_z * inflection_z * mei_start / 2; // mm
-
-        console.log('deflection_at_inflection_z', xbar_z, inflection_z, mei_start, deflection_at_inflection_z)
 
         return true;
 

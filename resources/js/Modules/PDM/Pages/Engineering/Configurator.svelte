@@ -47,8 +47,8 @@
 
         const ctx = chartCanvas.getContext("2d");
 
-        const all_M_EI_values = Object.values(data.sections).flatMap(section =>
-            Object.values(section).map(metrics => metrics.M_EI)
+        const all_M_EI_values = Object.values(data.sections).flatMap(
+            (section) => Object.values(section).map((metrics) => metrics.M_EI),
         );
 
         const min_EI = Math.min(...all_M_EI_values);
@@ -56,26 +56,16 @@
         const chartData = {
             //labels: Object.keys(data.control_points).map(Number),
             datasets: [
-
-
-
-
-
-
-
-
-
-
-
                 {
                     label: "w/o Side Adapter (Nm)",
                     //data: Object.values(data.control_points).map((point) => point.int_moment),
 
-                    data: Object.entries(data.control_points).map(([key, point]) => ({
-                        x: parseInt(key),
-                        y: point.int_moment
-                    })),
-
+                    data: Object.entries(data.control_points).map(
+                        ([key, point]) => ({
+                            x: parseInt(key),
+                            y: point.int_moment,
+                        }),
+                    ),
 
                     borderColor: "#D7263D",
                     yAxisID: "y",
@@ -85,32 +75,35 @@
                     label: "w/ Side Adapter (Nm)",
                     //data: Object.values(data.control_points2).map((point) => point.int_moment),
 
-                    data: Object.entries(data.control_points2).map(([key, point]) => ({
-                        x: parseInt(key),
-                        y: point.int_moment
-                    })),
+                    data: Object.entries(data.control_points2).map(
+                        ([key, point]) => ({
+                            x: parseInt(key),
+                            y: point.int_moment,
+                        }),
+                    ),
                     borderColor: "#8FB339",
                     yAxisID: "y",
                 },
 
-
                 // Correctly mapping the nested sections data
-                ...Object.entries(data.sections).map(([sectionIndex, sectionData]) => {
-                    return {
-                        label: `M/EI S${sectionIndex}`,
-                        // Convert the sub-keys (3550, 4300, etc.) into x, and extract M_EI for y
-                        data: Object.entries(sectionData)
-                            .map(([xValue, metrics]) => ({
-                                x: parseFloat(xValue),
-                                y: metrics.M_EI
-                            }))
-                            .sort((a, b) => a.x - b.x), // Keeps the line rendering left-to-right
-                        borderColor: "#02182B",
-                        backgroundColor: "rgba(1, 151, 246, 0.1)",
-                        fill: true,
-                        yAxisID: "y1",
-                    };
-                }),
+                ...Object.entries(data.sections).map(
+                    ([sectionIndex, sectionData]) => {
+                        return {
+                            label: `M/EI S${sectionIndex}`,
+                            // Convert the sub-keys (3550, 4300, etc.) into x, and extract M_EI for y
+                            data: Object.entries(sectionData)
+                                .map(([xValue, metrics]) => ({
+                                    x: parseFloat(xValue),
+                                    y: metrics.M_EI,
+                                }))
+                                .sort((a, b) => a.x - b.x), // Keeps the line rendering left-to-right
+                            borderColor: "#02182B",
+                            backgroundColor: "rgba(1, 151, 246, 0.1)",
+                            fill: true,
+                            yAxisID: "y1",
+                        };
+                    },
+                ),
             ],
         };
 
@@ -211,7 +204,6 @@
             }))
             .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
 
-
         const deflectionWAdapter = Object.entries(data.deflection_data2)
             .map(([height, deflection]) => ({
                 height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
@@ -219,35 +211,34 @@
             }))
             .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
 
-
         const max_deflection = data.deflection_data;
         const ctx = chartDeflection.getContext("2d");
 
         const chartData = {
             datasets: [
-                    {
-                        label: "Deflection w/o Side Adapter (mm)",
-                        // 2. Map directly to { x, y } coordinates
-                        data: deflectionWOAdapter.map((point) => ({
-                            x: point.height,
-                            y: point.deflection
-                        })),
-                        borderColor: "#D7263D",
-                        yAxisID: "y",
-                        tension: 0.35,
-                    },
-                    {
-                        label: "Deflection w/ Side Adapter (mm)",
-                        // 3. Map this dataset to its own independent { x, y } coordinates
-                        data: deflectionWAdapter.map((point) => ({
-                            x: point.height,
-                            y: point.deflection
-                        })),
-                        borderColor: "#8FB339",
-                        yAxisID: "y",
-                        tension: 0.35,
-                    },
-                ],
+                {
+                    label: "Deflection w/o Side Adapter (mm)",
+                    // 2. Map directly to { x, y } coordinates
+                    data: deflectionWOAdapter.map((point) => ({
+                        x: point.height,
+                        y: point.deflection,
+                    })),
+                    borderColor: "#D7263D",
+                    yAxisID: "y",
+                    tension: 0.35,
+                },
+                {
+                    label: "Deflection w/ Side Adapter (mm)",
+                    // 3. Map this dataset to its own independent { x, y } coordinates
+                    data: deflectionWAdapter.map((point) => ({
+                        x: point.height,
+                        y: point.deflection,
+                    })),
+                    borderColor: "#8FB339",
+                    yAxisID: "y",
+                    tension: 0.35,
+                },
+            ],
         };
 
         if (chartDeflectionInstance) {
@@ -305,7 +296,6 @@
             });
         }
     }
-
 
     let showJson = $state(false);
 
@@ -372,7 +362,7 @@
         svgDraw.svgDraw("Nested");
     });
 
-    let mast = $derived(new MastGeometry($form, config));
+    let mast = $derived(new MastGeometry($form.data(), config));
     let svgDraw = $derived(new SvgDraw(mast.data));
     let deflection = $derived(new MastDeflection(mast.data));
 
@@ -1050,6 +1040,5 @@
                 onclick={toggle}
             ></button>
         </div>
-
     </section>
 </Layout>
