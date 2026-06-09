@@ -323,7 +323,7 @@ export default class MastDeflection {
             sections = structuredClone(this.data.sections2);
 
             let inflection_z = Object.values(sections).at(-1)[0].int_moment * this.data.params.tubes.at(-1).wind_load_z / (Object.values(sections).at(-1)[0].int_moment + Math.abs(Object.values(sections).at(-1)[this.data.params.tubes.at(-1).wind_load_z].int_moment))
-            console.log('inflection_z', inflection_z)
+            //console.log('inflection_z', inflection_z)
 
             control_points[inflection_z.toFixed(0)] = {
                 ext_force: 0,
@@ -377,14 +377,14 @@ export default class MastDeflection {
 
                         if (mei_start < mei_end) {
                             cg_triangle = z_start + 1 * (z_end - z_start) / 3;
-                            area_rectangle = mei_end * (z_end - z_start);
-                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start);
+                            area_rectangle = mei_end * (z_end - z_start) / 1000;
+                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start) / 1000;
                         }
 
                         if (mei_start > mei_end) {
                             cg_triangle = z_start + 2 * (z_end - z_start) / 3;
-                            area_rectangle = mei_start * (z_end - z_start);
-                            area_triangle = 0.5 * (mei_end - mei_start) * (z_end - z_start);
+                            area_rectangle = mei_start * (z_end - z_start) / 1000;
+                            area_triangle = 0.5 * (mei_end - mei_start) * (z_end - z_start) / 1000;
                         }
                     }
 
@@ -392,14 +392,20 @@ export default class MastDeflection {
 
                         if (mei_start > mei_end) {
                             cg_triangle = z_start + 1 * (z_end - z_start) / 3;
-                            area_rectangle = mei_start * (z_end - z_start);
-                            area_triangle = 0.5 * (mei_end - mei_start) * (z_end - z_start);
+
+                            if (mei_end == 0 || mei_start == 0) {
+                                area_rectangle = 0;
+                            } else {
+                                area_rectangle = mei_start * (z_end - z_start) / 1000;
+                            }
+
+                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start) / 1000;
                         }
 
                         if (mei_start < mei_end) {
                             cg_triangle = z_start + 2 * (z_end - z_start) / 3;
-                            area_rectangle = mei_end * (z_end - z_start);
-                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start);
+                            area_rectangle = mei_end * (z_end - z_start) / 1000;
+                            area_triangle = 0.5 * (mei_start - mei_end) * (z_end - z_start) / 1000;
                         }
                     }
 
@@ -427,13 +433,10 @@ export default class MastDeflection {
             });
         });
 
-
         // Find All Deflections at all Control Points
         Object.keys(control_points).forEach((key) => {
             deflection_data[parseFloat(key)] = this.findDeflectionAtControlPoint(parseFloat(key), is_with_side_adapter);
         });
-
-
 
         if (is_with_side_adapter) {
             this.data.control_points2 = control_points;
@@ -457,13 +460,10 @@ export default class MastDeflection {
 
         let deflection = 0, deflection_value;
 
-        console.log(`Z: ${z}, is_with_side_adapter: ${is_with_side_adapter}\n*********************`);
+        //console.log(`Z: ${z}, is_with_side_adapter: ${is_with_side_adapter}\n*********************`);
 
         Object.values(is_with_side_adapter ? this.data.props.mei_data2 : this.data.props.mei_data).forEach((section) => {
             if (section.z_end <= z) {
-
-
-
                 deflection_value = (z - section.xbar_z) * section.mei_area;
                 deflection += deflection_value;
 
@@ -471,16 +471,14 @@ export default class MastDeflection {
                 section.deflection_increment = deflection_value;
                 section.deflection_total = deflection;
 
-
-                if (is_with_side_adapter && z <= 1800) {
+                //if (is_with_side_adapter && z <= 1800) {
                     //console.log(`deflection: ${deflection}, z: ${z}, section.xbar_z: ${section.xbar_z}`);
-                    console.log(`deflection value: ${deflection_value.toFixed(3)}, section.mei_area: ${section.mei_area.toFixed(5)}, area_arm ${section.MEI_area_arm.toFixed(1)} xbar_z ${section.xbar_z}`);
-
-                }
+                    //console.log(`deflection value: ${deflection_value.toFixed(3)}, section.mei_area: ${section.mei_area.toFixed(5)}, area_arm ${section.MEI_area_arm.toFixed(1)} xbar_z ${section.xbar_z}`);
+                //}
             }
         });
 
-        console.log(` Total deflection at ${z}: ${deflection} \n\n\n`);
+        //console.log(` Total deflection at ${z}: ${deflection} \n\n\n`);
 
         return deflection.toFixed(3);
     }

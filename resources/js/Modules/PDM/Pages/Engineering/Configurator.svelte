@@ -25,6 +25,7 @@
         ArrowDownNarrowWide,
         Wrench,
         Table,
+        ConciergeBell
     } from "@lucide/svelte";
 
     import { config } from "$modules/PDM/Shared/config.js";
@@ -34,12 +35,10 @@
     let chartInstance;
     let chartDeflectionInstance;
 
-    let chartSFBM;
-    let chartSFBMInstance;
-
     let { params1, isEdit = false } = $props();
 
     const params = { ...(() => params1)() };
+
 
     // Function to update/create the chart
     function drawBMChart(data) {
@@ -396,10 +395,17 @@
         await pdf.init(); // ✅ Initialize QR code first
         await pdf.run();
     }
+
+    function goToMastOptionsTable() {
+        window.location.href = "/pdm/engineering/options_table?params=" + encodeURIComponent(JSON.stringify(params));
+    }
+    
 </script>
 
 <Layout>
+
     <section class="section">
+
         <div class="columns">
             <div class="column is-10">
                 <Title
@@ -429,6 +435,17 @@
                         <FileText size="16" />
                     </span>
                 </button>
+
+                <button onclick={goToMastOptionsTable} class="button is-link is-light">
+                    <span class="icon is-small">
+                        <ConciergeBell size="16" />
+                    </span>
+                </button>
+
+
+
+
+
             </div>
         </div>
 

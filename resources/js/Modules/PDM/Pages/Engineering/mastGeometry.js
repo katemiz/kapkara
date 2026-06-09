@@ -3,7 +3,6 @@
 export class MastGeometry {
     constructor(params, config) {
 
-
         this.data = {
             params: JSON.parse(JSON.stringify(params)),
             config: config,
@@ -13,7 +12,7 @@ export class MastGeometry {
             beam: [],
         };
 
-        console.log("incoming params", params);
+        //console.log("incoming params", params);
 
         this.setDependentProps();
         this.setMastTubes();
