@@ -411,13 +411,16 @@
 
     let resonanceModes = $state([]);
 
+    let min_frequency = 0.2;
+    let max_frequency = 300;
+
     function runVibrationAnalysis() {
 
         // Create vibration analyzer with mast data, tube lengths and payload mass
         const analyzer = new MastVibration(mast.data.params.tubes, mast.data.params.tube_length, mast.data.params.payload_mass);
 
         // Find resonance options between 0Hz and 200Hz
-        resonanceModes = analyzer.findNaturalFrequencies(200, 0.2);
+        resonanceModes = analyzer.findNaturalFrequencies(max_frequency, min_frequency);
 
         //console.log("Resonance Frequencies (Hz):", resonanceModes);
         // Output Example: [2.45, 15.82, 48.11] -> 1st, 2nd, and 3rd modes
@@ -1098,7 +1101,7 @@
 
                 <Title
                     title="Resonance Frequencies"
-                    subtitle="For pure cantilever beam with concentrated mass at the end"
+                    subtitle="For pure cantilever beam with concentrated mass at the end  [between {min_frequency}, {max_frequency}]"
                 />
 
                 <div class="fixed-grid has-1-cols-mobile">
@@ -1148,5 +1151,6 @@
                 onclick={toggle}
             ></button>
         </div>
+        
     </section>
 </Layout>
