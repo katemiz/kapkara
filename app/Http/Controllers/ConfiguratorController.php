@@ -57,6 +57,7 @@ class ConfiguratorController extends Controller
         "motor_id" => 1,
         "gearbox_id" => 1,
         "tip_deflection_percentage" => 75,
+        "side_adapter_z" => null,
     ];
 
     /**
@@ -65,6 +66,8 @@ class ConfiguratorController extends Controller
     public function index(Request $request): Response
     {
         $this->setZOffset();
+
+        $this->params["side_adapter_z"] = $this->params["tube_length"] + $this->params["base_adapter_height"] - $this->params["overlap"]/2;
 
         if (isset($request["qr"])) {
             $p = explode("-", $request["qr"]);

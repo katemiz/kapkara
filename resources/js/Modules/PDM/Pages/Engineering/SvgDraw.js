@@ -289,11 +289,8 @@ export class SvgDraw {
     }
 
     drawVehicleAdapter() {
-        let side_support_height =
-            0.6 *
-            2 *
-            (this.data.params.tubes.at(-1).extended_zt -
-                this.data.props.side_adapter_z);
+        let side_support_height = this.data.params.tube_length * 0.1;
+
         let side_support_width = 1.3 * this.data.params.tubes.at(-1).od;
 
         let x = this.vcline_x - this.scale * side_support_width * 0.5;

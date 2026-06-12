@@ -212,8 +212,7 @@ export class MastGeometry {
         // Side Adapter
         const lastTube = this.data.params.tubes.at(-1);
 
-        this.data.props.side_adapter_z =
-            lastTube.extended_zt - this.data.params.overlap / 2;
+        this.data.props.side_adapter_z = this.data.params.side_adapter_z;
     }
 
     windLoadsOnTubes() {

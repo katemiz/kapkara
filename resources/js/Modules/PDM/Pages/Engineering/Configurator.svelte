@@ -13,6 +13,8 @@
     import MakePDF from "$modules/PDM/Pages/Engineering/MakePDF.js";
     import MastDeflection from "$modules/PDM/Pages/Engineering/Deflection.js";
 
+    import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration.js";    
+
     import Chart from "chart.js/auto";
 
     import {
@@ -25,7 +27,8 @@
         ArrowDownNarrowWide,
         Wrench,
         Table,
-        ConciergeBell
+        ConciergeBell,
+        AudioWaveform
     } from "@lucide/svelte";
 
     import { config } from "$modules/PDM/Shared/config.js";
@@ -321,6 +324,7 @@
         motor_id: params?.motor_id ?? "",
         gearbox_id: params?.gearbox_id ?? "",
         tip_deflection_percentage: params?.tip_deflection_percentage ?? "",
+        side_adapter_z: params?.side_adapter_z ?? "",
     });
 
     // If you need the form to update when the 'params' prop changes
@@ -345,6 +349,7 @@
                 motor_id: params.motor_id,
                 gearbox_id: params.gearbox_id,
                 tip_deflection_percentage: params.tip_deflection_percentage,
+                side_adapter_z:params.side_adapter_z
             });
         }
 
@@ -359,6 +364,9 @@
         svgDraw.svgDraw("Loads");
         svgDraw.svgDraw("Extended");
         svgDraw.svgDraw("Nested");
+
+        // Vibration analysis
+        runVibrationAnalysis()
     });
 
     let mast = $derived(new MastGeometry($form.data(), config));
@@ -398,6 +406,21 @@
 
     function goToMastOptionsTable() {
         window.location.href = "/pdm/engineering/options_table?params=" + encodeURIComponent(JSON.stringify(params));
+    }
+
+
+    let resonanceModes = $state([]);
+
+    function runVibrationAnalysis() {
+
+        // Create vibration analyzer with mast data, tube lengths and payload mass
+        const analyzer = new MastVibration(mast.data.params.tubes, mast.data.params.tube_length, mast.data.params.payload_mass);
+
+        // Find resonance options between 0Hz and 200Hz
+        resonanceModes = analyzer.findNaturalFrequencies(200, 0.2);
+
+        //console.log("Resonance Frequencies (Hz):", resonanceModes);
+        // Output Example: [2.45, 15.82, 48.11] -> 1st, 2nd, and 3rd modes
     }
     
 </script>
@@ -707,6 +730,30 @@
                     </div>
                 </div>
             </div>
+
+            <div class="fixed-grid has-4-cols has-1-cols-mobile">
+                <div class="grid">
+                    <div class="cell">
+                        <FormInput
+                            {form}
+                            name="side_adapter_z"
+                            label="Side Adapter Z [mm]"
+                            placeholder="Enter Side Adapter Z"
+                            type="number"
+                            min="500"
+                            max="3500"
+                            step="5"
+                            required={true}
+                        />
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+
         </form>
 
         <!-- SUMMARY TABLE -->
@@ -826,6 +873,18 @@
                             ><Wrench size="16" color="blue" /></span
                         >
                         <span>Torque/Power</span>
+                    </button>
+
+
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("Vibration")}
+                        id="tabVibration"
+                    >
+                        <span class="icon"
+                            ><AudioWaveform size="16" color="blue" /></span
+                        >
+                        <span>Frequencies</span>
                     </button>
                 </div>
             </div>
@@ -1033,6 +1092,38 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- VIBRATION DIAGRAM -->
+            <div class="container is-hidden" id="divVibration">
+
+                <Title
+                    title="Resonance Frequencies"
+                    subtitle="For pure cantilever beam with concentrated mass at the end"
+                />
+
+                <div class="fixed-grid has-1-cols-mobile">
+                    <div class="grid">
+                        <div class="cell">
+                            <img src="/images/PDM/ModeShapes.png" alt="Mode Shapes" />
+                        </div>
+                        <div class="cell">
+                            {#if resonanceModes.length > 0}
+                                <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+                                    <tbody>
+                                        {#each resonanceModes as mode, index}
+                                            <tr>
+                                                <td >Mode {index + 1}</td>
+                                                <td class="has-text-right">{mode.toFixed(2)} Hz</td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- JSON MODAL -->
