@@ -6,7 +6,7 @@ import QRCode from "qrcode";
 
 export default class MakePDF {
     constructor(data) {
-        console.log("DATA", data);
+        //console.log("DATA", data);
 
         this.data = data;
         this.pdf = new jsPDF();
@@ -58,25 +58,20 @@ export default class MakePDF {
             margin: 1,
         });
 
-        this.coverBGImage = await this.getImageData(
-            "/images/PDM/mtnx_background.png",
-        );
 
+
+        let cover_img;
+
+        this.data.config.mast_types.forEach(mast_type => {
+            if (mast_type.value === this.data.params.mast_type) {
+                cover_img = mast_type.pdf_cover_image;
+                this.props = mast_type.props;
+            }
+        });
+
+
+        this.coverBGImage = await this.getImageData(cover_img);
         this.bigLogo = await this.getImageData("/images/PDM/masttech-big.png");
-
-        let icon01 = await this.getImageData("/images/PDM/payload.png");
-        let icon02 = await this.getImageData("/images/PDM/deflection.png");
-        let icon03 = await this.getImageData("/images/PDM/lock.png");
-        let icon04 = await this.getImageData("/images/PDM/power.png");
-        let icon05 = await this.getImageData("/images/PDM/height.png");
-
-        this.props = [
-            { icon: icon01, text: ['Increased Payload Capacity', 'UHD - up to 550 kg '] },
-            { icon: icon02, text: ['Aluminium Stiffened Profiles', 'Low twist and deflection'] },
-            { icon: icon03, text: ['Power Screw Driven', 'AC/DC Motor'] },
-            { icon: icon04, text: ['Automatic','Mechanical Locks'] },
-            { icon: icon04, text: ['Heights Up To', '25m'] },
-        ]
     }
 
     async run() {
@@ -89,10 +84,8 @@ export default class MakePDF {
     }
 
     productNaming() {
-        this.product_family = 'MTNX';
-        this.product_family_name = 'MTNX';
         this.image_warning = "Image shown in cover page is for illustration purposes only.";
-        this.product_code = Math.round(this.data.props.extendedHeight / 1000, 0) + this.product_family + "-" + (this.data.props.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
+        this.product_code = Math.round(this.data.props.extendedHeight / 1000, 0) + this.data.params.mast_type + "-" + (this.data.props.nestedHeight / 1000).toFixed(1) + "-" + this.data.params.noOfTubes;
     }
 
     coverPage() {
@@ -103,7 +96,7 @@ export default class MakePDF {
         // COVER TITLE AND SUBTITLE
         this.pdf.setFontSize(72);
         this.pdf.setFont("helvetica", "bold");
-        this.pdf.text(this.product_family, this.mx, this.pageHeight * 0.27);
+        this.pdf.text(this.data.params.mast_type, this.mx, this.pageHeight * 0.27);
 
         this.pdf.setFontSize(24);
         this.pdf.setFont("helvetica", "normal");
@@ -127,8 +120,8 @@ export default class MakePDF {
             this.pdf.addImage(
                 element.icon,
                 "PNG",
-                this.mx+2,
-                y+2,
+                this.mx + 2,
+                y + 2,
                 8,
                 8,
             );
@@ -294,7 +287,7 @@ export default class MakePDF {
             //     url: '/pdm/engineering/configurator?qr='+this.qr,
             // });
 
-        //this.pdf.link(this.mx, this.my, this.qrs, this.qrs, { url: 'https://example.com' });
+            //this.pdf.link(this.mx, this.my, this.qrs, this.qrs, { url: 'https://example.com' });
 
 
 

@@ -1,13 +1,55 @@
 export default class MastVibration {
-    constructor(sections, tube_length, payloadMass) {
+    constructor(params, extendedHeight, payloadMass) {
         // sections: Array from base (index 0) to tip. 
         // Each section: { length (mm), EI (Nm2), m_per_length (kg/m) }
-        this.sections = sections.map(s => ({
-            L: tube_length / 1000, // convert mm to meters
-            EI: s.EI_Nm2,
-            mu: s.mass_per_m
+
+        this.sections = [];
+
+        Object.entries(params.tubes).forEach(([key, tube]) => {
+            const index = parseInt(key);
+
+            this.sections[index] = {};
+
+            if (index === 0) {
+                this.sections[index].length = (extendedHeight - params.tubes[index + 1].extended_zt) / 1000;
+            } else if (index === params.tubes.length - 1) {
+                this.sections[index].length = tube.extended_zt / 1000;
+            } else {
+                this.sections[index].length = (tube.extended_zt - params.tubes[index + 1].extended_zt) / 1000;
+            }
+
+            //tube.length = tube.length_mm / 1000;
+            this.sections[index].EI = tube.EI_Nm2;
+            this.sections[index].mu = tube.mass_per_m;
+        });
+
+
+
+        console.log(this.sections)
+
+
+
+
+        this.sections.reverse();
+
+        console.log("reversed sections", this.sections)
+
+
+
+
+
+
+
+
+
+        this.sections = this.sections.map(s => ({
+            L: s.length, // convert mm to meters
+            EI: s.EI,
+            mu: s.mu
         }));
         this.mPayload = payloadMass; // in kg
+
+        console.log(this.sections)
     }
 
     /**
@@ -122,7 +164,7 @@ export default class MastVibration {
         const C = Array(4).fill(0).map(() => Array(4).fill(0));
         for (let r = 0; r < 4; r++) {
             for (let c = 0; c < 4; c++) {
-                C[r][c] = A[r][0]*B[0][c] + A[r][1]*B[1][c] + A[r][2]*B[2][c] + A[r][3]*B[3][c];
+                C[r][c] = A[r][0] * B[0][c] + A[r][1] * B[1][c] + A[r][2] * B[2][c] + A[r][3] * B[3][c];
             }
         }
         return C;

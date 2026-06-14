@@ -2,6 +2,7 @@
     import Layout from "$modules/PDM/Shared/Layout.svelte";
     import Title from "$components/Title.svelte";
     import FormInput from "$components/FormInput.svelte";
+    import FormRadio from "$components/FormRadio.svelte";
     import FormSelect from "$components/FormSelect.svelte";
 
     import JsonTree from "$components/JsonTree.svelte";
@@ -12,8 +13,7 @@
 
     import MakePDF from "$modules/PDM/Pages/Engineering/MakePDF.js";
     import MastDeflection from "$modules/PDM/Pages/Engineering/Deflection.js";
-
-    import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration.js";    
+    import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration.js";
 
     import Chart from "chart.js/auto";
 
@@ -28,7 +28,7 @@
         Wrench,
         Table,
         ConciergeBell,
-        AudioWaveform
+        AudioWaveform,
     } from "@lucide/svelte";
 
     import { config } from "$modules/PDM/Shared/config.js";
@@ -37,11 +37,6 @@
     let chartDeflection;
     let chartInstance;
     let chartDeflectionInstance;
-
-    let { params1, isEdit = false } = $props();
-
-    const params = { ...(() => params1)() };
-
 
     // Function to update/create the chart
     function drawBMChart(data) {
@@ -307,52 +302,35 @@
 
     // 1. Inertia Form
     let form = useForm({
-        start_tube_no: params?.start_tube_no ?? "",
-        end_tube_no: params?.end_tube_no ?? "",
-        overlap: params?.overlap ?? "",
-        base_adapter_height: params?.base_adapter_height ?? "",
-        payload_adapter_height: params?.payload_adapter_height ?? null,
-        sail_area: params?.sail_area ?? "",
-        wind_speed: params?.wind_speed ?? 1,
-        head_height: params?.head_height ?? "",
-        material: params?.material ?? "",
-        tube_length: params?.tube_length ?? "",
-        terrain_category: params?.terrain_category ?? "",
-        x_offset: params?.x_offset ?? "",
-        z_offset: params?.z_offset ?? "",
-        payload_mass: params?.payload_mass ?? "",
-        motor_id: params?.motor_id ?? "",
-        gearbox_id: params?.gearbox_id ?? "",
-        tip_deflection_percentage: params?.tip_deflection_percentage ?? "",
-        side_adapter_z: params?.side_adapter_z ?? "",
+        start_tube_no: 13,
+        end_tube_no: 15,
+        overlap: 500,
+        base_adapter_height: 50,
+        payload_adapter_height: 15,
+        sail_area: 1.2,
+        wind_speed: 120,
+        head_height: 55,
+        material: "6063",
+        tube_length: 2000,
+        terrain_category: "II",
+        x_offset: 100,
+        z_offset: null,
+        payload_mass: 400,
+        motor_id: 1,
+        gearbox_id: 1,
+        tip_deflection_percentage: 75,
+        side_adapter_z: null,
+        mast_type: "MTNX",
     });
+
+    // Initialize dependent default values
+    $form.z_offset = Math.round((1000 * Math.sqrt($form.sail_area)) / 2, 0);
+    $form.side_adapter_z =
+        $form.tube_length + $form.base_adapter_height - $form.overlap / 2;
 
     // If you need the form to update when the 'params' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
-        if (isEdit) {
-            $form.defaults({
-                start_tube_no: params.start_tube_no,
-                end_tube_no: params.end_tube_no,
-                overlap: params.overlap,
-                base_adapter_height: params.base_adapter_height,
-                payload_adapter_height: params.payload_adapter_height,
-                sail_area: params.sail_area,
-                wind_speed: params.wind_speed,
-                head_height: params.head_height,
-                material: params.material,
-                tube_length: params.tube_length,
-                terrain_category: params.terrain_category,
-                x_offset: params.x_offset,
-                z_offset: params.z_offset,
-                payload_mass: params.payload_mass,
-                motor_id: params.motor_id,
-                gearbox_id: params.gearbox_id,
-                tip_deflection_percentage: params.tip_deflection_percentage,
-                side_adapter_z:params.side_adapter_z
-            });
-        }
-
         // We "touch" mast to ensure this effect re-runs when form changes
         const _mast = mast;
 
@@ -366,7 +344,7 @@
         svgDraw.svgDraw("Nested");
 
         // Vibration analysis
-        runVibrationAnalysis()
+        runVibrationAnalysis();
     });
 
     let mast = $derived(new MastGeometry($form.data(), config));
@@ -405,9 +383,10 @@
     }
 
     function goToMastOptionsTable() {
-        window.location.href = "/pdm/engineering/options_table?params=" + encodeURIComponent(JSON.stringify(params));
+        window.location.href =
+            "/pdm/engineering/options_table?params=" +
+            encodeURIComponent(JSON.stringify(params));
     }
-
 
     let resonanceModes = $state([]);
 
@@ -415,23 +394,26 @@
     let max_frequency = 300;
 
     function runVibrationAnalysis() {
-
         // Create vibration analyzer with mast data, tube lengths and payload mass
-        const analyzer = new MastVibration(mast.data.params.tubes, mast.data.params.tube_length, mast.data.params.payload_mass);
+        const analyzer = new MastVibration(
+            mast.data.params,
+            mast.data.props.extendedHeight,
+            mast.data.params.payload_mass,
+        );
 
         // Find resonance options between 0Hz and 200Hz
-        resonanceModes = analyzer.findNaturalFrequencies(max_frequency, min_frequency);
+        resonanceModes = analyzer.findNaturalFrequencies(
+            max_frequency,
+            min_frequency,
+        );
 
         //console.log("Resonance Frequencies (Hz):", resonanceModes);
         // Output Example: [2.45, 15.82, 48.11] -> 1st, 2nd, and 3rd modes
     }
-    
 </script>
 
 <Layout>
-
     <section class="section">
-
         <div class="columns">
             <div class="column is-10">
                 <Title
@@ -444,36 +426,52 @@
                 <a
                     href="/pdm/engineering/profiles_table"
                     class="button is-link is-light"
+                    data-tooltip="Profiles Table"
                 >
                     <span class="icon is-small">
                         <Table size="16" />
                     </span>
                 </a>
 
-                <button onclick={toggle} class="button is-link is-light">
+                <button
+                    onclick={toggle}
+                    class="button is-link is-light"
+                    data-tooltip="Toggle JSON Editor"
+                >
                     <span class="icon is-small">
                         <Braces size="16" />
                     </span>
                 </button>
 
-                <button onclick={generatePDF} class="button is-link is-light">
+                <button
+                    onclick={generatePDF}
+                    class="button is-link is-light"
+                    data-tooltip="Generate PDF"
+                >
                     <span class="icon is-small">
                         <FileText size="16" />
                     </span>
                 </button>
 
-                <button onclick={goToMastOptionsTable} class="button is-link is-light">
+                <button
+                    onclick={goToMastOptionsTable}
+                    class="button is-link is-light"
+                    data-tooltip="Mast Options Table"
+                >
                     <span class="icon is-small">
                         <ConciergeBell size="16" />
                     </span>
                 </button>
-
-
-
-
-
             </div>
         </div>
+
+        <FormRadio
+            {form}
+            name="mast_type"
+            label="Mast Type"
+            value="MTNX"
+            options={config.mast_types}
+        />
 
         <Title
             title="[{$form.end_tube_no - $form.start_tube_no + 1}] Sections"
@@ -689,7 +687,7 @@
                         <FormSelect
                             {form}
                             name="motor_id"
-                            label="Motor"
+                            label="Motor / Drive Type"
                             placeholder="Select Motor"
                             options={config.motors.map((motor) => ({
                                 value: motor.id,
@@ -749,14 +747,8 @@
                             required={true}
                         />
                     </div>
-
-
-
-
-
                 </div>
             </div>
-
         </form>
 
         <!-- SUMMARY TABLE -->
@@ -877,7 +869,6 @@
                         >
                         <span>Torque/Power</span>
                     </button>
-
 
                     <button
                         class="navbar-item is-light is-inverted"
@@ -1098,25 +1089,38 @@
 
             <!-- VIBRATION DIAGRAM -->
             <div class="container is-hidden" id="divVibration">
-
                 <Title
                     title="Resonance Frequencies"
                     subtitle="For pure cantilever beam with concentrated mass at the end  [between {min_frequency}, {max_frequency}]"
                 />
 
+                <a
+                    href="https://www.youtube.com/shorts/PJXdibF6fKk"
+                    target="_blank"
+                >
+                    Watch Video
+                </a>
+
                 <div class="fixed-grid has-1-cols-mobile">
                     <div class="grid">
                         <div class="cell">
-                            <img src="/images/PDM/ModeShapes.png" alt="Mode Shapes" />
+                            <img
+                                src="/images/PDM/ModeShapes.png"
+                                alt="Mode Shapes"
+                            />
                         </div>
                         <div class="cell">
                             {#if resonanceModes.length > 0}
-                                <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+                                <table
+                                    class="table is-bordered is-striped is-hoverable is-fullwidth"
+                                >
                                     <tbody>
                                         {#each resonanceModes as mode, index}
                                             <tr>
-                                                <td >Mode {index + 1}</td>
-                                                <td class="has-text-right">{mode.toFixed(2)} Hz</td>
+                                                <td>Mode {index + 1}</td>
+                                                <td class="has-text-right"
+                                                    >{mode.toFixed(1)} Hz</td
+                                                >
                                             </tr>
                                         {/each}
                                     </tbody>
@@ -1126,7 +1130,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- JSON MODAL -->
@@ -1151,6 +1154,5 @@
                 onclick={toggle}
             ></button>
         </div>
-        
     </section>
 </Layout>

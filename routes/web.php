@@ -68,10 +68,6 @@ Route::middleware(["auth"])->group(function () {
         MediaController::class,
         "destroy",
     ])->name("media.destroy");
-
-    // Get media for a model
-    // Route::get('/media/{modelType}/{modelId}', [MediaController::class, 'index'])
-    //     ->name('media.index');
 });
 
 // Protected Application Routes
@@ -83,17 +79,9 @@ Route::middleware(["auth", "verified"])->group(function () {
 });
 
 // 1. Define the GET routes for Fortify views and NAME them
-Route::get("/login/{sayfa?}", function ($sayfa = null) {
-    return Inertia::render("Modules/Auth/Login", compact("sayfa"));
-})->name("login");
-
-Route::get("/register", function () {
-    return Inertia::render("Modules/Auth/Register");
-})->name("register");
-
-Route::get("/forgot-password", function () {
-    return Inertia::render("Modules/Auth/ForgotPassword");
-})->name("password.request");
+Route::get("/login/{sayfa?}", fn($sayfa = null) => Inertia::render("Modules/Auth/Login", compact("sayfa")))->name("login");
+Route::get("/register", fn() => Inertia::render("Modules/Auth/Register"))->name("register");
+Route::get("/forgot-password", fn() => Inertia::render("Modules/Auth/ForgotPassword"))->name("password.request");
 
 // REQUIREMENTS
 Route::get(
@@ -121,10 +109,11 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("/pdm/crequest", ChangeRequestController::class);
     Route::resource("/pdm/ecn", EcnController::class);
 
-    Route::resource(
+    Route::get(
         "/pdm/engineering/configurator",
-        ConfiguratorController::class,
+        fn() => Inertia::render("Modules/PDM/Pages/Engineering/Configurator")
     );
+
 
     Route::get(
         "/pdm/engineering/profiles_table",

@@ -24,10 +24,10 @@
     margin-bottom: 8px;
 
     /* Styling */
-    padding: 8px 12px;
-    background-color: #91c99f;
+    padding: 4px 8px;
+    background-color: #47acf0;
     color: rgb(4, 48, 11);
-    font-size: 14px;
+    font-size: 12px;
     /* border-radius: 4px; */
     white-space: nowrap;
 
@@ -40,26 +40,7 @@
     z-index: 1000;
 }
 
-/* Tooltip arrow */
-[data-tooltip]::after {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 2px;
 
-    /* Triangle shape */
-    border: 6px solid transparent;
-    border-top-color: #333;
-
-    /* Hide by default */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-
-    z-index: 1000;
-}
 
 /* Show on hover */
 [data-tooltip]:hover::before,

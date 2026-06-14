@@ -292,6 +292,51 @@ export const config = {
     screw_coefficient_of_friction: 0.15, // For steel on bronze
     screw_density: 7850, // kg/m³
 
+    mast_types: [
+        {
+            value: "MTNX",
+            label: "MTNX Electromechanical Mast with Power Screw",
+            head_height: 55,
+            base_adapter_height: 50,
+            pdf_cover_image: "/images/PDM/mtnx_background.png",
+            props: [
+                { icon: "/images/PDM/payload.png", text: ['Increased Payload Capacity', 'UHD - up to 550 kg '] },
+                { icon: "/images/PDM/deflection.png", text: ['Aluminium Stiffened Profiles', 'Low twist and deflection'] },
+                { icon: "/images/PDM/power.png", text: ['Power Screw Driven', 'AC/DC Motor'] },
+                { icon: "/images/PDM/lock.png", text: ['Automatic', 'Mechanical Locks'] },
+                { icon: "/images/PDM/height.png", text: ['Heights Up To', '25m'] },
+            ]
+        },
+        {
+            value: "MTWR",
+            label: "MTWR Electromechanical Mast with Steel Ropes",
+            head_height: 47,
+            base_adapter_height: 11,
+            pdf_cover_image: "/images/PDM/mtwr_background.jpg",
+            props: [
+                { icon: "/images/PDM/payload.png", text: ['Increased Payload Capacity', 'UHD - up to 550 kg '] },
+                { icon: "/images/PDM/deflection.png", text: ['Aluminium Stiffened Profiles', 'Low twist and deflection'] },
+                { icon: "/images/PDM/power.png", text: ['Power Screw Driven', 'AC/DC Motor'] },
+                { icon: "/images/PDM/lock.png", text: ['Automatic', 'Mechanical Locks'] },
+                { icon: "/images/PDM/height.png", text: ['Heights Up To', '25m'] },
+            ]
+        },
+        {
+            value: "MTPR",
+            label: "MTPR Pneumatical Mast",
+            head_height: 99,
+            base_adapter_height: 99,
+            pdf_cover_image: "/images/PDM/mtpr_background.jpg",
+            props: [
+                { icon: "/images/PDM/payload.png", text: ['Increased Payload Capacity', 'UHD - up to 550 kg '] },
+                { icon: "/images/PDM/deflection.png", text: ['Aluminium Stiffened Profiles', 'Low twist and deflection'] },
+                { icon: "/images/PDM/power.png", text: ['Power Screw Driven', 'AC/DC Motor'] },
+                { icon: "/images/PDM/lock.png", text: ['Automatic', 'Mechanical Locks'] },
+                { icon: "/images/PDM/height.png", text: ['Heights Up To', '25m'] },
+            ]
+        },
+    ],
+
     tip_deflection_percentages: [
         {
             id: 0,
@@ -342,7 +387,7 @@ export const config = {
     motors: [
         {
             id: 1,
-            name: "0.35kW",
+            name: "0.35 kW",
             power_kW: 0.35,
             max_torque_Nm: 10,
             max_speed_rpm: 1400,
@@ -350,7 +395,7 @@ export const config = {
         },
         {
             id: 2,
-            name: "0.55kW",
+            name: "0.55 kW",
             power_kW: 0.55,
             max_torque_Nm: 10,
             max_speed_rpm: 1400,
@@ -358,12 +403,24 @@ export const config = {
         },
         {
             id: 3,
-            name: "0.75kW",
+            name: "0.75 kW",
             power_kW: 0.75,
             max_torque_Nm: 15,
             max_speed_rpm: 1400,
             mass_kg: 7,
         },
+
+        {
+            id: 4,
+            name: "Manual : Hand Winch",
+            power_kW: 0,
+            max_torque_Nm: 0,
+            max_speed_rpm: 0,
+            mass_kg: 9,
+        },
+
+
+
     ],
 
     gearboxes: [
