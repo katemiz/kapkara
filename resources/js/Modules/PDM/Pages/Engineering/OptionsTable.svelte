@@ -15,10 +15,10 @@
             this.lmin = 500;
             this.lmax = 3000;
 
-            this.overlap = params.overlap;
-            this.head_height = params.head_height;
-            this.base_adapter_height = params.base_adapter_height;
-            this.payload_adapter_height = params.payload_adapter_height;
+            this.overlap = null;
+            this.head_height = 55;
+            this.base_adapter_height = 11;
+            this.payload_adapter_height =10;
 
             this.target_heights = [2500,3000,4000,5000,6000,8000,9000,10000,12000,15000,18000];
             this.no_of_sections = [2,3,4,5,6,7,8,9,10,11,12,13,14,15];

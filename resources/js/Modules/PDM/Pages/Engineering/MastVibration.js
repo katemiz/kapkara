@@ -1,172 +1,285 @@
-export default class MastVibration {
-    constructor(params, extendedHeight, payloadMass) {
-        // sections: Array from base (index 0) to tip. 
-        // Each section: { length (mm), EI (Nm2), m_per_length (kg/m) }
+import * as math from "mathjs";
 
+export default class MastVibration {
+
+    constructor(options = {}) {
+
+        this.tipMass = options.params.payload_mass || 0;
+        this.modes = options.modes || 5;
+        this.integrationSteps = options.integrationSteps || 500;
         this.sections = [];
 
-        Object.entries(params.tubes).forEach(([key, tube]) => {
+        Object.entries(options.params.tubes).forEach(([key, tube]) => {
             const index = parseInt(key);
 
             this.sections[index] = {};
 
             if (index === 0) {
-                this.sections[index].length = (extendedHeight - params.tubes[index + 1].extended_zt) / 1000;
-            } else if (index === params.tubes.length - 1) {
-                this.sections[index].length = tube.extended_zt / 1000;
+                this.sections[index].L = (options.extendedHeight - options.params.tubes[index + 1].extended_zt) / 1000;
+            } else if (index === options.params.tubes.length - 1) {
+                this.sections[index].L = tube.extended_zt / 1000;
             } else {
-                this.sections[index].length = (tube.extended_zt - params.tubes[index + 1].extended_zt) / 1000;
+                this.sections[index].L = (tube.extended_zt - options.params.tubes[index + 1].extended_zt) / 1000;
             }
 
-            //tube.length = tube.length_mm / 1000;
             this.sections[index].EI = tube.EI_Nm2;
             this.sections[index].mu = tube.mass_per_m;
         });
 
-
-
-        console.log(this.sections)
-
-
-
-
+        // Order sections from BASE to TOP : Important
         this.sections.reverse();
 
-        console.log("reversed sections", this.sections)
+        this.totalLength = this.sections.reduce(
+            (sum, s) => sum + s.L,
+            0
+        );
 
-
-
-
-
-
-
-
-
-        this.sections = this.sections.map(s => ({
-            L: s.length, // convert mm to meters
-            EI: s.EI,
-            mu: s.mu
-        }));
-        this.mPayload = payloadMass; // in kg
-
-        console.log(this.sections)
     }
 
-    /**
-     * Computes the global transfer matrix for a given angular frequency omega (rad/s)
-     */
-    getGlobalMatrix(omega) {
-        if (omega === 0) return null;
 
-        // Start with a 4x4 Identity Matrix
-        let globalTM = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ];
+    // Simpson numerical integration
+    integrate(func, a, b)
+    {
+        const n = this.integrationSteps;
+        const h = (b - a) / n;
 
-        // Multiply matrices from base to tip
-        for (const sec of this.sections) {
-            // Calculate wavenumber beta for the Bernoulli-Euler segment
-            const beta = Math.pow((sec.mu * omega * omega) / sec.EI, 0.25);
-            const bL = beta * sec.L;
+        let sum = 0;
 
-            const ch = Math.cosh(bL);
-            const sh = Math.sinh(bL);
-            const c = Math.cos(bL);
-            const s = Math.sin(bL);
+        for(let i=0; i<=n; i++)
+        {
+            let x = a + i*h;
 
-            // Standard Euler-Bernoulli beam transfer matrix coefficients
-            const c1 = 0.5 * (ch + c);
-            const c2 = 0.5 * (sh + s) / beta;
-            const c3 = 0.5 * (ch - c) / (beta * beta);
-            const c4 = 0.5 * (sh - s) / (beta * beta * beta);
+            let weight =
+                (i===0 || i===n) ? 1 :
+                (i % 2 ? 4 : 2);
 
-            // Construct field matrix for current segment mapping state vector: [w, theta, M, V]
-            const fieldM = [
-                [c1, c2, c3 / sec.EI, c4 / sec.EI],
-                [beta * beta * c4, c1, c2 / sec.EI, c3 / sec.EI],
-                [sec.EI * beta * beta * c3, sec.EI * beta * beta * c4, c1, c2],
-                [sec.EI * beta * beta * beta * c2, sec.EI * beta * beta * c3, beta * beta * c4, c1]
-            ];
-
-            globalTM = this.multiply4x4(fieldM, globalTM);
+            sum += weight * func(x);
         }
 
-        // Apply point boundary condition at the tip for the payload mass (adds inertal shear force)
-        const payloadEffect = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [this.mPayload * omega * omega, 0, 0, 1]
-        ];
-
-        return this.multiply4x4(payloadEffect, globalTM);
+        return sum*h/3;
     }
 
-    /**
-     * Boundary condition determinant tracking. 
-     * For a fixed-free cantilever system, boundary values at base are w=0, theta=0.
-     * Boundary values at tip are M=0, V=0.
-     */
-    getResidual(omega) {
-        const TM = this.getGlobalMatrix(omega);
-        // Residual determinant of top-right submatrix mapping unknown base values (M_0, V_0) to zero tip values
-        return (TM[2][2] * TM[3][3]) - (TM[2][3] * TM[3][2]);
+
+
+    // Ritz polynomial mode shape
+    phi(i, x)
+    {
+        let r = x / this.totalLength;
+        return Math.pow(r, i+2);
     }
 
-    /**
-     * Scans frequency ranges to isolate zero-crossings (roots)
-     */
-    findNaturalFrequencies(maxFreqHz = 150, stepHz = 0.1) {
-        const frequenciesHz = [];
-        let prevOmega = 0.01;
-        let prevResidual = this.getResidual(prevOmega);
 
-        // Step scan over target domain
-        for (let f = stepHz; f <= maxFreqHz; f += stepHz) {
-            const omega = 2 * Math.PI * f;
-            const residual = this.getResidual(omega);
 
-            // Sign change indicates a natural frequency root found in this interval
-            if (prevResidual * residual < 0) {
-                // Refine root via basic bisection
-                const accurateF = this.bisectionRefine(f - stepHz, f);
-                frequenciesHz.push(accurateF);
+    // second derivative of mode shape
+    d2phi(i, x)
+    {
+        let n = i + 2;
+
+        let r = x / this.totalLength;
+
+        return (
+            n*(n-1) *
+            Math.pow(r,n-2) /
+            (this.totalLength*this.totalLength)
+        );
+    }
+
+
+
+    buildMatrices(sections=this.sections)
+    {
+        let K = math.zeros(
+            this.modes,
+            this.modes
+        );
+
+        let M = math.zeros(
+            this.modes,
+            this.modes
+        );
+
+
+        let x0 = 0;
+
+
+        // Beam contribution
+
+        for(const sec of sections)
+        {
+            let xa = x0;
+            let xb = x0 + sec.L;
+
+
+            for(let i=0;i<this.modes;i++)
+            {
+                for(let j=0;j<this.modes;j++)
+                {
+
+                    let kij =
+                    this.integrate(
+                        x =>
+                            sec.EI *
+                            this.d2phi(i,x) *
+                            this.d2phi(j,x),
+                        xa, xb
+                    );
+
+
+                    let mij =
+                    this.integrate(
+                        x =>
+                            sec.mu *
+                            this.phi(i,x) *
+                            this.phi(j,x),
+                        xa, xb
+                    );
+
+
+                    K.set(
+                        [i,j],
+                        K.get([i,j])+kij
+                    );
+
+                    M.set(
+                        [i,j],
+                        M.get([i,j])+mij
+                    );
+                }
             }
-            prevResidual = residual;
+
+            x0 = xb;
         }
 
-        return frequenciesHz;
-    }
 
-    bisectionRefine(fMin, fMax, iterations = 15) {
-        let low = fMin;
-        let high = fMax;
-        let mid = 0;
 
-        for (let i = 0; i < iterations; i++) {
-            mid = (low + high) / 2;
-            const resMid = this.getResidual(2 * Math.PI * mid);
-            const resLow = this.getResidual(2 * Math.PI * low);
+        // Tip mass contribution
 
-            if (resLow * resMid < 0) {
-                high = mid;
-            } else {
-                low = mid;
+        for(let i=0;i<this.modes;i++)
+        {
+            for(let j=0;j<this.modes;j++)
+            {
+                let m =
+                    this.tipMass *
+                    this.phi(
+                        i,
+                        this.totalLength
+                    ) *
+                    this.phi(
+                        j,
+                        this.totalLength
+                    );
+
+
+                M.set(
+                    [i,j],
+                    M.get([i,j])+m
+                );
             }
         }
-        return mid;
+
+
+        return {K,M};
     }
 
-    multiply4x4(A, B) {
-        const C = Array(4).fill(0).map(() => Array(4).fill(0));
-        for (let r = 0; r < 4; r++) {
-            for (let c = 0; c < 4; c++) {
-                C[r][c] = A[r][0] * B[0][c] + A[r][1] * B[1][c] + A[r][2] * B[2][c] + A[r][3] * B[3][c];
-            }
-        }
-        return C;
+
+    calculateFrequencies(sections=this.sections)
+    {
+        let {K,M} = this.buildMatrices(sections);
+
+        // Generalized eigenvalue:
+        // K*x = w^2*M*x
+
+        let A = math.multiply(
+            math.inv(M),
+            K
+        );
+
+        let eig = math.eigs(A);
+
+        // Convert mathjs matrix -> JS array
+        let eigenValues = Array.from(
+            eig.values.valueOf()
+        );
+
+        let frequencies = eigenValues
+            .map(v => {
+
+                // Remove tiny negative numerical errors
+                if (v < 0 && Math.abs(v) < 1e-12)
+                    v = 0;
+
+                return Math.sqrt(v)/(2*Math.PI);
+            })
+            .sort((a,b)=>a-b);
+
+        frequencies = frequencies.filter(
+            f => Number.isFinite(f)
+        );
+
+        //console.log("Frequencies:", frequencies);
+        return frequencies;
+    }
+
+
+    comparativeFrequencies()
+    {
+        /*
+        This should compare frequencies for :
+            - STIFF Single beam made up of biggest EI section whole length with mass
+            - ELASTIC Single beam made up of smallest EI section whole length with mass
+        */
+
+        // When single tube with whole length : STIFF beam
+        let stiffSection = {
+            L: this.totalLength,
+            EI: this.sections[0].EI,
+            mu: this.sections[0].mu
+        };
+
+        let frequenciesStrong = this.calculateFrequencies([stiffSection]);
+        //this.printResults();
+
+
+        // When multiple tubes : WEAK beam
+        let weakSection = {
+            L: this.totalLength,
+            EI: this.sections.at(-1).EI,
+            mu: this.sections.at(-1).mu
+        };
+
+
+        //this.sections = [weakSection];
+        let frequenciesWeak = this.calculateFrequencies([weakSection]);
+        //this.printResults();
+
+        
+        return {strong:frequenciesStrong, weak:frequenciesWeak};
+    }
+
+
+    printResults()
+    {
+        let f = this.calculateFrequencies();
+
+        console.log(
+            `Mast length: ${this.totalLength.toFixed(3)} m`
+        );
+
+        console.log(
+            `Tip mass: ${this.tipMass} kg`
+        );
+
+        console.log("\nResonance frequencies:");
+
+        f.forEach((x,i)=>{
+            console.log(
+                `Mode ${i+1}: ${x.toFixed(3)} Hz`
+            );
+        });
+
+        return f;
     }
 }
+
+
+

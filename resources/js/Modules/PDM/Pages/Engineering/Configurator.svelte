@@ -1,4 +1,6 @@
 <script>
+    import { onMount } from "svelte";
+
     import Layout from "$modules/PDM/Shared/Layout.svelte";
     import Title from "$components/Title.svelte";
     import FormInput from "$components/FormInput.svelte";
@@ -323,10 +325,61 @@
         mast_type: "MTNX",
     });
 
-    // Initialize dependent default values
-    $form.z_offset = Math.round((1000 * Math.sqrt($form.sail_area)) / 2, 0);
-    $form.side_adapter_z =
-        $form.tube_length + $form.base_adapter_height - $form.overlap / 2;
+
+
+
+
+
+    onMount(() => {
+
+
+                // Initialize dependent default values
+        $form.z_offset = Math.round((1000 * Math.sqrt($form.sail_area)) / 2, 0);
+        $form.side_adapter_z =
+            $form.tube_length + $form.base_adapter_height - $form.overlap / 2;
+
+        const selectedMast = config['mast_types'].find(mast => mast.value.toString() === $form.mast_type.toString());
+        $form.head_height = selectedMast ? selectedMast.head_height : null;
+
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
+        const qr = params.get("qr");
+
+        if(qr)
+        {
+            let qr_arr = qr.split('-');
+
+            console.log("QR parameter:", qr, qr_arr);
+
+            $form.mast_type = qr_arr[0];
+            $form.start_tube_no = parseInt(qr_arr[1]);
+            $form.end_tube_no = parseInt(qr_arr[2]);
+            $form.overlap = parseInt(qr_arr[3]);
+            $form.base_adapter_height = parseInt(qr_arr[4]);
+            $form.payload_adapter_height = parseInt(qr_arr[5]);
+            $form.sail_area = parseFloat(qr_arr[6]);
+            $form.wind_speed = parseFloat(qr_arr[7]);
+            $form.head_height = parseFloat(qr_arr[8]);
+            $form.tube_length = parseFloat(qr_arr[9]);
+            $form.terrain_category = qr_arr[10];
+            $form.x_offset = parseFloat(qr_arr[11]);
+            $form.z_offset = parseFloat(qr_arr[12]);
+            $form.payload_mass = parseFloat(qr_arr[13]);
+            $form.motor_id = parseInt(qr_arr[14]);
+            $form.gearbox_id = parseInt(qr_arr[15]);
+            $form.tip_deflection_percentage = parseFloat(qr_arr[16]);
+            $form.side_adapter_z = parseFloat(qr_arr[17]);
+        }
+
+
+    });
+
+
+
+
+
 
     // If you need the form to update when the 'params' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
@@ -362,6 +415,7 @@
             "Extended",
             "Nested",
             "Torque",
+            "Vibration"
         ];
 
         tabs.forEach((element) => {
@@ -383,32 +437,48 @@
     }
 
     function goToMastOptionsTable() {
-        window.location.href =
-            "/pdm/engineering/options_table?params=" +
-            encodeURIComponent(JSON.stringify(params));
+        window.location.href = "/pdm/engineering/options_table"
     }
 
-    let resonanceModes = $state([]);
 
-    let min_frequency = 0.2;
-    let max_frequency = 300;
+    function updateFormValues() {
+        console.log("Mast type changed");
+
+
+        const selectedMast = config['mast_types'].find(mast => mast.value.toString() === $form.mast_type.toString());
+
+        $form.head_height = selectedMast ? selectedMast.head_height : null;
+        $form.base_adapter_height = selectedMast ? selectedMast.base_adapter_height : null;
+
+
+
+    }
+
+    let all_frequencies = $state([]);
 
     function runVibrationAnalysis() {
+
         // Create vibration analyzer with mast data, tube lengths and payload mass
-        const analyzer = new MastVibration(
-            mast.data.params,
-            mast.data.props.extendedHeight,
-            mast.data.params.payload_mass,
-        );
+        const analyzer2 = new MastVibration({
+            params: mast.data.params,
+            extendedHeight: mast.data.props.extendedHeight,
+            modes: 3,
+            integrationSteps: 500
+        });
 
-        // Find resonance options between 0Hz and 200Hz
-        resonanceModes = analyzer.findNaturalFrequencies(
-            max_frequency,
-            min_frequency,
-        );
+        // Calculate frequencies
+        const frequencies = analyzer2.calculateFrequencies();
+        const karsilastirma = analyzer2.comparativeFrequencies();
 
-        //console.log("Resonance Frequencies (Hz):", resonanceModes);
-        // Output Example: [2.45, 15.82, 48.11] -> 1st, 2nd, and 3rd modes
+        frequencies.forEach((freq, index) => {
+            //console.log(`Frequency ${index + 1}:`, freq);
+
+            all_frequencies[index] = {
+                "weak":karsilastirma.weak[index],
+                "strong":karsilastirma.strong[index],
+                "frequency":freq
+            };
+        });
     }
 </script>
 
@@ -471,6 +541,7 @@
             label="Mast Type"
             value="MTNX"
             options={config.mast_types}
+            onchange={() => updateFormValues()}
         />
 
         <Title
@@ -1091,7 +1162,7 @@
             <div class="container is-hidden" id="divVibration">
                 <Title
                     title="Resonance Frequencies"
-                    subtitle="For pure cantilever beam with concentrated mass at the end  [between {min_frequency}, {max_frequency}]"
+                    subtitle="For pure cantilever beam with concentrated mass at the tip"
                 />
 
                 <a
@@ -1110,16 +1181,32 @@
                             />
                         </div>
                         <div class="cell">
-                            {#if resonanceModes.length > 0}
+                            {#if all_frequencies.length > 0}
                                 <table
                                     class="table is-bordered is-striped is-hoverable is-fullwidth"
                                 >
+                                    <thead>
+                                        <tr>
+                                            <th>Mode</th>
+                                            <th>Weak</th>
+                                            <th>Frequency</th>
+                                            <th>Strong</th>
+                                        </tr>
+                                    </thead>
+
                                     <tbody>
-                                        {#each resonanceModes as mode, index}
+                                        {#each all_frequencies as mode, index}
                                             <tr>
-                                                <td>Mode {index + 1}</td>
+                                                <td>Mode {index}</td>
+
                                                 <td class="has-text-right"
-                                                    >{mode.toFixed(1)} Hz</td
+                                                    >{mode.weak.toFixed(1)} Hz</td
+                                                >
+                                                <td class="has-text-right has-background-grey-lighter 	 has-text-weight-bold"
+                                                    >{mode.frequency.toFixed(1)} Hz</td
+                                                >
+                                                <td class="has-text-right"
+                                                    >{mode.strong.toFixed(1)} Hz</td
                                                 >
                                             </tr>
                                         {/each}

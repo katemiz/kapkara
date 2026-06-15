@@ -34,6 +34,7 @@ export default class MakePDF {
         this.guying_note = `(*) As a general rule of thumb, guying radius should be equal to extended mast height for optimal stability. Guying radius, number of guying and at which tubes guying to be fixed should be evaluated per payload, stability requirements and available space. Please contact Masttech for detailed guying recommendations.`
 
         this.qr =
+            data.params.mast_type + '-' +
             data.params.start_tube_no + '-' +
             data.params.end_tube_no + '-' +
             data.params.overlap + '-' +
@@ -48,7 +49,14 @@ export default class MakePDF {
             data.params.z_offset + '-' +
             data.params.payload_mass + '-' +
             data.params.motor_id + '-' +
-            data.params.gearbox_id;
+            data.params.gearbox_id + '-' +
+            data.params.tip_deflection_percentage + '-' +
+            data.params.side_adapter_z;
+
+
+
+
+
     }
 
     // Pre-generate QR code  and images before running

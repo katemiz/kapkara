@@ -16,15 +16,21 @@
      * />
      */
     
+
     let {
-        form,              // Inertia form object (required)
-        name,              // Field name (required)
-        options = [],      // Array of { value, label, disabled? } objects (required)
-        label = '',        // Field label text
-        required = false,  // Required attribute
-        inline = false,    // Display options inline (horizontally)
-        class: customClass = '' // Additional CSS classes for the field wrapper
-    } = $props();
+            form,                   // Inertia form object (required)
+            name,                   // Field name (required)
+            options = [],           // Array of { value, label, disabled? } objects (required)
+            label = '',             // Field label text
+            required = false,       // Required attribute
+            inline = false,         // Display options inline (horizontally)
+            onchange = null,        // Callback function for value changes (added)
+            class: customClass = '' // Additional CSS classes for the field wrapper
+        } = $props();
+
+
+
+
 </script>
 
 <div class="field {customClass}">
@@ -47,6 +53,7 @@
                     bind:group={$form[name]}
                     disabled={option.disabled || false}
                     {required}
+                    {onchange}
                 />
                 {option.label} 
             </label>
