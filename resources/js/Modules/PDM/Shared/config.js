@@ -401,8 +401,19 @@ export const config = {
             max_speed_rpm: 1400,
             mass_kg: 5,
         },
+
         {
             id: 3,
+            name: "0.55 kW",
+            power_kW: 0.55,
+            max_torque_Nm: 10,
+            max_speed_rpm: 2800,
+            mass_kg: 5,
+        },
+
+
+        {
+            id: 4,
             name: "0.75 kW",
             power_kW: 0.75,
             max_torque_Nm: 15,
@@ -410,8 +421,19 @@ export const config = {
             mass_kg: 7,
         },
 
+
         {
-            id: 4,
+            id: 5,
+            name: "0.75 kW",
+            power_kW: 0.75,
+            max_torque_Nm: 15,
+            max_speed_rpm: 2800,
+            mass_kg: 7,
+        },
+
+
+        {
+            id: 6,
             name: "Manual : Hand Winch",
             power_kW: 0,
             max_torque_Nm: 0,

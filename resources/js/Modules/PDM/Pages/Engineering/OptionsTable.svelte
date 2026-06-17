@@ -139,11 +139,15 @@
 
             <thead>
                 <tr>
-                    <th>Height</th>
-                    <th>Sections</th>
-                    <th class="has-text-right">Extended Height</th>
-                    <th class="has-text-right">Nested Height</th>
-                    <th>Details</th>
+                    <th rowspan="2">Height</th>
+                    <th rowspan="2">Sections</th>
+                    <th class="has-text-centered" colspan="2">Mast Type</th>
+                    <th rowspan="2">Details</th>
+                </tr>
+
+                <tr>
+                    <th class="has-text-right">Extended<br>Height</th>
+                    <th class="has-text-right">Nested<br>Height</th>
                 </tr>
             </thead>
 
@@ -159,9 +163,9 @@
                             {/if}
 
                             <td>{ noOfSections + ' Sections'}</td>
-                            <td class="has-text-right">{opt.EH} mm</td>
-                            <td class="has-text-right">{opt.NH} mm</td>
-                            <td><a href="/pdm/engineering/configurator?qr={opt.QR}">{opt.Code}</a></td>
+                            <td class="has-text-right"><a href="/pdm/engineering/configurator?qr={opt.QR}" title="Extended Height">{opt.EH} mm</a></td>
+                            <td class="has-text-right"><a href="/pdm/engineering/configurator?qr={opt.QR}" title="Nested Height">{opt.NH} mm</a></td>
+                            <td><a href="/pdm/engineering/configurator?qr={opt.QR}" title="Configuration Details">{opt.Code}</a></td>
                         </tr>
                     {/each}
                 {/each}

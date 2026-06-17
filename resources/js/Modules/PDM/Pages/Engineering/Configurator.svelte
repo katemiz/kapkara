@@ -7,6 +7,9 @@
     import FormRadio from "$components/FormRadio.svelte";
     import FormSelect from "$components/FormSelect.svelte";
 
+    import Pdf from "$components/Icons/Pdf.svelte";
+
+
     import JsonTree from "$components/JsonTree.svelte";
 
     import { useForm } from "@inertiajs/svelte";
@@ -28,8 +31,8 @@
         ArrowUpNarrowWide,
         ArrowDownNarrowWide,
         Wrench,
-        Table,
-        ConciergeBell,
+        Target,
+        List,
         AudioWaveform,
     } from "@lucide/svelte";
 
@@ -67,6 +70,7 @@
                     ),
 
                     borderColor: "#D7263D",
+                    fill:true,
                     yAxisID: "y",
                 },
 
@@ -331,9 +335,7 @@
 
 
     onMount(() => {
-
-
-                // Initialize dependent default values
+        // Initialize dependent default values
         $form.z_offset = Math.round((1000 * Math.sqrt($form.sail_area)) / 2, 0);
         $form.side_adapter_z =
             $form.tube_length + $form.base_adapter_height - $form.overlap / 2;
@@ -442,16 +444,10 @@
 
 
     function updateFormValues() {
-        console.log("Mast type changed");
-
-
         const selectedMast = config['mast_types'].find(mast => mast.value.toString() === $form.mast_type.toString());
 
         $form.head_height = selectedMast ? selectedMast.head_height : null;
         $form.base_adapter_height = selectedMast ? selectedMast.base_adapter_height : null;
-
-
-
     }
 
     let all_frequencies = $state([]);
@@ -499,7 +495,7 @@
                     data-tooltip="Profiles Table"
                 >
                     <span class="icon is-small">
-                        <Table size="16" />
+                        <Target size="16" />
                     </span>
                 </a>
 
@@ -519,7 +515,8 @@
                     data-tooltip="Generate PDF"
                 >
                     <span class="icon is-small">
-                        <FileText size="16" />
+                        <!-- <FileText size="16" /> -->
+                        <Pdf size="16" />
                     </span>
                 </button>
 
@@ -529,7 +526,7 @@
                     data-tooltip="Mast Options Table"
                 >
                     <span class="icon is-small">
-                        <ConciergeBell size="16" />
+                        <List size="16" />
                     </span>
                 </button>
             </div>
@@ -1017,6 +1014,7 @@
                                                 )}</td
                                             >
                                         </tr>
+
                                     </tbody>
                                 </table>
                             </td>
@@ -1085,6 +1083,18 @@
                                                 )} m/min
                                             </td>
                                         </tr>
+
+                                        <tr>
+                                            <th>Time to Extend Mast [Estimated]</th>
+                                            <td>
+                                                {mast.data.power.time_to_extend_seconds.toFixed(
+                                                    0,
+                                                )} seconds
+                                            </td>
+                                        </tr>
+
+
+
 
                                         <tr>
                                             <th

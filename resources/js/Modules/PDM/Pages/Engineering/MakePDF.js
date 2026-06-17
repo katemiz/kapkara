@@ -258,6 +258,12 @@ export default class MakePDF {
                 this.data.power.vertical_speed.toFixed(2),
                 "m/min",
             ],
+
+            [
+                "Time to Extend Mast [Estimated]",
+                this.data.power.time_to_extend_seconds.toFixed(0),
+                "seconds",
+            ],
         ];
 
         autoTable(this.pdf, {
