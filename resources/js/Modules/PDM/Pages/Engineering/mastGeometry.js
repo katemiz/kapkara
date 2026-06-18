@@ -552,14 +552,10 @@ export class MastGeometry {
         this.data.power.vertical_speed =
             (this.data.power.screw_rpm * this.data.config.screw_lead) / 1000; // Convert RPM to m/min
 
-
         // TIME TO EXTEND
-
         let total_travel_length = (this.data.props.extendedHeight - this.data.props.nestedHeight) /1000; //m
         this.data.power.time_to_extend_seconds =
             1.15 *60 * total_travel_length / this.data.power.vertical_speed; // with 1.15 safety factor
-
-            console.log("Time to extend:", this.data.power.time_to_extend_seconds);
     }
 
     getMastMass() {

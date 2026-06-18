@@ -480,7 +480,7 @@ export default class MastDeflection {
 
         //console.log(` Total deflection at ${z}: ${deflection} \n\n\n`);
 
-        return deflection.toFixed(3);
+        return deflection.toFixed(1);
     }
 
 
