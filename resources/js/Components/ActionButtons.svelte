@@ -1,9 +1,8 @@
 <script>
+import DeleteButton from "$components/DeleteButton.svelte";
+import { Save, X, TableOfContents, Pencil, Plus, Send,Pin } from "@lucide/svelte";
 
-    import DeleteButton from "$components/DeleteButton.svelte";
-    import { Save, X, TableOfContents, Pencil, Plus } from "@lucide/svelte";
-
-    let { form_type, item, isEdit, route_name } = $props();
+let { form_type, item, isEdit, route_name } = $props();
 </script>
 
 {#if form_type == "show"}
@@ -13,38 +12,59 @@
             <p class="buttons">
                 <a
                     href="/{route_name}"
-                    class="button is-link is-inverted is-outlined"
-                    data-tooltip="List All Materials"
+                    class="button is-ghost"
                 >
                     <span class="icon is-small">
-                        <TableOfContents size="16" />
+                        <TableOfContents size="20" />
                     </span>
+                    <span>List All</span>
                 </a>
 
                 <a
                     href="/{route_name}/create"
-                    class="button is-link is-inverted is-outlined"
-                    data-tooltip="New {route_name}"
+                    class="button is-ghost"
                 >
                     <span class="icon is-small">
-                        <Plus size="16" />
+                        <Plus size="20" />
                     </span>
+                    <span>Add New</span>
                 </a>
 
-                <a
-                    href="/{route_name}/{item.id}/edit"
-                    class="button is-link is-inverted is-outlined"
-                    data-tooltip="Edit this {route_name}"
-                >
-                    <span class="icon is-small">
-                        <Pencil size="16" />
-                    </span>
-                </a>
             </p>
         </div>
 
         <!-- Right side -->
         <div class="level-right">
+            <a
+                href="/{route_name}/{item.id}/edit"
+                class="button is-dark"
+                data-tooltip="Edit"
+            >
+                <span class="icon is-small">
+                    <Pencil size="20" />
+                </span>
+            </a>
+
+            <a
+                href="/{route_name}/{item.id}/edit"
+                class="button is-dark"
+                data-tooltip="Freeze"
+            >
+                <span class="icon is-small">
+                    <Pin size="20" />
+                </span>
+            </a>
+
+            <a
+                href="/{route_name}/{item.id}/edit"
+                class="button is-dark"
+                data-tooltip="Release"
+            >
+                <span class="icon is-small">
+                    <Send size="20" />
+                </span>
+            </a>
+
             <p class="buttons">
                 <DeleteButton url="/{route_name}/{item.id}" />
             </p>

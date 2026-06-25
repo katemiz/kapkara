@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->integer("revision")->default(1);
             $table->text("description");
             $table->text("remarks")->nullable();
+            $table->boolean("is_latest")->default(true);
+            $table->string("status")->default("DRAFT");
             $table->userstamps(); // provided by App\Providers\AppServiceProvider
             $table->timestamps();
         });

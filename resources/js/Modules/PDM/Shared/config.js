@@ -8,6 +8,7 @@ export const config = {
             area_mm2: 531.42,
             inertia_mm4: 144359.94,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 2,
@@ -17,6 +18,7 @@ export const config = {
             area_mm2: 657.93,
             inertia_mm4: 351727.54,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 3,
@@ -26,6 +28,7 @@ export const config = {
             area_mm2: 852.28,
             inertia_mm4: 733496.51,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 4,
@@ -36,6 +39,7 @@ export const config = {
             area_mm2: 1057.42,
             inertia_mm4: 1372498.49,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 5,
@@ -45,6 +49,7 @@ export const config = {
             area_mm2: 1290.94,
             inertia_mm4: 2372673.47,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 6,
@@ -55,6 +60,7 @@ export const config = {
             area_mm2: 1553.09,
             inertia_mm4: 3861481.58,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 7,
@@ -64,6 +70,7 @@ export const config = {
             area_mm2: 1844.42,
             inertia_mm4: 5992457.14,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 8,
@@ -73,6 +80,7 @@ export const config = {
             area_mm2: 2165.56,
             inertia_mm4: 8947902.11,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 9,
@@ -83,6 +91,7 @@ export const config = {
             area_mm2: 2517.21,
             inertia_mm4: 12941721.43,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 10,
@@ -93,6 +102,7 @@ export const config = {
             area_mm2: 2900.08,
             inertia_mm4: 18222403.31,
             channel_number: 4,
+            has_die: true,
         },
         {
             no: 11,
@@ -102,6 +112,7 @@ export const config = {
             area_mm2: 3538.49,
             inertia_mm4: 26761768.83,
             channel_number: 8,
+            has_die: true,
         },
         {
             no: 12,
@@ -111,6 +122,7 @@ export const config = {
             area_mm2: 3986.05,
             inertia_mm4: 35883568,
             channel_number: 8,
+            has_die: true,
         },
         {
             no: 13,
@@ -120,6 +132,7 @@ export const config = {
             area_mm2: 4467.07,
             inertia_mm4: 47211434.31,
             channel_number: 8,
+            has_die: true,
         },
         {
             no: 14,
@@ -129,6 +142,7 @@ export const config = {
             area_mm2: 4982.29,
             inertia_mm4: 61316545,
             channel_number: 8,
+            has_die: true,
         },
 
         {
@@ -139,6 +153,7 @@ export const config = {
             area_mm2: 5532.44,
             inertia_mm4: 78621879.48,
             channel_number: 8,
+            has_die: true,
         },
 
         {
@@ -149,6 +164,7 @@ export const config = {
             area_mm2: 6118.3,
             inertia_mm4: 99656139.01,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -159,6 +175,7 @@ export const config = {
             area_mm2: 6740.59,
             inertia_mm4: 125007834.15,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -169,6 +186,7 @@ export const config = {
             area_mm2: 7400.09,
             inertia_mm4: 155329543.18,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -179,6 +197,7 @@ export const config = {
             area_mm2: 8097.53,
             inertia_mm4: 191342344.57,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -189,6 +208,7 @@ export const config = {
             area_mm2: 8833.67,
             inertia_mm4: 233840426.71,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -199,6 +219,7 @@ export const config = {
             area_mm2: 9609.26,
             inertia_mm4: 283695878.24,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -209,6 +230,7 @@ export const config = {
             area_mm2: 10425.07,
             inertia_mm4: 341863661.87,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -219,6 +241,7 @@ export const config = {
             area_mm2: 11281.83,
             inertia_mm4: 409386775.15,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -229,6 +252,7 @@ export const config = {
             area_mm2: 12180.32,
             inertia_mm4: 487401601.14,
             channel_number: 8,
+            has_die: false,
         },
 
         {
@@ -239,7 +263,34 @@ export const config = {
             area_mm2: 13121.27,
             inertia_mm4: 577143452.27,
             channel_number: 8,
+            has_die: false,
         },
+    ],
+
+    circular_tubes:[
+
+        {
+            no: 1,
+            od: 48,
+            id: 44,
+            thk: 2,
+            area_mm2: 531.42,
+            inertia_mm4: 144359.94,
+            channel_number: 4,
+            has_die: true,
+        },
+
+        {
+            no: 2,
+            od: 60,
+            id: 54,
+            thk: 3,
+            area_mm2: 888.26,
+            inertia_mm4: 361449.86,
+            channel_number: 4,
+            has_die: true,
+        },
+
     ],
 
     terrain_category: [

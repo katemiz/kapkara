@@ -13,7 +13,7 @@
      */
     
     let {
-        form,              // Inertia form object (required)
+        form=false,              // Inertia form object (required)
         name,              // Field name (required)
         label = '',        // Checkbox label text (required for accessibility)
         required = false,  // Required attribute

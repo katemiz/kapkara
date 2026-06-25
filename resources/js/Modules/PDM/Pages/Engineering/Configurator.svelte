@@ -20,11 +20,14 @@
     import MastDeflection from "$modules/PDM/Pages/Engineering/Deflection.js";
     import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration.js";
 
+    import Configurator from "$modules/PDM/Pages/Engineering/Configurator.js";
+
+
     import Chart from "chart.js/auto";
 
     import {
         Braces,
-        FileText,
+        Info,
         ChartLine,
         ChartSpline,
         WeightTilde,
@@ -301,9 +304,14 @@
     }
 
     let showJson = $state(false);
+    let showInfoGraphic = $state(false);
 
     function toggle() {
         showJson = !showJson;
+    }
+
+    function toggleInfoGraphic() {
+        showInfoGraphic = !showInfoGraphic;
     }
 
     // 1. Inertia Form
@@ -400,11 +408,16 @@
 
         // Vibration analysis
         runVibrationAnalysis();
+
+        configurator.run();
     });
 
     let mast = $derived(new MastGeometry($form.data(), config));
     let svgDraw = $derived(new SvgDraw(mast.data));
     let deflection = $derived(new MastDeflection(mast.data));
+
+
+    let configurator = $derived(new Configurator($form.data()));
 
     function toggleTab(elName) {
         let tabSelected = "tab" + elName;
@@ -481,7 +494,7 @@
 <Layout>
     <section class="section">
         <div class="columns">
-            <div class="column is-10">
+            <div class="column is-8">
                 <Title
                     title="Mast Configurator"
                     subtitle="Payload - Extended/Nested Height - Weight / Loads Estimation"
@@ -489,36 +502,27 @@
             </div>
 
             <div class="column has-text-right has-text-left-mobile">
+
+                <button
+                    onclick={toggleInfoGraphic}
+                    class="button is-link is-light"
+                    data-tooltip="Mast Parameters"
+                >
+                    <span class="icon is-small">
+                        <Info size="20" />
+                    </span>
+                </button>
+
+
                 <a
                     href="/pdm/engineering/profiles_table"
-                    class="button is-link is-light"
+                    class="button is-link is-light ml-6"
                     data-tooltip="Profiles Table"
                 >
                     <span class="icon is-small">
-                        <Target size="16" />
+                        <Target size="18" />
                     </span>
                 </a>
-
-                <button
-                    onclick={toggle}
-                    class="button is-link is-light"
-                    data-tooltip="Toggle JSON Editor"
-                >
-                    <span class="icon is-small">
-                        <Braces size="16" />
-                    </span>
-                </button>
-
-                <button
-                    onclick={generatePDF}
-                    class="button is-link is-light"
-                    data-tooltip="Generate PDF"
-                >
-                    <span class="icon is-small">
-                        <!-- <FileText size="16" /> -->
-                        <Pdf size="16" />
-                    </span>
-                </button>
 
                 <button
                     onclick={goToMastOptionsTable}
@@ -526,7 +530,7 @@
                     data-tooltip="Mast Options Table"
                 >
                     <span class="icon is-small">
-                        <List size="16" />
+                        <List size="18" />
                     </span>
                 </button>
             </div>
@@ -541,9 +545,42 @@
             onchange={() => updateFormValues()}
         />
 
-        <Title
-            title="[{$form.end_tube_no - $form.start_tube_no + 1}] Sections"
-        />
+
+        <div class="columns">
+            <div class="column is-10">
+                <Title
+                    title="[{$form.end_tube_no - $form.start_tube_no + 1}] Sections"
+                />
+            </div>
+
+            <div class="column has-text-right has-text-left-mobile">
+
+                <button
+                    onclick={toggle}
+                    class="button is-link is-light"
+                    data-tooltip="Toggle JSON Editor"
+                >
+                    <span class="icon is-small">
+                        <Braces size="18" />
+                    </span>
+                </button>
+
+                <button
+                    onclick={generatePDF}
+                    class="button is-link is-light"
+                    data-tooltip="Generate PDF"
+                >
+                    <span class="icon is-small">
+                        <!-- <FileText size="16" /> -->
+                        <Pdf size="20" />
+                    </span>
+                </button>
+            </div>
+        </div>
+
+
+
+
 
         <form novalidate id="genericForm" class="my-6">
             <div class="fixed-grid has-4-cols has-1-cols-mobile">
@@ -1251,5 +1288,95 @@
                 onclick={toggle}
             ></button>
         </div>
+
+        <!-- INFO GRAPHIC MODAL -->
+        <div class="modal {showInfoGraphic ? 'is-active' : ''}" id="infoGraphicModal">
+            <button
+                type="button"
+                class="modal-background {showInfoGraphic ? 'is-active' : ''}"
+                id="infoGraphicModal"
+                onclick={() => (showInfoGraphic = false)}
+                aria-label="close"
+            ></button>
+
+            <div class="modal-content has-background-white p-6">
+
+                <!-- PARAMETERS -->
+                <Title
+                    title="Definition of Parameters Used"
+                />
+                <p class="image">
+                <img src="/images/PDM/MastParameters.png" alt="Description of mast parameters">
+                </p>
+
+                <!-- TERRAIN CATEGORIES -->
+                <Title
+                    title="Terrain Categories"
+                />
+
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {#each config.terrain_category as terrain}
+                            <tr>
+                                <th class="is-4">{terrain.no}</th>
+                                <td>{terrain.description}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+
+
+                <!-- LOADS RESOURCES -->
+
+                <Title
+                    title="Load Calculation Resources"
+                />
+
+                <article class="message is-info">
+                    <Title subtitle="Wind Load on Payloads" />
+                    <div class="message-body">
+                    Dynamic pressure formula is used to calculate wind load on payloads.
+                    </div>
+                </article>
+
+                <article class="message is-info">
+                    <Title subtitle="Wind Load Circular Mast Sections" />
+                    <div class="message-body">
+                        <p>Eurocode 1: Actions on structures - Part 1-4: General actions - Wind actions</p>
+
+                        <p>
+                            <a href="https://www.phd.eng.br/wp-content/uploads/2015/12/en.1991.1.4.2005.pdf">
+                            EN 1991-1-4:2005+A1:2010 Section 7.9.2</a> Cylindrical structures, isolated cylindrical elements
+                        </p>
+                        
+                        <p>All load calculations on mast sections are performed per above document.</p>
+
+                        <p>
+                            <a href="https://eurocodeapplied.com/design/en1991/wind-force-cylinder">Eurocode Implementation</a>
+                        </p>
+                    </div>
+                </article>
+
+
+
+
+            </div>
+
+            <button
+                class="modal-close is-large"
+                aria-label="close"
+                onclick={toggleInfoGraphic}
+            ></button>
+
+        </div>
+
     </section>
 </Layout>

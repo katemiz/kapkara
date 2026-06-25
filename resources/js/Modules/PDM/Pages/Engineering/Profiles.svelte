@@ -82,6 +82,7 @@
         />
 
         <table class="table is-fullwidth my-6">
+        <caption class="has-text-weight-bold has-text-centered mb-4 is-size-2">Tubes with Lips</caption>
             <thead>
                 <tr>
                     <th class="has-text-left font-bold">#</th>
@@ -141,7 +142,7 @@
                 {#each  config.tubes as tube,i}
 
                     <tr>
-                        <th>
+                        <th class="{tube.has_die ? 'has-background-success-light' : ''}">
                             MT-{String(tube.no).padStart(2, "0")}
                         </th>
                         <td class="has-text-right">{tube.od.toFixed(2)}</td>
@@ -158,6 +159,113 @@
 
             </tbody>
         </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <table class="table is-fullwidth my-6">
+        <caption class="has-text-weight-bold has-text-centered mb-4 is-size-2">Circular Tubes</caption>
+            <thead>
+                <tr>
+                    <th class="has-text-left font-bold">#</th>
+                    <th class="has-text-right">OD<br>(mm)</th>
+                    <th class="has-text-right">ID<br>(mm)</th>
+                    <th class="has-text-right">THK<br>(mm)</th>
+                    <th class="has-text-right">Mass <br>(kg/m)</th>
+                    <th class="has-text-right">
+                        Moment<br>Capacity<br>
+                        <span class="is-size-7">(Factor of Safety : {factorOfSafety})</span>
+                        <br>(Nm)
+                    </th>
+
+                    <th class="has-text-centered has-background-white-ter" colspan="2">
+                        Pneumatic<br>Load Capacity<sup>(1)</sup>
+                        <br>
+
+                        <div class="column">
+                            <button class="button p-2" onclick={() => changeUpDown('pressure','down')}>
+                                <span class="icon is-small">
+                                    <Minus size="16" />
+                                </span>
+                            </button>
+                            <span class="tag is-info">{ pressure.toFixed(1) } Bars</span>
+                            <button class="button p-2" onclick={() => changeUpDown('pressure','up')}>
+                                <span class="icon is-small">
+                                    <Plus size="16" />
+                                </span>
+                            </button>
+                        </div>
+
+                    </th>
+
+                    <th class="has-text-centered">
+                        P<sub>cr</sub><sup>(2)</sup>
+                        <br><br>
+                        <div class="column">
+                            <button class="button p-2" onclick={() => changeUpDown('buckling_length','down')}>
+                                <span class="icon is-small">
+                                    <Minus size="16" />
+                                </span>
+                            </button>
+                            <span class="tag is-info">{ tubeBucklingLength.toFixed(0) } mm</span>
+                            <button class="button p-2" onclick={() => changeUpDown('buckling_length','up')}>
+                                <span class="icon is-small">
+                                    <Plus size="16" />
+                                </span>
+                            </button>
+                        </div>
+                    </th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {#each  config.circular_tubes as tube,i}
+
+                    <tr>
+                        <th class="{tube.has_die ? 'has-background-success-light' : ''}">
+                            C-{String(tube.no).padStart(2, "0")}
+                        </th>
+                        <td class="has-text-right">{tube.od.toFixed(2)}</td>
+                        <td class="has-text-right">{tube.id.toFixed(2)}</td>
+                        <td class="has-text-right">{tube.thk.toFixed(1)}</td>
+                        <td class="has-text-right">{calculateMass(tube, 1).toFixed(2)}</td>
+                        <td class="has-text-right">{getMomentCapacity(tube).toFixed(0)} Nm</td>
+                        <td class="has-text-right has-background-white-ter">{ CalculateLiftCapacity(tube).N.toFixed(0) } N</td>
+                        <td class="has-text-right has-background-white-ter">{ (CalculateLiftCapacity(tube)).kg.toFixed(0) } kg</td>
+                        <td class="has-text-right">{getCriticalLoad(tube).toFixed(0)} N</td>
+                    </tr>
+
+                {/each}
+            </tbody>
+
+        </table>
+
+
+
+
+
+
+
+
+
+
+
+
 
     </section>
 </Layout>

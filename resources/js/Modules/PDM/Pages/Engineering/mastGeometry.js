@@ -485,6 +485,8 @@ export class MastGeometry {
         });
     }
 
+
+
     torqueRequired() {
         // Torque Required to Extend the Mast
         let torque;
@@ -521,6 +523,8 @@ export class MastGeometry {
         this.getScrewSpeed();
     }
 
+
+
     getMotorTorque() {
         this.data.power.motor_power = this.data.config.motors.find(
             (g) => g.id === this.data.params.motor_id,
@@ -534,6 +538,8 @@ export class MastGeometry {
             (9550 * this.data.power.motor_power) / this.data.power.motor_rpm;
     }
 
+
+    
     getLiftingTorque() {
         this.data.power.lifting_torque =
             this.data.power.motor_torque *

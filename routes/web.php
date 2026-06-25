@@ -104,6 +104,10 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("/pdm/product-note", ProductNoteController::class);
     Route::resource("/pdm/standard", StandardController::class);
     Route::resource("/pdm/document", DocumentController::class);
+    Route::patch('/pdm/document/{document}/freeze', [DocumentController::class, 'freeze']);
+    Route::patch('/pdm/document/{document}/release', [DocumentController::class, 'release']);
+    Route::patch('/pdm/document/{document}/revise', [DocumentController::class, 'revise']);
+
 
     Route::inertia("/pdm/requests", "Modules/PDM/HomeRequests");
     Route::resource("/pdm/crequest", ChangeRequestController::class);

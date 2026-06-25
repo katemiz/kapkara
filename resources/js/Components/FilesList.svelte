@@ -39,44 +39,43 @@
 </script>
 
 {#if media.length > 0}
-    <div class="card has-background-white-ter mt-4">
-        <div class="card-content">
-            <table class="table is-striped is-fullwidth">
-                <caption class="mb-2">
-                    Attachments [{media.length} Files]
-                </caption>
 
-                <tbody>
-                    {#each media as file}
-                        <tr>
-                            <td><Paperclip size="16" /></td>
-                            <td>
-                                <button
-                                    type="button"
-                                    class="is-small has-text-link"
-                                    onclick={() =>
-                                        downloadFile(file.url, file.name)}
-                                >
-                                    <span>{file.name}</span>
-                                </button>
-                            </td>
-                            <td>{file.mime}</td>
-                            <td>{file.size}</td>
-                            <td class="has-text-danger has-text-right">
-                                <button
-                                    type="button"
-                                    class="is-small is-danger is-clickable"
-                                    onclick={() => deleteFile(file.id)}
-                                >
-                                    <span class="icon is-small">
-                                        <CircleX size="16" color="red" />
-                                    </span>
-                                </button>
-                            </td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <table class="table mt-6 has-background-white-ter">
+        <caption class="mb-2 has-text-left">
+            {media.length === 1 ? "Attachment " : "Attachments "}
+            [{media.length}]
+        </caption>
+
+        <tbody>
+            {#each media as file}
+                <tr>
+                    <td class="is-narrow"><Paperclip size="16" /></td>
+                    <td class="is-narrow">
+                        <button
+                            type="button"
+                            class="is-small has-text-link"
+                            onclick={() =>
+                                downloadFile(file.url, file.name)}
+                        >
+                            <span>{file.name}</span>
+                        </button>
+                    </td>
+                    <td class="is-narrow">{file.mime}</td>
+                    <td class="is-narrow">{file.size}</td>
+                    <td class="has-text-danger has-text-right">
+                        <button
+                            type="button"
+                            class="is-small is-danger is-clickable"
+                            onclick={() => deleteFile(file.id)}
+                        >
+                            <span class="icon is-small">
+                                <CircleX size="16" color="red" />
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            {/each}
+        </tbody>
+    </table>
+
 {/if}

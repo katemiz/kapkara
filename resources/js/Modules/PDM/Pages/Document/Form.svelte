@@ -1,6 +1,5 @@
 <script>
     import { useForm } from "@inertiajs/svelte";
-    import { page } from "@inertiajs/svelte";
 
     import Layout from "$modules/PDM/Shared/Layout.svelte";
     import Editor from "$components/Editor.svelte";
@@ -15,7 +14,9 @@
 
     import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
 
-    let { document = null, isEdit = false, supportFixedData } = $props();
+    let { document = null, isEdit = false } = $props();
+    import { docs_config } from "$modules/PDM/Shared/docs_config.js";
+
 
     const doc = { ...(() => document)() };
 
@@ -29,7 +30,7 @@
         status: doc?.status ?? 1,
     });
 
-    // If you need the form to update when the 'material' prop changes
+    // If you need the form to update when the prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
         if (document && isEdit) {
@@ -45,41 +46,58 @@
     });
 
     let doc_types = $derived(
-        supportFixedData.doc_types.map((cat) => ({
+        docs_config.doc_types.map((cat) => ({
             value: cat.value,
             label: cat["description"],
         })),
     );
 
-    function submit(e) {
-        // console.log("The form object is:", $form);
-        // console.log("Form data submitted:", $form.data());
 
-        e.preventDefault();
 
-        if (isEdit) {
-            $form.put(`/pdm/document/${document.id}`, {
-                onSuccess: () => {
-                    console.log("Updated successfully!");
-                },
 
-                onError: (errors) => {
-                    console.log("Validation errors:", errors);
-                },
-            });
-        } else {
-            $form.post("/pdm/document", {
-                onSuccess: () => {
-                    console.log("Saved successfully!");
-                    $form.reset();
-                },
+function submit(e) {
+    console.log("The form object is:", $form);
+    console.log("Form data submitted:", $form.data());
 
-                onError: (errors) => {
-                    console.log("Validation errors:", errors);
-                },
-            });
-        }
+    e.preventDefault();
+
+    if (isEdit) {
+        // Use .post() instead of .put() to support multipart file data, 
+        // and let Inertia spoof the PUT method via query parameter or options object
+        $form.post(`/pdm/document/${document.id}`, {
+            headers: {
+                'X-HTTP-Method-Override': 'PUT'
+            },
+            // Alternatively, depending on your Inertia adapter configuration, 
+            // you can pass `_method: 'PUT'` directly inside your form dataset.
+            queryParams: {
+                _method: 'PUT'
+            },
+            onSuccess: () => {
+                console.log("Updated successfully!");
+            },
+            onError: (errors) => {
+                console.log("Validation errors:", errors);
+            },
+        });
+    } else {
+        $form.post("/pdm/document", {
+            onSuccess: () => {
+                console.log("Saved successfully!");
+                $form.reset();
+            },
+            onError: (errors) => {
+                console.log("Validation errors:", errors);
+            },
+        });
     }
+}
+
+
+
+
+
+
 </script>
 
 <Layout>
