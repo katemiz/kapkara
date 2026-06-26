@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\QuestionController;
@@ -7,6 +6,8 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\ProductNoteController;
 use App\Http\Controllers\StandardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ItemController;
+
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\EcnController;
 use App\Http\Controllers\ConfiguratorController;
@@ -100,6 +101,7 @@ Route::get(
 
 // PDM
 Route::middleware(["auth", "verified"])->group(function () {
+    
     Route::resource("/pdm/material", MaterialController::class);
     Route::resource("/pdm/product-note", ProductNoteController::class);
     Route::resource("/pdm/standard", StandardController::class);
@@ -108,6 +110,7 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::patch('/pdm/document/{document}/release', [DocumentController::class, 'release']);
     Route::patch('/pdm/document/{document}/revise', [DocumentController::class, 'revise']);
 
+    Route::resource("/pdm/item", ItemController::class);
 
     Route::inertia("/pdm/requests", "Modules/PDM/HomeRequests");
     Route::resource("/pdm/crequest", ChangeRequestController::class);
@@ -117,7 +120,6 @@ Route::middleware(["auth", "verified"])->group(function () {
         "/pdm/engineering/configurator",
         fn() => Inertia::render("Modules/PDM/Pages/Engineering/Configurator")
     );
-
 
     Route::get(
         "/pdm/engineering/profiles_table",

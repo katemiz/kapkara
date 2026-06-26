@@ -146,7 +146,7 @@
                             <span class="ml-2">Sellable Parts</span>
                         </a>
 
-                        <a href="/parts/list" class="navbar-item">
+                        <a href="/pdm/item" class="navbar-item">
                             <span class="icon has-text-link">
                                 <Component size={18} />
                             </span>
@@ -205,6 +205,7 @@
                             </span>
                             <span class="ml-2">Standards</span>
                         </a>
+
                     </div>
                 </div>
             {/if}

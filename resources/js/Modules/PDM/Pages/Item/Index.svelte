@@ -9,7 +9,7 @@
     import { router } from "@inertiajs/svelte";
 
     // 1. Receive the initial filter states sent from Laravel
-    let { documents, filters, per_page } = $props();
+    let { items, filters, per_page } = $props();
 
     let clearSearchIcon = $state(false);
 
@@ -28,8 +28,6 @@
             clearSearchIcon = false;
             doSearch();
         }
-
-        console.log(query,showLatestOnly)
     });
 
 
@@ -38,7 +36,7 @@
 
 
     function doSearch() {
-        router.get('/pdm/document', {
+        router.get('/pdm/item', {
             search: query,
             show_latest_only: showLatestOnly
         }, {
@@ -69,7 +67,7 @@
         
         <div class="columns">
             <div class="column is-10">
-                <Title title="Documents" subtitle="List of All Documents" />
+                <Title title="Parts/Assemblies" subtitle="List of All Items" />
             </div>
             <div class="column has-text-right">
 
@@ -93,11 +91,11 @@
             <!-- Left side -->
             <div class="level-left">
                 <p class="buttons">
-                    <a href="/pdm/document/create" class="button is-link">
+                    <a href="/pdm/item/create" class="button is-link">
                         <span class="icon is-small">
                             <Plus size="16" />
                         </span>
-                        <span>Add Document</span>
+                        <span>Add Component</span>
                     </a>
                 </p>
             </div>
@@ -132,15 +130,15 @@
             </div>
         </nav>
 
-        <TableRecordsInfo results={documents} {per_page} />
+        <TableRecordsInfo results={items} {per_page} />
 
-        {#if documents.data.length > 0}
+        {#if items.data.length > 0}
             <table class="table is-fullwidth">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Doc No</th>
-                        <th>Doc Title</th>
+                        <th>Item No</th>
+                        <th>Item Title</th>
                         <th>Author</th>
                         <th>Date</th>
                         <th>Status</th>
@@ -149,23 +147,23 @@
                 </thead>
 
                 <tbody>
-                    {#each documents.data as document}
+                    {#each items.data as item}
                         <tr>
-                            <td>{document.id}</td>
-                            <td>D{document.document_no} R{document.revision}</td>
-                            <td>{@html document.description}</td>
+                            <td>{item.id}</td>
+                            <td>{item.number}</td>
+                            <td>{@html item.title}</td>
 
-                            <td>{document.created_user_mail}</td>
-                            <td>{formatDate(document.updated_at)}</td>
-                            <td>{document.status}</td>
+                            <td>{item.created_user_mail}</td>
+                            <td>{formatDate(item.updated_at)}</td>
+                            <td>{item.status}</td>
 
                             <td class="has-text-right">
-                                <a href="/pdm/document/{document.id}">
+                                <a href="/pdm/item/{item.id}">
                                     <Eye size="24" />
                                 </a>
 
                                 <a
-                                    href="/pdm/document/{document.id}/edit"
+                                    href="/pdm/item/{item.id}/edit"
                                     class="ml-2"
                                     ><Pencil size="20" />
                                 </a>
@@ -176,11 +174,11 @@
             </table>
         {:else}
             <div class="notification is-warning is-light">
-                No documents exist
+                No products exist
             </div>
         {/if}
 
         <!-- Pagination component here -->
-        <Paginate items={documents} />
+        <Paginate items={items} />
     </section>
 </Layout>

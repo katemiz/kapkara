@@ -133,5 +133,6 @@ return [
 
     "counters" => [
         "document_no" => 1000,
+        "item_no" => 100000,
     ],
 ];

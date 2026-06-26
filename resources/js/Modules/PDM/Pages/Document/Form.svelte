@@ -7,16 +7,13 @@
     import FormSelect from "$components/FormSelect.svelte";
     import FilesList from "$components/FilesList.svelte";
     import ActionButtons from "$components/ActionButtons.svelte";
-
     import FormUpload from "$components/FormUpload.svelte";
-
     import Title from "$components/Title.svelte";
 
-    import { Save, Pencil, Trash, X, ChevronRight } from "@lucide/svelte";
+    import { X, ChevronRight } from "@lucide/svelte";
 
     let { document = null, isEdit = false } = $props();
     import { docs_config } from "$modules/PDM/Shared/docs_config.js";
-
 
     const doc = { ...(() => document)() };
 
@@ -56,8 +53,9 @@
 
 
 function submit(e) {
-    console.log("The form object is:", $form);
-    console.log("Form data submitted:", $form.data());
+
+    // console.log("The form object is:", $form);
+    // console.log("Form data submitted:", $form.data());
 
     e.preventDefault();
 
@@ -74,7 +72,7 @@ function submit(e) {
                 _method: 'PUT'
             },
             onSuccess: () => {
-                console.log("Updated successfully!");
+                //console.log("Updated successfully!");
             },
             onError: (errors) => {
                 console.log("Validation errors:", errors);
@@ -83,7 +81,7 @@ function submit(e) {
     } else {
         $form.post("/pdm/document", {
             onSuccess: () => {
-                console.log("Saved successfully!");
+               // console.log("Saved successfully!");
                 $form.reset();
             },
             onError: (errors) => {

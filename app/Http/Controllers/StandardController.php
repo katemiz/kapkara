@@ -10,6 +10,7 @@ use Inertia\Response;
 
 use App\Services\UploadService;
 
+
 class StandardController extends Controller
 {
     public $supportFixedData = [
@@ -171,7 +172,7 @@ class StandardController extends Controller
             "organisation" => "required|string|min:1|max:64",
             "standard_number" => "required|string|max:64",
             "description" => "required|string|max:256",
-            "remarks" => "nullable|string|max:500",
+            "remarks" => "nullable|string|max:5000",
             "isActive" => "required|boolean",
         ]);
 
@@ -199,4 +200,6 @@ class StandardController extends Controller
 
         return true;
     }
+
+
 }

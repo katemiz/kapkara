@@ -9,7 +9,7 @@
     import Title from "$components/Title.svelte";
     import DeleteButton from "$components/DeleteButton.svelte";
 
-    let { document,permissions,revisions } = $props();
+    let { item,permissions,revisions } = $props();
 
     import { docs_config } from "$modules/PDM/Shared/docs_config.js";
     import QRCode from "$components/QRCode.svelte";
@@ -17,7 +17,7 @@
     import { TableOfContents, Pencil, Plus, Send,Pin, LayersPlus } from "@lucide/svelte";
 
 
-    let url = $derived(window.location.origin + "/document/" + document.id);
+    let url = $derived(window.location.origin + "/item/" + item.id);
 
     const confirmFreezeReleaseRevise = (action_type) => {
 
@@ -26,17 +26,17 @@
         if (action_type === 'freeze') {
             // Show freeze confirmation
             title = 'Are you sure to freeze this document?';
-            path = `/pdm/document/${document.id}/freeze`;
+            path = `/pdm/item/${item.id}/freeze`;
             return_text = 'Frozen';
         } else if (action_type === 'release') {
             // Show release confirmation
             title = 'Are you sure to release this document?';
-            path = `/pdm/document/${document.id}/release`;
+            path = `/pdm/item/${item.id}/release`;
             return_text = 'Released';
         } else if (action_type === 'revise') {
             // Show revise confirmation
             title = 'Are you sure to revise this document?';
-            path = `/pdm/document/${document.id}/revise`;
+            path = `/pdm/item/${item.id}/revise`;
             return_text = 'Revised';
         }
 
@@ -80,7 +80,7 @@
 
 <Layout>
     <section class="section min-height-screen">
-        <Title title="Documents" subtitle="Show Document Attributes and Properties" />
+        <Title title="Parts/Products/Components" subtitle="Show Parts/Products/Components Attributes and Properties" />
 
         <div class="box mt-6">
             
@@ -89,7 +89,7 @@
                 <div class="level-left">
                     <p class="buttons">
                         <a
-                            href="/pdm/document"
+                            href="/pdm/item"
                             class="button is-ghost"
                         >
                             <span class="icon is-small">
@@ -99,7 +99,7 @@
                         </a>
 
                         <a
-                            href="/pdm/document/create"
+                            href="/pdm/item/create"
                             class="button is-ghost"
                         >
                             <span class="icon is-small">
@@ -116,7 +116,7 @@
 
                     {#if permissions.is_editable}
                     <a
-                        href="/pdm/document/{document.id}/edit"
+                        href="/pdm/item/{item.id}/edit"
                         class="button is-dark"
                         data-tooltip="Edit"
                     >
@@ -163,7 +163,7 @@
                     {/if}
 
                     {#if permissions.is_deletable}
-                        <DeleteButton url="/pdm/document/{document.id}" />
+                        <DeleteButton url="/pdm/item/{item.id}" />
                     {/if}
                 </div>
             </nav>
@@ -178,16 +178,16 @@
                 </div>
                 <div class="column">
                     <!-- Sidebar or additional info -->
-                    <Title title={"D" + document.document_no + " R" + document.revision} subtitle={document.description}/>
+                    <Title title={"D" + item.number + " R" + item.revision} subtitle={item.title}/>
                 </div>
 
                 <div class="column has-text-right">
-                    <span class="tag">{docs_config.doc_types.find((type) => type.value === document.doc_type)?.description}</span>
+                    <span class="tag">{docs_config.doc_types.find((type) => type.value === item.item_type)?.description}</span>
                     <div class="mt-1">
                     {#if revisions}
                         {#each revisions as revision}
-                        <a href="/pdm/document/{revision.id}">
-                        <span class="tag {document.revision == revision.revision ? 'is-black' : 'is-warning'} mr-1">R{revision.revision}</span>
+                        <a href="/pdm/item/{revision.id}">
+                        <span class="tag {item.revision == revision.revision ? 'is-black' : 'is-warning'} mr-1">R{revision.revision}</span>
                         </a>
                         {/each}
                     {/if}
@@ -196,10 +196,10 @@
             </div>
 
 
-            {@html document.remarks}
+            {@html item.remarks}
 
-            <FilesList media={document.files} />
-            <RecordData item={document} {url} status={docs_config.statuses.find((status) => status.value === document.status)?.description}/>
+            <FilesList media={item.files} />
+            <RecordData item={item} {url} status={docs_config.statuses.find((status) => status.value === item.status)?.description}/>
         </div>
     </section>
 </Layout>

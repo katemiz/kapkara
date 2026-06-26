@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Counter;
-use App\Models\Document;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -11,7 +11,7 @@ use Inertia\Response;
 
 use App\Services\UploadService;
 
-class DocumentController extends Controller
+class ItemController extends Controller
 {
     public $permissions = [
         'is_editable' => false,
@@ -33,7 +33,7 @@ class DocumentController extends Controller
 
         $search = $request->input("search");
 
-        return Inertia::render("Modules/PDM/Pages/Document/Index", [
+        return Inertia::render("Modules/PDM/Pages/Item/Index", [
 
             "per_page" => config("pagination.per_page"),
             
@@ -43,13 +43,13 @@ class DocumentController extends Controller
                 "show_latest_only" => $show_latest_only
             ],
 
-            "documents" => Document::query()
+            "items" => Item::query()
                 ->when($request->input("search"), function ($query, $search) {
                     // Wrap all the OR clauses together inside a single, isolated WHERE group
                     $query->where(function ($nestedQuery) use ($search) {
-                        $nestedQuery->where("description", "like", "%{$search}%")
+                        $nestedQuery->where("title", "like", "%{$search}%")
                                     ->orWhere("remarks", "like", "%{$search}%")
-                                    ->orWhere("document_no", "like", "%{$search}%");
+                                    ->orWhere("item_no", "like", "%{$search}%");
                     });
                 })
                 ->when($show_latest_only, function ($query) {
@@ -104,10 +104,7 @@ class DocumentController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render("Modules/PDM/Pages/Document/Form", [
-            "document" => null,
-            "isEdit" => false,
-        ]);
+        return Inertia::render("Modules/PDM/Pages/Item/Form");
     }
 
     /**
@@ -117,32 +114,32 @@ class DocumentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $props = $this->readInput($request);
-        $props["document_no"] = $this->getDocumentNo();
+        $props["number"] = $this->getItemNo();
 
-        $doc = Document::create($props);
+        $item = Item::create($props);
 
-        $this->uploadFiles($request, $doc);
+        $this->uploadFiles($request, $item);
 
         return redirect()
-            ->route("document.show", $doc->id)
+            ->route("item.show", $item->id)
             ->with("success", "Document created successfully.");
     }
 
     /**
      * Display the specified question.
      */
-    public function show(int $idDoc): Response
+    public function show(int $idItem): Response
     {
-        $doc = Document::findOrFail($idDoc);
-        $this->checkPermissions($doc);
+        $item = Item::findOrFail($idItem);
+        $this->checkPermissions($item);
 
-        $revisions = Document::where('document_no', $doc->document_no)
+        $revisions = Item::where('number', $item->number)
             ->select('id', 'revision')
             ->orderBy('revision')
             ->get();
 
-        return Inertia::render("Modules/PDM/Pages/Document/Show", [
-            "document" => $doc,
+        return Inertia::render("Modules/PDM/Pages/Item/Show", [
+            "item" => $item,
             "permissions" => $this->permissions,
             "revisions" => $revisions
         ]);
@@ -151,12 +148,12 @@ class DocumentController extends Controller
     /**
      * Show the form for editing the specified question.
      */
-    public function edit(int $idDoc): Response
+    public function edit(int $idItem): Response
     {
-        $doc = Document::findOrFail($idDoc)->toArray();
+        $item = Item::findOrFail($idItem)->toArray();
 
-        return Inertia::render("Modules/PDM/Pages/Document/Form", [
-            "document" => $doc,
+        return Inertia::render("Modules/PDM/Pages/Item/Form", [
+            "item" => $item,
             "isEdit" => true,
         ]);
     }
@@ -164,40 +161,40 @@ class DocumentController extends Controller
     /**
      * Update the specified material in storage.
      */
-    public function update(Request $request, int $idDoc): RedirectResponse
+    public function update(Request $request, int $idItem): RedirectResponse
     {
-        $doc = Document::findOrFail($idDoc);
+        $item = Item::findOrFail($idItem);
 
         $theData = $this->readInput($request);
 
-        $this->uploadFiles($request, $doc);
+        $this->uploadFiles($request, $item);
 
-        $doc->update($theData);
+        $item->update($theData);
 
         return redirect()
-            ->route("document.show", $doc->id)
-            ->with("success", "Document updated successfully.");
+            ->route("item.show", $item->id)
+            ->with("success", "Item updated successfully.");
     }
 
     /**
      * Remove the specified material from storage.
      */
-    public function destroy(int $idDoc): RedirectResponse
+    public function destroy(int $idItem): RedirectResponse
     {
-        $doc = Document::findOrFail($idDoc);
-        $this->checkPermissions($doc);
+        $item = Item::findOrFail($idItem);
+        $this->checkPermissions($item);
         
         if (!$this->permissions['is_deletable']) {
             return redirect()
-                ->route("document.index")
-                ->with("error", "Document cannot be deleted in its current state.");
+                ->route("item.index")
+                ->with("error", "Item cannot be deleted in its current state.");
         }
         
-        $doc->delete();
+        $item->delete();
 
         return redirect()
-            ->route("document.index")
-            ->with("success", "Document deleted successfully.");
+            ->route("item.index")
+            ->with("success", "Item deleted successfully.");
     }
 
 
@@ -206,13 +203,13 @@ class DocumentController extends Controller
         $values = [];
 
         $validated = $request->validate([
-            "doc_type" => "required|string|min:1|max:64",
-            "description" => "required|string|max:256",
+            "item_type" => "required|string|min:1|max:64",
+            "title" => "required|string|max:256",
             "remarks" => "nullable|string|max:10000",
         ]);
 
-        $values["doc_type"] = $validated["doc_type"];
-        $values["description"] = $validated["description"];
+        $values["item_type"] = $validated["item_type"];
+        $values["title"] = $validated["title"];
         $values["remarks"] = $validated["remarks"];
 
         return $values;
@@ -220,29 +217,29 @@ class DocumentController extends Controller
 
 
 
-    public function freeze(Document $document)
+    public function freeze(Item $item)
     {
         // 1. Optional: Security/Authorization check 
-        // $this->authorize('update', $document);
+        // $this->authorize('update', $item);
 
         // 2. Update the status column to FROZEN
-        $document->update([
+        $item->update([
             'status' => 'FROZEN'
         ]);
 
         // 3. Redirect back to preserve the Inertia state gracefully
-        return redirect()->back()->with('success', 'Document frozen successfully.');
+        return redirect()->back()->with('success', 'Item frozen successfully.');
     }
 
 
 
-    public function release(Document $document)
+    public function release(Item $item)
     {
         // 1. Optional: Security/Authorization check 
-        // $this->authorize('update', $document);
+        // $this->authorize('update', $item);
 
         // 2. Update the status column to RELEASED
-        $document->update([
+        $item->update([
             'status' => 'RELEASED'
         ]);
 
@@ -250,7 +247,7 @@ class DocumentController extends Controller
         // send email to notify users
 
         // 3. Redirect back to preserve the Inertia state gracefully
-        return redirect()->back()->with('success', 'Document released successfully.');
+        return redirect()->back()->with('success', 'Item released successfully.');
     }
 
 
@@ -258,19 +255,19 @@ class DocumentController extends Controller
 
 
 
-    public function revise(Document $document)
+    public function revise(Item $item)
     {
         // 1. Enforce business rules using your state check logic
-        $this->checkPermissions($document);
+        $this->checkPermissions($item);
         if (!$this->permissions['is_reviseable']) {
-            throw new Exception("This document cannot be revised in its current state.");
+            throw new Exception("This item cannot be revised in its current state.");
         }
 
-        $newRev = $document->revision + 1;
+        $newRev = $item->revision + 1;
 
         // 2. Wrap operations in a transaction to guarantee data integrity
         // Clone the Eloquent model attributes (excluding the primary key)
-        $newRevision = $document->replicate();
+        $newRevision = $item->replicate();
 
         // Increment the revision string (e.g., 'A' -> 'B', 'B' -> 'C')
         // This assumes you have a 'revision' column defaulting to 'A'
@@ -299,16 +296,16 @@ class DocumentController extends Controller
         */
 
         // Update previous revision status to 'OBSOLETE'
-        $document->update(['is_latest' => false,'status' => 'OBSOLETE']);
+        $item->update(['is_latest' => false,'status' => 'OBSOLETE']);
 
-        return redirect('/pdm/document/' . $newRevision->id);
+        return redirect('/pdm/item/' . $newRevision->id);
     }
 
 
-    public function getDocumentNo(): int
+    public function getItemNo(): int
     {
-        $parameter = "document_no";
-        $initial_no = config("app.counters.document_no");
+        $parameter = "item_no";
+        $initial_no = config("app.counters.item_no");
         $counter = Counter::where("counter_type", $parameter)->first();
 
         if ($counter == null) {
@@ -326,16 +323,26 @@ class DocumentController extends Controller
     }
 
 
+    public function searchMakeFrom(Request $request): JsonResponse
+    {
+        $query = $request->get('search');
+        $items = Item::where('number', 'like', '%' . $query . '%')
+            ->where('is_latest', true)
+            ->get(['id', 'number', 'title']);
+        return response()->json($items);
+    }
 
-    public function uploadFiles(Request $request, Document $doc): bool
+
+
+    public function uploadFiles(Request $request, Item $item): bool
     {
         // For file upload params
         // Request, Model, Input Element Name, Preset Key (For File Types), Collection (Spatie), Max Size (eg 2048)
         UploadService::uploadMultiple(
             $request,
-            $doc,
-            "docFiles",     // Input name : should match the name attribute in the form
-            "documents",    // Preset name for uploadable files : See UploadService::PRESETS
+            $item,          // Model
+            "itemfiles",    // Input name : should match the name attribute in the form
+            "allOf",        // Preset name for uploadable files : See UploadService::PRESETS
             "attachments",  // collection_name
             "20480",        // max_size
         );
