@@ -9,6 +9,7 @@ export const config = {
             inertia_mm4: 144359.94,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-001"
         },
         {
             no: 2,
@@ -19,6 +20,7 @@ export const config = {
             inertia_mm4: 351727.54,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-002"
         },
         {
             no: 3,
@@ -29,6 +31,7 @@ export const config = {
             inertia_mm4: 733496.51,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-003"
         },
         {
             no: 4,
@@ -40,6 +43,7 @@ export const config = {
             inertia_mm4: 1372498.49,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-004"
         },
         {
             no: 5,
@@ -50,6 +54,7 @@ export const config = {
             inertia_mm4: 2372673.47,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-005"
         },
         {
             no: 6,
@@ -61,6 +66,7 @@ export const config = {
             inertia_mm4: 3861481.58,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-006"
         },
         {
             no: 7,
@@ -71,6 +77,7 @@ export const config = {
             inertia_mm4: 5992457.14,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-007"
         },
         {
             no: 8,
@@ -81,6 +88,7 @@ export const config = {
             inertia_mm4: 8947902.11,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-008"
         },
         {
             no: 9,
@@ -92,6 +100,7 @@ export const config = {
             inertia_mm4: 12941721.43,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-009"
         },
         {
             no: 10,
@@ -103,6 +112,7 @@ export const config = {
             inertia_mm4: 18222403.31,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-010"
         },
         {
             no: 11,
@@ -113,6 +123,7 @@ export const config = {
             inertia_mm4: 26761768.83,
             channel_number: 8,
             has_die: true,
+            part_number: "TUBE-011"
         },
         {
             no: 12,
@@ -123,6 +134,7 @@ export const config = {
             inertia_mm4: 35883568,
             channel_number: 8,
             has_die: true,
+            part_number: "TUBE-012"
         },
         {
             no: 13,
@@ -133,6 +145,7 @@ export const config = {
             inertia_mm4: 47211434.31,
             channel_number: 8,
             has_die: true,
+            part_number: "TUBE-013"
         },
         {
             no: 14,
@@ -143,6 +156,7 @@ export const config = {
             inertia_mm4: 61316545,
             channel_number: 8,
             has_die: true,
+            part_number: "TUBE-014"
         },
 
         {
@@ -154,6 +168,7 @@ export const config = {
             inertia_mm4: 78621879.48,
             channel_number: 8,
             has_die: true,
+            part_number: "TUBE-015"
         },
 
         {
@@ -165,6 +180,7 @@ export const config = {
             inertia_mm4: 99656139.01,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-016"
         },
 
         {
@@ -176,6 +192,7 @@ export const config = {
             inertia_mm4: 125007834.15,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-017"
         },
 
         {
@@ -187,6 +204,7 @@ export const config = {
             inertia_mm4: 155329543.18,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-018"
         },
 
         {
@@ -198,6 +216,7 @@ export const config = {
             inertia_mm4: 191342344.57,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-019"
         },
 
         {
@@ -209,6 +228,7 @@ export const config = {
             inertia_mm4: 233840426.71,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-020"
         },
 
         {
@@ -220,6 +240,7 @@ export const config = {
             inertia_mm4: 283695878.24,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-021"
         },
 
         {
@@ -231,6 +252,7 @@ export const config = {
             inertia_mm4: 341863661.87,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-022"
         },
 
         {
@@ -242,6 +264,7 @@ export const config = {
             inertia_mm4: 409386775.15,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-023"
         },
 
         {
@@ -253,6 +276,7 @@ export const config = {
             inertia_mm4: 487401601.14,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-024"
         },
 
         {
@@ -264,6 +288,7 @@ export const config = {
             inertia_mm4: 577143452.27,
             channel_number: 8,
             has_die: false,
+            part_number: "TUBE-025"
         },
     ],
 
@@ -278,6 +303,7 @@ export const config = {
             inertia_mm4: 144359.94,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-026"
         },
 
         {
@@ -289,6 +315,7 @@ export const config = {
             inertia_mm4: 361449.86,
             channel_number: 4,
             has_die: true,
+            part_number: "TUBE-027"
         },
 
     ],
@@ -443,6 +470,7 @@ export const config = {
             max_torque_Nm: 10,
             max_speed_rpm: 1400,
             mass_kg: 5,
+            part_number: "MOTOR-001"
         },
         {
             id: 2,
@@ -451,6 +479,7 @@ export const config = {
             max_torque_Nm: 10,
             max_speed_rpm: 1400,
             mass_kg: 5,
+            part_number: "MOTOR-002"
         },
 
         {
@@ -460,6 +489,7 @@ export const config = {
             max_torque_Nm: 10,
             max_speed_rpm: 2800,
             mass_kg: 5,
+            part_number: "MOTOR-003"
         },
 
 
@@ -470,6 +500,7 @@ export const config = {
             max_torque_Nm: 15,
             max_speed_rpm: 1400,
             mass_kg: 7,
+            part_number: "MOTOR-004"
         },
 
 
@@ -480,6 +511,7 @@ export const config = {
             max_torque_Nm: 15,
             max_speed_rpm: 2800,
             mass_kg: 7,
+            part_number: "MOTOR-005"
         },
 
 
@@ -490,6 +522,7 @@ export const config = {
             max_torque_Nm: 0,
             max_speed_rpm: 0,
             mass_kg: 9,
+            part_number: "MOTOR-006"
         },
 
 
@@ -503,6 +536,7 @@ export const config = {
             gear_ratio: 6,
             efficiency: 0.85,
             mass_kg: 5,
+            part_number: "GEARBOX-001"
         },
 
         {
@@ -511,6 +545,7 @@ export const config = {
             gear_ratio: 12,
             efficiency: 0.75,
             mass_kg: 7,
+            part_number: "GEARBOX-002"
         },
 
         {
@@ -519,6 +554,7 @@ export const config = {
             gear_ratio: 18,
             efficiency: 0.75,
             mass_kg: 7,
+            part_number: "GEARBOX-003"
         },
 
         {
@@ -527,6 +563,7 @@ export const config = {
             gear_ratio: 24,
             efficiency: 0.75,
             mass_kg: 7,
+            part_number: "GEARBOX-004"
         },
         {
             id: 6,
@@ -534,6 +571,7 @@ export const config = {
             gear_ratio: 60,
             efficiency: 0.65,
             mass_kg: 10,
+            part_number: "GEARBOX-005"
         },
     ],
 
@@ -743,4 +781,134 @@ export const config = {
         lock_key_each: 0.04,
         lock_mechanism_each: 0.15,
     },
+
+
+    fixed_top_flange : [
+        {
+            id: 1,
+            section_id: 1,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-001"
+        },
+        {
+            id: 2,
+            section_id: 2,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-002"
+        },
+        {
+            id: 3,
+            section_id: 3,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-003"
+        },
+        {
+            id: 4,
+            section_id: 4,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-004"
+        },
+        {
+            id: 5,
+            section_id: 5,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-005"
+        },
+        {
+            id: 6,
+            section_id: 6,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-006"
+        },
+        {
+            id: 7,
+            section_id: 7,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-007"
+        },
+        {
+            id: 8,
+            section_id: 8,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-008"
+        },
+        {
+            id: 9,
+            section_id: 9,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-009"
+        },
+        {
+            id: 10,
+            section_id: 10,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-010"
+        },
+        {
+            id: 11,
+            section_id: 11,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-011"
+        },
+        {
+            id: 12,
+            section_id: 12,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-012"
+        },
+        {
+            id: 13,
+            section_id: 13,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-013"
+        },
+        {
+            id: 14,
+            section_id: 14,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-014"
+        },
+        {
+            id: 15,
+            section_id: 15,
+            name: "Fixed Top Flange",
+            mass_kg: 0.5,
+            valid_configurations:['BOTTOM','TOP','TM','BP'],
+            part_number: "FTF-015"
+        }
+
+    ],
+
+    
+
+    
+
 };

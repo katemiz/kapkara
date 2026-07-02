@@ -1,4 +1,28 @@
 <script>
+    
+    /**
+     * Reusable Filter Select Component for Laravel-Inertia-Svelte 5
+     * 
+     * @component
+     * @example
+     * <FilterSelect 
+     *   label="Select an option"
+     *   name="option"
+     *   options={options}
+     *   placeholder="Type to search..."
+     *   minChars={4}
+     *   selectedValue={$bindable(null)}
+     * />
+     */
+    
+
+
+
+
+
+
+
+
     import { untrack } from "svelte";
 
     // 1. Define Component Props
@@ -6,7 +30,10 @@
         options = [],          // Array: [{ value: 'M-101', label: 'Assembly - Montaj' }]
         placeholder = "Type to search...", 
         minChars = 4,          // Minimum characters required to display list
-        selectedValue = $bindable(null) // Two-way bound selection identifier
+        selectedValue = $bindable(null), // Two-way bound selection identifier
+        label = "",
+        name = "",
+        required = false
     } = $props();
 
     // 2. Local State Runes
@@ -48,8 +75,30 @@
     }
 </script>
 
-<div class="search-select-wrapper">
+
+
+
+
+
+
+
+<div class="field">
+
+            {#if label}
+        <label class="label" for={name}>
+            {label}
+            {#if required}
+                <span class="has-text-danger">*</span>
+            {/if}
+        </label>
+        {/if}
     <div class="input-container">
+
+
+
+
+
+
         <input 
             type="text" 
             class="search-input"

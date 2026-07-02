@@ -16,7 +16,7 @@ export default class Configurator {
 
         this.setExtendedHeight();
         this.setNestedHeight();
-
+        this.productNaming();
         this.setPayloadParameters();
 
         this.setMastSections();
@@ -34,6 +34,8 @@ export default class Configurator {
         this.setBeamControlPoints();
 
         this.getInternalLoads();
+
+        this.setBOM();
 
 
         console.log("Mast", this.mast)
@@ -228,7 +230,9 @@ export default class Configurator {
         });
     }
 
-
+    productNaming() {
+        this.mast.product_code = Math.round(this.mast.extendedHeight / 1000, 0) + this.params.mast_type + "-" + (this.mast.nestedHeight / 1000).toFixed(1) + "-" + this.params.noOfTubes;
+    }
 
 
 
@@ -827,6 +831,33 @@ export default class Configurator {
 
 
 
+    setBOM() {
+
+        this.mast.bom = [];
+
+        this.mast.sections.forEach((section,index) => {
+
+            // TUBES
+            let the_tube = this.mast.tubes.find(tube => tube.no === section.tube_no);
+
+            this.mast.bom.push({
+                type: 'tube',
+                part_number: the_tube.part_number,
+                length: the_tube.length - 5,
+                material: the_tube.material,
+                quantity: 1
+            });
+
+
+
+
+        })
+
+
+
+
+
+    }
 
 
 }

@@ -16,8 +16,10 @@ use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\MediaController;
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ApiController;
 
 use Inertia\Inertia;
+
 
 // 1. Root Route
 // Public Routes
@@ -101,7 +103,7 @@ Route::get(
 
 // PDM
 Route::middleware(["auth", "verified"])->group(function () {
-    
+
     Route::resource("/pdm/material", MaterialController::class);
     Route::resource("/pdm/product-note", ProductNoteController::class);
     Route::resource("/pdm/standard", StandardController::class);
@@ -134,4 +136,9 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("question", QuestionController::class);
     Route::resource("answer", AnswerController::class);
     Route::resource("user", UserController::class);
+
+    // API
+    Route::post('/api/code2cad', [ApiController::class, 'runCode2Cad']);
 });
+
+

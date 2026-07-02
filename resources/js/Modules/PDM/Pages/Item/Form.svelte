@@ -19,7 +19,7 @@
 
     // 1. Initialize the Inertia Form
     let form = useForm(untrack(() => ({
-        item_type: item?.item_type ?? "",
+        item_type: item?.item_type ?? "Part",
         number: item?.number ?? "",
         title: item?.title ?? "",
         itemfiles: item?.files ?? null,
@@ -43,20 +43,9 @@
             });
         }
 
-        searchMakeFrom();
     });
 
-    function searchMakeFrom() {
-        // TODO: Implement search for make_from_part_id
-        router.get('/pdm/item', {
-            search: $form.make_from_part_id,
-            show_latest_only: true
-        }, {
-            preserveState: true,
-            replace: true, // Prevents flooding browser history with every single keystroke
-            preserveScroll: true,
-        });
-    }
+
 
     let item_types = $derived(
         items_config.item_types.map((cat) => ({
@@ -177,6 +166,17 @@
             />
         {/if}
 
+
+
+
+
+
+
+
+
+
+
+
         <form onsubmit={submit} novalidate id="genericForm">
             <FormSelect
                 {form}
@@ -195,21 +195,7 @@
                 required={true}
             />
 
-            <div class="field">
-                <label class="label" for="ed">Notes/Comments/Remarks</label>
-                <div class="control" id="ed">
-                    <Editor
-                        onUpdate={(html) => ($form.remarks = html)}
-                        value={item != null ? item.remarks : ""}
-                        placeholder="Enter any notes, comments, or remarks about the item here..."
-                    />
-                </div>
-                {#if $form.errors.remarks}
-                    <p class="help is-danger">
-                        {$form.errors.remarks}
-                    </p>
-                {/if}
-            </div>
+
 
             {#if item && item.files.length > 0}
                 <FilesList media={item.files} />
@@ -224,23 +210,21 @@
             />
 
 
-            <FormInput
-                {form}
-                name="make_from_part_id"
+
+
+            {#if $form.item_type === "Make-From"}
+            <FilterSelect 
                 label="Make from Part ID"
+                name="make_from_part_id"
+                options={results} 
                 placeholder="Enter Make from Part ID"
-                required={false}
+                minChars={4} 
             />
+            {/if}
 
 
 
-<label for="component-search"><strong>Search & Select Component:</strong></label>
-<FilterSelect 
-    options={results} 
-    minChars={4} 
-/>
-
-
+            {#if $form.item_type === "Buyable"}
 
 
             <div class="fixed-grid">
@@ -273,6 +257,8 @@
                 placeholder="Enter Vendor URL"
                 required={false}
             />
+
+            {/if}
 
 
 
@@ -316,7 +302,21 @@
 
 
 
-
+            <div class="field">
+                <label class="label" for="ed">Notes/Comments/Remarks</label>
+                <div class="control" id="ed">
+                    <Editor
+                        onUpdate={(html) => ($form.remarks = html)}
+                        value={item != null ? item.remarks : ""}
+                        placeholder="Enter any notes, comments, or remarks about the item here..."
+                    />
+                </div>
+                {#if $form.errors.remarks}
+                    <p class="help is-danger">
+                        {$form.errors.remarks}
+                    </p>
+                {/if}
+            </div>
 
 
 

@@ -8,8 +8,26 @@ export const items_config = {
         },
         {
             "value" : "Part",
-            "description" : "Part",
+            "description" : "Detail (Make) Part",
             "description_tr" : "Parça",
+        },
+
+        {
+            "value" : "Buyable",
+            "description" : "Buyable Item",
+            "description_tr" : "Satın Alınabilir",
+        },
+
+        {
+            "value" : "Make-From",
+            "description" : "Make-From Part",
+            "description_tr" : "Başkasından Yapılan",
+        },
+
+        {
+            "value" : "Standard",
+            "description" : "Standard Part",
+            "description_tr" : "Standart Parça",
         },
 
     ],

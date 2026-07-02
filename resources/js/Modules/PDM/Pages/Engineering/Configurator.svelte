@@ -26,6 +26,7 @@
     import Chart from "chart.js/auto";
 
     import {
+        Box,
         Braces,
         Info,
         ChartLine,
@@ -489,6 +490,48 @@
             };
         });
     }
+
+
+
+
+    let result = '';
+    let error = '';
+
+    async function code2Cad() {
+
+        console.log(configurator.mast)
+
+        try {
+            const response = await fetch('/api/code2cad', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ mast: configurator.mast })
+            });
+            
+            const data = await response.json();
+            console.log("Response from server:", data); // ◄ View this in F12 Console
+            
+            if (response.ok) {
+                result = data.result; // Saves "Python received parameter: tube_data"
+                error = '';
+                alert("done")
+                console.log(JSON.parse(result))
+            } else {
+                error = data.error || 'Something went wrong';
+            }
+        } catch (err) {
+            error = err.message;
+            console.error("Fetch Error:", err);
+        }
+    }
+
+
+
+
+
 </script>
 
 <Layout>
@@ -554,6 +597,22 @@
             </div>
 
             <div class="column has-text-right has-text-left-mobile">
+
+
+                <button
+                    onclick={code2Cad}
+                    class="button is-link is-light"
+                    data-tooltip="Code2CAD"
+                >
+                    <span class="icon is-small">
+                        <Box size="18" color="red"/>
+                    </span>
+                </button>
+
+
+
+
+
 
                 <button
                     onclick={toggle}
@@ -764,7 +823,7 @@
                             placeholder="Enter Base Adapter Thickness"
                             type="number"
                             min="0"
-                            max="100"
+                            max="1000"
                             step="1"
                             required={true}
                         />
