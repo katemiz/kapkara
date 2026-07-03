@@ -122,10 +122,19 @@ export default class Configurator {
                 // Calculate EI
                 tube.EI_Nm2 = tube.material_e * tube.inertia_mm4 * 1e-12; // Nm2
 
+                // SET TUBE STATES
                 tube.state_name = "INTERMEDIATE";
 
                 if (tube.no === this.params.start_tube_no) {
                     tube.state_name = "TOP";
+                }
+
+                if (this.params.noOfTubes > 3 && tube.no === this.params.start_tube_no + 1) {
+                    tube.state_name = "TM"; // Top Minus
+                }
+
+                if (this.params.noOfTubes > 3 && tube.no === this.params.end_tube_no - 1) {
+                    tube.state_name = "BP"; // Base Plus
                 }
 
                 if (tube.no === this.params.end_tube_no) {
@@ -850,8 +859,29 @@ export default class Configurator {
 
 
 
+            // UPPER GUIDE KEYS
+            this.mast.bom.push({
+                type: 'guide_key',
+                part_number: 'GUIDE_KEY_UPPER',
+                length: 100,
+                material: 'Steel',
+                quantity: 1
+            });
+
+
+
 
         })
+
+
+        // LOWER GUIDE KEYS
+        this.mast.bom.push({
+            type: 'guide_key',
+            part_number: 'GUIDE_KEY_LOWER',
+            length: 100,
+            material: 'Steel',
+            quantity: 1
+        });
 
 
 

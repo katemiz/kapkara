@@ -907,7 +907,25 @@ export const config = {
 
     ],
 
-    
+    kamalar:{
+        material: "bronze"
+        
+    },
+
+    materials: [
+        {
+            name: "aluminum",
+            density: 2704
+        },
+        {
+            name: "bronze",
+            density: 8730
+        },
+        {
+            name: "steel",
+            density: 7850
+        }
+    ]
 
     
 

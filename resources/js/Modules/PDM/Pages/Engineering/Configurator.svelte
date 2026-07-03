@@ -499,7 +499,8 @@
 
     async function code2Cad() {
 
-        console.log(configurator.mast)
+        console.log("Configurator.mast",configurator.mast)
+        console.log("Form.overlap",$form.overlap)
 
         try {
             const response = await fetch('/api/code2cad', {
@@ -508,7 +509,7 @@
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ mast: configurator.mast })
+                body: JSON.stringify({ pnumber:"199234", mast: configurator.mast, overlap: $form.overlap })
             });
             
             const data = await response.json();

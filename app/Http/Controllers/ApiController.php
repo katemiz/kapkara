@@ -16,7 +16,6 @@ class ApiController extends Controller
         // Convert the array cleanly into a JSON string
         $jsonPayload = json_encode($mastData);
 
-        //$scriptPath = storage_path('app/python/mast.py');
         $scriptPath = resource_path('js/API/python/mast.py');
         $pythonPath = 'C:\\Users\\ThinkPad\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe';
 

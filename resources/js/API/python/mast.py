@@ -15,6 +15,7 @@ from cadquery.vis import show
 import tubes
 import payload
 import base_plate 
+import kama
 
 # 1. Define your base directory path object
 base_dir = Path(r"C:\Users\ThinkPad\Desktop\CADQuery")
@@ -25,10 +26,14 @@ try:
     if input_data:
         # 1. data is a dictionary containing all keys from Svelte
         data = json.loads(input_data)
-        
+
+        assy_number = int(data.get("pnumber", 0))
+
         # 2. ◄ CRITICAL FIX: Extract the actual list of tubes from the dict
         profiles = data["mast"]["tubes"] # 'mast' is coming from svelte fetch
         product_code = data["mast"]["product_code"]
+        #params = int(data["overlap"])
+        overlap = int(data.get("overlap", 0))
         
         #print(f"Successfully processed {len(tubes)} tubes via stdin!")
         #print(f"dddd {profiles}")
@@ -57,12 +62,12 @@ total_assembly_mass = 0.0
 for i, profile in enumerate(profiles):
 
     # TUBE MODEL
-    cad_tube = tubes.create_tube(profile)
+    cad_tube = tubes.create_tube(profile,overlap)
     cad_tube_shifted = cad_tube.translate((0, 0, profile["extended_zb"]))
     #visual_collection.append(cad_tube_shifted) # 3. Add to our visualization list
 
     # MASS
-    part_key = f"MT-{profile['no']}"
+    part_key = f"{assy_number}-BORU-{profile['no']}"
     volume_mm3 = cad_tube_shifted.val().Volume()
     part_mass = profile["mass_per_m"] * profile['length'] / 1000    # Density of Aluminum: 2704 kg/m³ -> 2.704e-6 kg/mm³
     individual_masses[part_key] = round(part_mass, 3) # Round to 3 decimal places
@@ -78,19 +83,19 @@ for i, profile in enumerate(profiles):
 
     # Check if this is the first tube (index 0)
     if i == 0:
+
+        # PAYLOAD ADAPTER : MODEL, MASS
         payload_cad = payload.payload_adapter(profile)
         payload_cad_shifted = payload_cad.translate((0, 0, profile["extended_zt"]))
-        #visual_collection.append(payload_cad_shifted) # 3. Add to our visualization list
 
-        # MASS
+        # mass
         part_key = f"PayloadAdapter"
         volume_mm3 = payload_cad_shifted.val().Volume()
         part_mass = volume_mm3 * profile['material_density'] * 1e-9    # Density of Aluminum: 2704 kg/m³ -> 2.704e-6 kg/mm³
         individual_masses[part_key] = round(part_mass, 3) # Round to 3 decimal places
         total_assembly_mass += part_mass
 
-        # Add parts directly, specifying their absolute location transforms
-        assembly.add(payload_cad_shifted, name="Payload", color=cq.Color("gray"))
+        assembly.add(payload_cad_shifted, name="Payload", color=cq.Color("gray")) # Add to assembly
 
 
 
@@ -116,6 +121,18 @@ for i, profile in enumerate(profiles):
         flange_step_shifted = flange_step.translate((0, 0, profile["extended_zt"] -35))
         assembly.add(flange_step_shifted, name="Flange1", color=cq.Color("red"))
 
+    # KAMALAR
+    if profile["state_name"] != 'BASE':
+        kama_solid,volume_mm3 = kama.kama(profile,overlap)
+        #visual_collection.append(kama) # 3. Add to our visualization list
+
+        part_key = f"KAMA{profile['no']}"
+        part_mass = volume_mm3 * profile['material_density'] * 1e-9    # Density of Aluminum: 2704 kg/m³ -> 2.704e-6 kg/mm³
+        individual_masses[part_key] = round(part_mass, 3) # Round to 3 decimal places
+        total_assembly_mass += part_mass
+
+        # Add parts directly, specifying their absolute location transforms
+        assembly.add(kama_solid, name=f"KAMA{profile['no']}", color=cq.Color("gray"))
 
 
 
