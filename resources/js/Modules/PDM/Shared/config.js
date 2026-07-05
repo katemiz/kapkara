@@ -292,7 +292,7 @@ export const config = {
         },
     ],
 
-    circular_tubes:[
+    circular_tubes: [
 
         {
             no: 1,
@@ -783,134 +783,7 @@ export const config = {
     },
 
 
-    fixed_top_flange : [
-        {
-            id: 1,
-            section_id: 1,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-001"
-        },
-        {
-            id: 2,
-            section_id: 2,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-002"
-        },
-        {
-            id: 3,
-            section_id: 3,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-003"
-        },
-        {
-            id: 4,
-            section_id: 4,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-004"
-        },
-        {
-            id: 5,
-            section_id: 5,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-005"
-        },
-        {
-            id: 6,
-            section_id: 6,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-006"
-        },
-        {
-            id: 7,
-            section_id: 7,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-007"
-        },
-        {
-            id: 8,
-            section_id: 8,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-008"
-        },
-        {
-            id: 9,
-            section_id: 9,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-009"
-        },
-        {
-            id: 10,
-            section_id: 10,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-010"
-        },
-        {
-            id: 11,
-            section_id: 11,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-011"
-        },
-        {
-            id: 12,
-            section_id: 12,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-012"
-        },
-        {
-            id: 13,
-            section_id: 13,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-013"
-        },
-        {
-            id: 14,
-            section_id: 14,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-014"
-        },
-        {
-            id: 15,
-            section_id: 15,
-            name: "Fixed Top Flange",
-            mass_kg: 0.5,
-            valid_configurations:['BOTTOM','TOP','TM','BP'],
-            part_number: "FTF-015"
-        }
 
-    ],
-
-    kamalar:{
-        material: "bronze"
-        
-    },
 
     materials: [
         {
@@ -927,6 +800,6 @@ export const config = {
         }
     ]
 
-    
+
 
 };

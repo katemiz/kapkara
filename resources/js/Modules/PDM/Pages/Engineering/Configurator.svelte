@@ -9,7 +9,6 @@
 
     import Pdf from "$components/Icons/Pdf.svelte";
 
-
     import JsonTree from "$components/JsonTree.svelte";
 
     import { useForm } from "@inertiajs/svelte";
@@ -22,10 +21,10 @@
 
     import Configurator from "$modules/PDM/Pages/Engineering/Configurator.js";
 
-
     import Chart from "chart.js/auto";
 
     import {
+        ReceiptText,
         Box,
         Braces,
         Info,
@@ -74,7 +73,7 @@
                     ),
 
                     borderColor: "#D7263D",
-                    fill:true,
+                    fill: true,
                     yAxisID: "y",
                 },
 
@@ -338,29 +337,23 @@
         mast_type: "MTNX",
     });
 
-
-
-
-
-
     onMount(() => {
         // Initialize dependent default values
         $form.z_offset = Math.round((1000 * Math.sqrt($form.sail_area)) / 2, 0);
         $form.side_adapter_z =
             $form.tube_length + $form.base_adapter_height - $form.overlap / 2;
 
-        const selectedMast = config['mast_types'].find(mast => mast.value.toString() === $form.mast_type.toString());
+        const selectedMast = config["mast_types"].find(
+            (mast) => mast.value.toString() === $form.mast_type.toString(),
+        );
         $form.head_height = selectedMast ? selectedMast.head_height : null;
 
-        const params = new URLSearchParams(
-            window.location.search
-        );
+        const params = new URLSearchParams(window.location.search);
 
         const qr = params.get("qr");
 
-        if(qr)
-        {
-            let qr_arr = qr.split('-');
+        if (qr) {
+            let qr_arr = qr.split("-");
 
             console.log("QR parameter:", qr, qr_arr);
 
@@ -383,20 +376,14 @@
             $form.tip_deflection_percentage = parseFloat(qr_arr[16]);
             $form.side_adapter_z = parseFloat(qr_arr[17]);
         }
-
-
     });
-
-
-
-
-
 
     // If you need the form to update when the 'params' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
         // We "touch" mast to ensure this effect re-runs when form changes
         const _mast = mast;
+        //const _configurator = configurator;
 
         deflection.run();
         drawBMChart(deflection.data);
@@ -410,14 +397,16 @@
         // Vibration analysis
         runVibrationAnalysis();
 
-        configurator.run();
+        //configurator.run();
+
+        // configurator.svgDraw("Loads");
+        // configurator.svgDraw("Extended");
+        // configurator.svgDraw("Nested");
     });
 
     let mast = $derived(new MastGeometry($form.data(), config));
     let svgDraw = $derived(new SvgDraw(mast.data));
     let deflection = $derived(new MastDeflection(mast.data));
-
-
     let configurator = $derived(new Configurator($form.data()));
 
     function toggleTab(elName) {
@@ -431,7 +420,8 @@
             "Extended",
             "Nested",
             "Torque",
-            "Vibration"
+            "Vibration",
+            "BOM",
         ];
 
         tabs.forEach((element) => {
@@ -453,27 +443,29 @@
     }
 
     function goToMastOptionsTable() {
-        window.location.href = "/pdm/engineering/options_table"
+        window.location.href = "/pdm/engineering/options_table";
     }
 
-
     function updateFormValues() {
-        const selectedMast = config['mast_types'].find(mast => mast.value.toString() === $form.mast_type.toString());
+        const selectedMast = config["mast_types"].find(
+            (mast) => mast.value.toString() === $form.mast_type.toString(),
+        );
 
         $form.head_height = selectedMast ? selectedMast.head_height : null;
-        $form.base_adapter_height = selectedMast ? selectedMast.base_adapter_height : null;
+        $form.base_adapter_height = selectedMast
+            ? selectedMast.base_adapter_height
+            : null;
     }
 
     let all_frequencies = $state([]);
 
     function runVibrationAnalysis() {
-
         // Create vibration analyzer with mast data, tube lengths and payload mass
         const analyzer2 = new MastVibration({
             params: mast.data.params,
             extendedHeight: mast.data.props.extendedHeight,
             modes: 3,
-            integrationSteps: 500
+            integrationSteps: 500,
         });
 
         // Calculate frequencies
@@ -484,55 +476,50 @@
             //console.log(`Frequency ${index + 1}:`, freq);
 
             all_frequencies[index] = {
-                "weak":karsilastirma.weak[index],
-                "strong":karsilastirma.strong[index],
-                "frequency":freq
+                weak: karsilastirma.weak[index],
+                strong: karsilastirma.strong[index],
+                frequency: freq,
             };
         });
     }
 
-
-
-
-    let result = '';
-    let error = '';
+    let result = "";
+    let error = "";
 
     async function code2Cad() {
-
-        console.log("Configurator.mast",configurator.mast)
-        console.log("Form.overlap",$form.overlap)
+        console.log("Configurator.mast", configurator.mast);
+        console.log("Form.overlap", $form.overlap);
 
         try {
-            const response = await fetch('/api/code2cad', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+            const response = await fetch("/api/code2cad", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
                 },
-                body: JSON.stringify({ pnumber:"199234", mast: configurator.mast, overlap: $form.overlap })
+                body: JSON.stringify({
+                    pnumber: "199234",
+                    mast: configurator.mast,
+                    overlap: $form.overlap,
+                }),
             });
-            
+
             const data = await response.json();
             console.log("Response from server:", data); // ◄ View this in F12 Console
-            
+
             if (response.ok) {
                 result = data.result; // Saves "Python received parameter: tube_data"
-                error = '';
-                alert("done")
-                console.log(JSON.parse(result))
+                error = "";
+                alert("done");
+                console.log(JSON.parse(result));
             } else {
-                error = data.error || 'Something went wrong';
+                error = data.error || "Something went wrong";
             }
         } catch (err) {
             error = err.message;
             console.error("Fetch Error:", err);
         }
     }
-
-
-
-
-
 </script>
 
 <Layout>
@@ -546,7 +533,6 @@
             </div>
 
             <div class="column has-text-right has-text-left-mobile">
-
                 <button
                     onclick={toggleInfoGraphic}
                     class="button is-link is-light"
@@ -556,7 +542,6 @@
                         <Info size="20" />
                     </span>
                 </button>
-
 
                 <a
                     href="/pdm/engineering/profiles_table"
@@ -589,31 +574,25 @@
             onchange={() => updateFormValues()}
         />
 
-
         <div class="columns">
             <div class="column is-10">
                 <Title
-                    title="[{$form.end_tube_no - $form.start_tube_no + 1}] Sections"
+                    title="[{$form.end_tube_no -
+                        $form.start_tube_no +
+                        1}] Sections"
                 />
             </div>
 
             <div class="column has-text-right has-text-left-mobile">
-
-
                 <button
                     onclick={code2Cad}
                     class="button is-link is-light"
                     data-tooltip="Code2CAD"
                 >
                     <span class="icon is-small">
-                        <Box size="18" color="red"/>
+                        <Box size="18" color="red" />
                     </span>
                 </button>
-
-
-
-
-
 
                 <button
                     onclick={toggle}
@@ -637,10 +616,6 @@
                 </button>
             </div>
         </div>
-
-
-
-
 
         <form novalidate id="genericForm" class="my-6">
             <div class="fixed-grid has-4-cols has-1-cols-mobile">
@@ -1045,6 +1020,17 @@
                         >
                         <span>Frequencies</span>
                     </button>
+
+                    <button
+                        class="navbar-item is-light is-inverted"
+                        onclick={() => toggleTab("BOM")}
+                        id="tabBOM"
+                    >
+                        <span class="icon"
+                            ><ReceiptText size="16" color="blue" /></span
+                        >
+                        <span>BOM</span>
+                    </button>
                 </div>
             </div>
         </nav>
@@ -1111,7 +1097,6 @@
                                                 )}</td
                                             >
                                         </tr>
-
                                     </tbody>
                                 </table>
                             </td>
@@ -1182,16 +1167,15 @@
                                         </tr>
 
                                         <tr>
-                                            <th>Time to Extend Mast [Estimated]</th>
+                                            <th
+                                                >Time to Extend Mast [Estimated]</th
+                                            >
                                             <td>
                                                 {mast.data.power.time_to_extend_seconds.toFixed(
                                                     0,
                                                 )} seconds
                                             </td>
                                         </tr>
-
-
-
 
                                         <tr>
                                             <th
@@ -1304,13 +1288,15 @@
                                     <tbody>
                                         {#each all_frequencies as mode, index}
                                             <tr>
-                                                <td>Mode {index}</td>
+                                                <td>Mode {index + 1}</td>
 
                                                 <td class="has-text-right"
                                                     >{mode.weak.toFixed(1)} Hz</td
                                                 >
-                                                <td class="has-text-right has-background-grey-lighter 	 has-text-weight-bold"
-                                                    >{mode.frequency.toFixed(1)} Hz</td
+                                                <td
+                                                    class="has-text-right has-background-grey-lighter has-text-weight-bold"
+                                                    >{mode.frequency.toFixed(1)}
+                                                    Hz</td
                                                 >
                                                 <td class="has-text-right"
                                                     >{mode.strong.toFixed(1)} Hz</td
@@ -1323,6 +1309,34 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- BOM TAB -->
+            <div class="container is-hidden" id="divBOM">
+                <Title title="BOM" subtitle="Bill of Materials" />
+                {console.log("lllllllll", configurator.mast.bom)}
+                {console.log("lllllllll", configurator.mast.bom)}
+
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Config No</th>
+                            <th>Name</th>
+                            <th>Mass (kg)</th>
+                            <th>Part Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each configurator.mast.bom as item}
+                            <tr>
+                                <td>AA{item.config_no} {console.log(item)}</td>
+                                <td>BB{item.name}</td>
+                                <td>CC{item.mass_kg}</td>
+                                <td>DD{item.part_number}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -1350,7 +1364,10 @@
         </div>
 
         <!-- INFO GRAPHIC MODAL -->
-        <div class="modal {showInfoGraphic ? 'is-active' : ''}" id="infoGraphicModal">
+        <div
+            class="modal {showInfoGraphic ? 'is-active' : ''}"
+            id="infoGraphicModal"
+        >
             <button
                 type="button"
                 class="modal-background {showInfoGraphic ? 'is-active' : ''}"
@@ -1360,19 +1377,17 @@
             ></button>
 
             <div class="modal-content has-background-white p-6">
-
                 <!-- PARAMETERS -->
-                <Title
-                    title="Definition of Parameters Used"
-                />
+                <Title title="Definition of Parameters Used" />
                 <p class="image">
-                <img src="/images/PDM/MastParameters.png" alt="Description of mast parameters">
+                    <img
+                        src="/images/PDM/MastParameters.png"
+                        alt="Description of mast parameters"
+                    />
                 </p>
 
                 <!-- TERRAIN CATEGORIES -->
-                <Title
-                    title="Terrain Categories"
-                />
+                <Title title="Terrain Categories" />
 
                 <table class="table is-fullwidth">
                     <thead>
@@ -1383,7 +1398,6 @@
                     </thead>
 
                     <tbody>
-
                         {#each config.terrain_category as terrain}
                             <tr>
                                 <th class="is-4">{terrain.no}</th>
@@ -1393,41 +1407,47 @@
                     </tbody>
                 </table>
 
-
                 <!-- LOADS RESOURCES -->
 
-                <Title
-                    title="Load Calculation Resources"
-                />
+                <Title title="Load Calculation Resources" />
 
                 <article class="message is-info">
                     <Title subtitle="Wind Load on Payloads" />
                     <div class="message-body">
-                    Dynamic pressure formula is used to calculate wind load on payloads.
+                        Dynamic pressure formula is used to calculate wind load
+                        on payloads.
                     </div>
                 </article>
 
                 <article class="message is-info">
                     <Title subtitle="Wind Load Circular Mast Sections" />
                     <div class="message-body">
-                        <p>Eurocode 1: Actions on structures - Part 1-4: General actions - Wind actions</p>
-
                         <p>
-                            <a href="https://www.phd.eng.br/wp-content/uploads/2015/12/en.1991.1.4.2005.pdf">
-                            EN 1991-1-4:2005+A1:2010 Section 7.9.2</a> Cylindrical structures, isolated cylindrical elements
+                            Eurocode 1: Actions on structures - Part 1-4:
+                            General actions - Wind actions
                         </p>
-                        
-                        <p>All load calculations on mast sections are performed per above document.</p>
 
                         <p>
-                            <a href="https://eurocodeapplied.com/design/en1991/wind-force-cylinder">Eurocode Implementation</a>
+                            <a
+                                href="https://www.phd.eng.br/wp-content/uploads/2015/12/en.1991.1.4.2005.pdf"
+                            >
+                                EN 1991-1-4:2005+A1:2010 Section 7.9.2</a
+                            > Cylindrical structures, isolated cylindrical elements
+                        </p>
+
+                        <p>
+                            All load calculations on mast sections are performed
+                            per above document.
+                        </p>
+
+                        <p>
+                            <a
+                                href="https://eurocodeapplied.com/design/en1991/wind-force-cylinder"
+                                >Eurocode Implementation</a
+                            >
                         </p>
                     </div>
                 </article>
-
-
-
-
             </div>
 
             <button
@@ -1435,8 +1455,6 @@
                 aria-label="close"
                 onclick={toggleInfoGraphic}
             ></button>
-
         </div>
-
     </section>
 </Layout>
