@@ -12,13 +12,8 @@
     import JsonTree from "$components/JsonTree.svelte";
 
     import { useForm } from "@inertiajs/svelte";
-    import { MastGeometry } from "$modules/PDM/Pages/Engineering/mastGeometry.js";
-    import { SvgDraw } from "$modules/PDM/Pages/Engineering/SvgDraw.js";
 
     import MakePDF from "$modules/PDM/Pages/Engineering/MakePDF.js";
-    import MastDeflection from "$modules/PDM/Pages/Engineering/Deflection.js";
-    import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration.js";
-
     import Configurator from "$modules/PDM/Pages/Engineering/Configurator.js";
 
     import Chart from "chart.js/auto";
@@ -42,9 +37,13 @@
     import { config } from "$modules/PDM/Shared/config.js";
 
     let chartCanvas;
-    let chartDeflection;
     let chartInstance;
-    let chartDeflectionInstance;
+
+    let configurator = $derived.by(() => {
+        const c = new Configurator($form.data());
+        c.run();
+        return c;
+    });
 
     // Function to update/create the chart
     function drawBMChart(data) {
@@ -376,38 +375,38 @@
             $form.tip_deflection_percentage = parseFloat(qr_arr[16]);
             $form.side_adapter_z = parseFloat(qr_arr[17]);
         }
+
+        //configurator.run();
     });
 
     // If you need the form to update when the 'params' prop changes
     // (e.g., navigating from one edit page to another edit page), use an effect:
     $effect(() => {
         // We "touch" mast to ensure this effect re-runs when form changes
-        const _mast = mast;
+        //const _configurator = configurator;
         //const _configurator = configurator;
 
-        deflection.run();
-        drawBMChart(deflection.data);
-        drawDeflectionChart(deflection.data);
-
-        // Chart and SVG should update whenever form changes and mast recalculates
-        svgDraw.svgDraw("Loads");
-        svgDraw.svgDraw("Extended");
-        svgDraw.svgDraw("Nested");
-
-        // Vibration analysis
-        runVibrationAnalysis();
-
-        configurator.run();
+        //configurator.run();
 
         // configurator.svgDraw("Loads");
         // configurator.svgDraw("Extended");
         // configurator.svgDraw("Nested");
+
+        const bomData = configurator.mast.bom;
+
+        // Ensure our calculations are complete and data exists before side effects
+        if (bomData) {
+            // deflection.run();
+            // drawBMChart(deflection.data);
+            // drawDeflectionChart(deflection.data);
+            // svgDraw.svgDraw("Loads");
+            // svgDraw.svgDraw("Extended");
+            // svgDraw.svgDraw("Nested");
+            // runVibrationAnalysis();
+        }
     });
 
-    let mast = $derived(new MastGeometry($form.data(), config));
-    let svgDraw = $derived(new SvgDraw(mast.data));
-    let deflection = $derived(new MastDeflection(mast.data));
-    let configurator = $derived(new Configurator($form.data()));
+    //let configurator = $derived(new Configurator($form.data()));
 
     function toggleTab(elName) {
         let tabSelected = "tab" + elName;
@@ -455,70 +454,6 @@
         $form.base_adapter_height = selectedMast
             ? selectedMast.base_adapter_height
             : null;
-    }
-
-    let all_frequencies = $state([]);
-
-    function runVibrationAnalysis() {
-        // Create vibration analyzer with mast data, tube lengths and payload mass
-        const analyzer2 = new MastVibration({
-            params: mast.data.params,
-            extendedHeight: mast.data.props.extendedHeight,
-            modes: 3,
-            integrationSteps: 500,
-        });
-
-        // Calculate frequencies
-        const frequencies = analyzer2.calculateFrequencies();
-        const karsilastirma = analyzer2.comparativeFrequencies();
-
-        frequencies.forEach((freq, index) => {
-            //console.log(`Frequency ${index + 1}:`, freq);
-
-            all_frequencies[index] = {
-                weak: karsilastirma.weak[index],
-                strong: karsilastirma.strong[index],
-                frequency: freq,
-            };
-        });
-    }
-
-    let result = "";
-    let error = "";
-
-    async function code2Cad() {
-        console.log("Configurator.mast", configurator.mast);
-        console.log("Form.overlap", $form.overlap);
-
-        try {
-            const response = await fetch("/api/code2cad", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    pnumber: "199234",
-                    mast: configurator.mast,
-                    overlap: $form.overlap,
-                }),
-            });
-
-            const data = await response.json();
-            console.log("Response from server:", data); // ◄ View this in F12 Console
-
-            if (response.ok) {
-                result = data.result; // Saves "Python received parameter: tube_data"
-                error = "";
-                alert("done");
-                console.log(JSON.parse(result));
-            } else {
-                error = data.error || "Something went wrong";
-            }
-        } catch (err) {
-            error = err.message;
-            console.error("Fetch Error:", err);
-        }
     }
 </script>
 
@@ -898,7 +833,7 @@
                     <div>
                         <p class="heading mb-0">Extended Height</p>
                         <p class="title mb-0">
-                            {mast.data.props.extendedHeight}
+                            {configurator.extendedHeight}
                         </p>
                         <p class="heading">mm</p>
                     </div>
@@ -907,7 +842,7 @@
                 <div class="level-item has-text-centered">
                     <div>
                         <p class="heading mb-0">Nested Height</p>
-                        <p class="title mb-0">{mast.data.props.nestedHeight}</p>
+                        <p class="title mb-0">{configurator.nestedHeight}</p>
                         <p class="heading">mm</p>
                     </div>
                 </div>
@@ -916,7 +851,7 @@
                     <div>
                         <p class="heading mb-0">Wind Load on Payload</p>
                         <p class="title mb-0">
-                            {mast.data.props.payload.wind_load.toFixed(0)}
+                            <!-- {configurator.payload.wind_load.toFixed(0)} -->
                         </p>
                         <p class="heading">N</p>
                     </div>
@@ -928,9 +863,9 @@
                             Lifted Mass / Total Mast Mass
                         </p>
                         <p class="title mb-0">
-                            {mast.data.weights.lifted_mass.toFixed(0)} / {mast.data.weights.total_mast_mass.toFixed(
+                            <!-- {configurator.mass.lifted.toFixed(0)} / {configurator.mass.total.toFixed(
                                 0,
-                            )}
+                            )} -->
                         </p>
                         <p class="heading">kg</p>
                     </div>
@@ -1044,12 +979,13 @@
 
             <!-- BENDING MOMENT DIAGRAM -->
             <div class="container is-hidden" id="divBM">
-                <canvas bind:this={chartCanvas}></canvas>
+                <!--                 <canvas bind:this={chartCanvas}></canvas>
+ -->
             </div>
 
             <!-- DEFLECTION DIAGRAM -->
             <div class="container is-hidden" id="divDeflection">
-                <canvas bind:this={chartDeflection}></canvas>
+                <!-- <canvas bind:this={chartDeflection}></canvas> -->
             </div>
 
             <!-- EXTENDED DIAGRAM -->
@@ -1059,195 +995,7 @@
             <div class="container is-hidden" id="divNested"></div>
 
             <!-- TORQUE/POWER REQUIRED DIAGRAM -->
-            <div class="container is-hidden" id="divTorque">
-                <table class="table is-fullwidth is-striped">
-                    <tbody>
-                        <tr>
-                            <th>Screw Data</th>
-                            <td>
-                                <table
-                                    class="table is-fullwidth is-striped mt-2"
-                                >
-                                    <tbody>
-                                        <tr>
-                                            <th>Screw Nominal Diameter [mm]</th>
-                                            <td
-                                                >{mast.data.config.screw_nominal_diameter.toFixed(
-                                                    2,
-                                                )}</td
-                                            >
-                                        </tr>
-                                        <tr>
-                                            <th>Screw Lead [mm]</th>
-                                            <td
-                                                >{mast.data.config.screw_lead.toFixed(
-                                                    2,
-                                                )}</td
-                                            >
-                                        </tr>
-
-                                        <tr>
-                                            <th
-                                                >Coefficient of Friction
-                                                [Steel-Bronze]</th
-                                            >
-                                            <td
-                                                >{mast.data.config.screw_coefficient_of_friction.toFixed(
-                                                    2,
-                                                )}</td
-                                            >
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th
-                                >Minimum Torque Required to Extend Mast<br />
-                                <span
-                                    class="has-text-weight-normal has-text-success"
-                                    >[with {mast.data.weights.lifted_mass.toFixed(
-                                        0,
-                                    )} kg Lifted Mass]</span
-                                >
-                            </th>
-                            <td>
-                                <table
-                                    class="table is-fullwidth is-striped mt-2"
-                                >
-                                    <tbody>
-                                        <tr>
-                                            <th>Selected Motor Power</th>
-                                            <td
-                                                >{mast.data.power.motor_power} kW</td
-                                            >
-                                        </tr>
-
-                                        <tr>
-                                            <th>Selected Motor Maximum Speed</th
-                                            >
-                                            <td
-                                                >{mast.data.power.motor_rpm} RPM</td
-                                            >
-                                        </tr>
-
-                                        <tr>
-                                            <th>Selected Motor Output Torque</th
-                                            >
-                                            <td>
-                                                {mast.data.power.motor_torque.toFixed(
-                                                    2,
-                                                )} Nm
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <th>
-                                                Total Driveline Speed Reduction
-                                                Ratio
-                                            </th>
-                                            <td
-                                                >{mast.data.power
-                                                    .gearbox_ratio}</td
-                                            >
-                                        </tr>
-
-                                        <tr>
-                                            <th>Screw Speed</th>
-                                            <td>
-                                                {mast.data.power.screw_rpm.toFixed(
-                                                    1,
-                                                )} RPM
-                                                <br />
-                                                {mast.data.power.vertical_speed.toFixed(
-                                                    3,
-                                                )} m/min
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <th
-                                                >Time to Extend Mast [Estimated]</th
-                                            >
-                                            <td>
-                                                {mast.data.power.time_to_extend_seconds.toFixed(
-                                                    0,
-                                                )} seconds
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <th
-                                                >Minimum Torque Required to
-                                                Extend Mast</th
-                                            >
-                                            <td
-                                                >{mast.data.power.torque_required_to_extend_mast_Nm.toFixed(
-                                                    2,
-                                                )} Nm</td
-                                            >
-                                        </tr>
-
-                                        <tr>
-                                            <th>Total Torque at Screw End</th>
-                                            <td>
-                                                {mast.data.power.lifting_torque.toFixed(
-                                                    2,
-                                                )} Nm
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            {#if mast.data.power.lifting_torque > mast.data.power.torque_required_to_extend_mast_Nm}
-                                                <td
-                                                    colspan="2"
-                                                    class="is-success"
-                                                >
-                                                    Available Torque <strong>
-                                                        {mast.data.power.lifting_torque.toFixed(
-                                                            1,
-                                                        )}
-                                                    </strong>
-                                                    > Required Torque
-                                                    <strong>
-                                                        {mast.data.power.torque_required_to_extend_mast_Nm.toFixed(
-                                                            1,
-                                                        )}
-                                                    </strong> Nm
-                                                </td>
-                                            {/if}
-
-                                            {#if mast.data.power.lifting_torque < mast.data.power.torque_required_to_extend_mast_Nm}
-                                                <td
-                                                    colspan="2"
-                                                    class="is-danger is-light"
-                                                >
-                                                    Available Torque <strong>
-                                                        {mast.data.power.lifting_torque.toFixed(
-                                                            1,
-                                                        )}
-                                                    </strong>
-                                                    <span
-                                                        class="has-text-danger"
-                                                    >
-                                                        <strong> &lt; </strong>
-                                                    </span>
-                                                    Required Torque
-                                                    <strong>
-                                                        {mast.data.power.torque_required_to_extend_mast_Nm.toFixed(
-                                                            1,
-                                                        )}
-                                                    </strong> Nm
-                                                </td>
-                                            {/if}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="container is-hidden" id="divTorque"></div>
 
             <!-- VIBRATION DIAGRAM -->
             <div class="container is-hidden" id="divVibration">
@@ -1271,42 +1019,7 @@
                                 alt="Mode Shapes"
                             />
                         </div>
-                        <div class="cell">
-                            {#if all_frequencies.length > 0}
-                                <table
-                                    class="table is-bordered is-striped is-hoverable is-fullwidth"
-                                >
-                                    <thead>
-                                        <tr>
-                                            <th>Mode</th>
-                                            <th>Weak</th>
-                                            <th>Frequency</th>
-                                            <th>Strong</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {#each all_frequencies as mode, index}
-                                            <tr>
-                                                <td>Mode {index + 1}</td>
-
-                                                <td class="has-text-right"
-                                                    >{mode.weak.toFixed(1)} Hz</td
-                                                >
-                                                <td
-                                                    class="has-text-right has-background-grey-lighter has-text-weight-bold"
-                                                    >{mode.frequency.toFixed(1)}
-                                                    Hz</td
-                                                >
-                                                <td class="has-text-right"
-                                                    >{mode.strong.toFixed(1)} Hz</td
-                                                >
-                                            </tr>
-                                        {/each}
-                                    </tbody>
-                                </table>
-                            {/if}
-                        </div>
+                        <div class="cell"></div>
                     </div>
                 </div>
             </div>
@@ -1315,12 +1028,11 @@
             <div class="container is-hidden" id="divBOM">
                 <Title title="BOM" subtitle="Bill of Materials" />
                 {console.log("lllllllll", configurator.mast.bom)}
-                {console.log("lllllllll", configurator.mast.bom)}
 
                 <table class="table is-fullwidth">
                     <thead>
                         <tr>
-                            <th>Config No</th>
+                            <th>Part Number</th>
                             <th>Name</th>
                             <th>Mass (kg)</th>
                             <th>Part Number</th>
@@ -1329,10 +1041,10 @@
                     <tbody>
                         {#each configurator.mast.bom as item}
                             <tr>
-                                <td>AA{item.config_no} {console.log(item)}</td>
-                                <td>BB{item.name}</td>
-                                <td>CC{item.mass_kg}</td>
-                                <td>DD{item.part_number}</td>
+                                <td>{item.part_number}-{item.config_no} </td>
+                                <td>{item.name}</td>
+                                <td>{item.mass_kg}</td>
+                                <td>{item.part_number}</td>
                             </tr>
                         {/each}
                     </tbody>
@@ -1353,7 +1065,7 @@
             <div class="modal-content">
                 <pre>
                   <!-- {JSON.stringify(deflection.data, null, 2)} -->
-                  <JsonTree data={deflection.data} />
+                  <!-- <JsonTree data={deflection.data} /> -->
                 </pre>
             </div>
             <button

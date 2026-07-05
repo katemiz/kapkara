@@ -5,10 +5,13 @@ import { mtnx_bom } from "$modules/PDM/Shared/mtnx_bom.js";
 export default class Configurator {
     constructor(params) {
         this.params = params;
-        this.mast = {};
+        this.mast = {
+            bom: []
+        };
+
+
 
         // SVG
-        //this.data = data;
         this.drawType = null;
         this.svgDiv = null;
         this.svgWidth = null;
@@ -55,7 +58,7 @@ export default class Configurator {
 
         // DRAWNG FUNCTIONS
 
-        this.svgDraw();
+        //this.svgDraw();
 
 
     }
@@ -211,7 +214,7 @@ export default class Configurator {
 
             new_index_no = this.mast.tubes.length - index - 1;
 
-            console.log('setting section config_suffix ', tube.config_suffix)
+            //console.log('setting section config_suffix ', tube.config_suffix)
 
             // TOP SECTION
             if (tube.config_suffix === "T") {
@@ -230,9 +233,6 @@ export default class Configurator {
                         load: -this.mast.payload.wind_load, // TODO: Calculate tip load,
                     }
                 };
-
-                console.log('SSSSSSSSS setting section config_suffix T ')
-
             }
 
             // BASE-FIXED SECTION
@@ -248,8 +248,6 @@ export default class Configurator {
                         load: 0 // TODO: Calculate wind load,
                     },
                 };
-
-                console.log('SSSSSSSSS setting section config_suffix B ', tube.config_suffix)
             }
 
             // IN-BETWEEN SECTION
@@ -265,9 +263,6 @@ export default class Configurator {
                         load: 0 // TODO: Calculate wind load,
                     }
                 };
-
-
-                console.log('SSSSSSSSS setting section config_suffix IB ')
             }
         });
     }
@@ -874,7 +869,6 @@ export default class Configurator {
 
     setBOM() {
 
-        this.mast.bom = [];
 
         let top_fixed_flanges = []
 
@@ -884,7 +878,7 @@ export default class Configurator {
             // Determine tube no
             let requested_config_name = "C" + String(section.tube_no).padStart(2, '0') + section.config_suffix;
 
-            console.log("requested_config_name", requested_config_name)
+            //console.log("requested_config_name", requested_config_name)
 
             let flange = mtnx_bom.fixed_top_flange.find(item => item.config_no === requested_config_name);
 

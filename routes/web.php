@@ -124,6 +124,11 @@ Route::middleware(["auth", "verified"])->group(function () {
     );
 
     Route::get(
+        "/pdm/engineering/configurator2",
+        fn() => Inertia::render("Modules/PDM/Pages/Engineering/Configurator2")
+    );
+
+    Route::get(
         "/pdm/engineering/profiles_table",
         fn() => Inertia::render("Modules/PDM/Pages/Engineering/Profiles")
     );
