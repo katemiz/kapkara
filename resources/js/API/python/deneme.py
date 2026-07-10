@@ -36,8 +36,8 @@ hole1 = tool_plane.extrude(1.5*cylinder_radius, both=True, combine=False)
 hole2 = tool_plane2.extrude(1.5*cylinder_radius, both=True, combine=False)
 
 
-radial_hole_copy1 = hole1.translate((0, 0, 20))
-radial_hole_copy2 = hole2.translate((0, 0, 20))
+radial_hole_copy1 = hole1.translate((0, 0, 70))
+radial_hole_copy2 = hole2.translate((0, 0, 70))
 
 rotated_rod1 = radial_hole_copy1.rotate((0, 0, 0), (0, 0, 1), 90)
 rotated_rod2 = radial_hole_copy2.rotate((0, 0, 0), (0, 0, 1), 90)
@@ -60,4 +60,4 @@ final_part = final_part.cut(rotated_rod4)
 show(final_part)
 
 # STEP EXPORT
-cad_export.exportSTEP(cylinder,'TEST','TUBE')
+cad_export.exportSTEP(final_part,'TEST','TUBE')

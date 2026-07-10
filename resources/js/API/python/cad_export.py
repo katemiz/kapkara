@@ -11,6 +11,8 @@ def setFileName (sectionNo,partType):
             return f"PAYLOAD-{sectionNo}.step"
         case "KAMA":
             return f"KAMA-{sectionNo}.step"
+        case "POWER_SCREW":
+            return f"POWER_SCREW-{sectionNo}.step"
         case _: # ◄ The underscore acts as the default case (fallback)
             return f"PART-{sectionNo}.step"
 

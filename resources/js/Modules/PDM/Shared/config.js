@@ -462,6 +462,7 @@ export const config = {
         },
     ],
 
+    // Configurator2.svelte tamam olduğu zaman sil
     motors: [
         {
             id: 1,
@@ -529,14 +530,15 @@ export const config = {
 
     ],
 
+    // Configurator2.svelte tamam olduğu zaman sil
     gearboxes: [
         {
             id: 1,
             name: "i 1:6",
             gear_ratio: 6,
             efficiency: 0.85,
-            mass_kg: 5,
-            part_number: "GEARBOX-001"
+            mass_kg: 5.2,
+            part_number: "105065-T6"
         },
 
         {
@@ -544,8 +546,8 @@ export const config = {
             name: "i 1:12",
             gear_ratio: 12,
             efficiency: 0.75,
-            mass_kg: 7,
-            part_number: "GEARBOX-002"
+            mass_kg: 6.2,
+            part_number: "105065-T12"
         },
 
         {
@@ -553,8 +555,8 @@ export const config = {
             name: "i 1:18",
             gear_ratio: 18,
             efficiency: 0.75,
-            mass_kg: 7,
-            part_number: "GEARBOX-003"
+            mass_kg: 7.3,
+            part_number: "105065-T18"
         },
 
         {
@@ -562,16 +564,16 @@ export const config = {
             name: "i 1:24",
             gear_ratio: 24,
             efficiency: 0.75,
-            mass_kg: 7,
-            part_number: "GEARBOX-004"
+            mass_kg: 8.4,
+            part_number: "105065-T24"
         },
         {
             id: 6,
             name: "i 1:60",
             gear_ratio: 60,
             efficiency: 0.65,
-            mass_kg: 10,
-            part_number: "GEARBOX-005"
+            mass_kg: 9.5,
+            part_number: "105065-T60"
         },
     ],
 

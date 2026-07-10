@@ -18,7 +18,6 @@ def create_tube(tube,overlap):
 
     kama_length = overlap - 80
 
-
     # 1. Base Cylinder Geometry
     result = cq.Workplane("XY").circle(OD / 2).circle(ID / 2)
     result = result.extrude(tube["length"])
@@ -76,7 +75,7 @@ def create_tube(tube,overlap):
     )
 
     # BASE CONNECTION OR NUT HOUSING CONNECTION HOLES (SHOULD HAVE COUNTERSINK ALSO)
-    if tube["state_name"] == "BASE":
+    if tube["config_suffix"] == "B":
         connection_hole_dia = 10.25
     else:
         connection_hole_dia = 12.25
@@ -108,7 +107,7 @@ def create_tube(tube,overlap):
     result = result.cut(all_holes)
 
     # KAMA HOLES
-    if tube["state_name"] != "BASE":
+    if tube["config_suffix"] != "B":
 
         # 1. Create independent 3D cutting cylinders using pushPoints and extrude
         kama_holes_tool = (
@@ -141,6 +140,95 @@ def create_tube(tube,overlap):
         # This keeps your main body count at exactly 1 in the STEP file
         result = result.cut(all_kama_holes)
 
+        # LOCK SUPPORT HOLES
+        upper_hole_z = overlap - 27;
+        r = tube["od"]/2
+        angle = math.degrees(math.acos((2*math.pow(r,2) - 36*36) / (2*math.pow(r,2)))/2)
+        
+        # Then draw the hole's circle profile
+        tool_plane = (
+            cq.Workplane("XZ")
+            .transformed(rotate=(0, -angle, 0)) 
+        )
+
+        tool_plane2 = (
+            cq.Workplane("XZ")
+            .transformed(rotate=(0, angle, 0)) 
+        )
+
+        hole_tool = (
+            tool_plane
+            .moveTo(0, upper_hole_z)
+            # Extrude both ways so it punches all the way through the tube walls
+            .circle(2)  # hole(10.25) creates an 10.25mm diameter, 
+            .extrude(tube["od"] * 2, both=True) 
+        )
+
+        hole_tool2 = (
+            tool_plane2
+            .moveTo(0, upper_hole_z)
+            # Extrude both ways so it punches all the way through the tube walls
+            .circle(2)  # hole(10.25) creates an 10.25mm diameter, 
+            .extrude(tube["od"] * 2, both=True) 
+        )
+
+        hole_tool3 = hole_tool.translate((0, 0, 15))
+        hole_tool4 = hole_tool2.translate((0, 0, 15))
+
+        rotated_hole1 = hole_tool.rotate((0, 0, 0), (0, 0, 1), 90)
+        rotated_hole2 = hole_tool2.rotate((0, 0, 0), (0, 0, 1), 90)
+        rotated_hole3 = hole_tool3.rotate((0, 0, 0), (0, 0, 1), 90)
+        rotated_hole4 = hole_tool4.rotate((0, 0, 0), (0, 0, 1), 90)
+
+        result = result.cut(hole_tool)
+        result = result.cut(hole_tool2)
+        result = result.cut(hole_tool3)
+        result = result.cut(hole_tool4)
+
+        result = result.cut(rotated_hole1)
+        result = result.cut(rotated_hole2)
+        result = result.cut(rotated_hole3)
+        result = result.cut(rotated_hole4)
+
+
+    # LOCK RECTANGULAR CUTOUTS
+    if tube["config_suffix"] != "B" and tube["config_suffix"] != "T":
+        tool_plane = (
+            cq.Workplane("XZ")
+            .rect(31, 31)
+            .extrude(tube["od"])  # 1. Extrude the sharp box first
+            .edges("|Y")          # 2. Select only the 4 long corner edges (parallel to Y axis)
+            .fillet(4)            # 3. Apply the 4mm radius fillet to those 3D edges
+        )
+
+        # Your translation and cut logic remains exactly the same:
+        rectangular_hole = tool_plane.translate((0, 0, tube["length"] - 20.5))
+
+        rotated_hole1 = rectangular_hole.rotate((0, 0, 0), (0, 0, 1), 90)
+        rotated_hole2 = rectangular_hole.rotate((0, 0, 0), (0, 0, 1), 180)
+        rotated_hole3 = rectangular_hole.rotate((0, 0, 0), (0, 0, 1), 270)
+
+        result = result.cut(rectangular_hole)
+        result = result.cut(rotated_hole1)
+        result = result.cut(rotated_hole2)
+        result = result.cut(rotated_hole3)
+
+    # EULER HOLES
+    if tube["config_suffix"] == "T" :
+        euler_plane = (
+            cq.Workplane("XZ")
+            .circle(10)
+            .extrude(tube["od"] * 2, both=True) 
+        )
+
+        # Your translation and cut logic remains exactly the same:
+        euler_hole1 = euler_plane.translate((0, 0, tube["length"] - 250))
+        rotated_hole1 = euler_hole1.rotate((0, 0, 0), (0, 0, 1), 90)
+
+        result = result.cut(euler_hole1)
+        result = result.cut(rotated_hole1)
+
+
     # Create the plate model from our previous step
     # (Make sure to export your actual model variable name, which was 'result')
     # result.export(r"C:\Users\ThinkPad\Desktop\CADQuery\plate.step")
@@ -157,3 +245,33 @@ def create_tube(tube,overlap):
     cad_export.exportSTEP(result,tube["no"],'TUBE')
 
     return result  # ◄ CRITICAL: Send the generated solid back to the loop
+
+
+
+
+
+
+def testing ():
+    tube_data = {
+        "no": 15,
+        "od": 342,
+        "id": 332.4,
+        "thk": 4.8,
+        "area_mm2": 5532.44,
+        "inertia_mm4": 78621879.48,
+        "channel_number": 8,
+        "has_die": True,
+        "material_density": 2704,
+        "material_e": 70000000000,
+        "yield_strength": 170000000,
+        "ultimate_strength": 210000000,
+        "state_name": "INTERMEDIATE",
+        "extended_zb": 100,
+        "length":1000,
+        "config_suffix":"T"
+    }
+
+    sonuc = create_tube(tube_data, 300)
+    show(sonuc)
+
+#testing()

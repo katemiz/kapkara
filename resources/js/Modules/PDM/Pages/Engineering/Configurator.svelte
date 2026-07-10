@@ -397,7 +397,7 @@
         // Vibration analysis
         runVibrationAnalysis();
 
-        configurator.run();
+        //configurator.run();
 
         // configurator.svgDraw("Loads");
         // configurator.svgDraw("Extended");

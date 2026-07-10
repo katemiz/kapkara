@@ -5,120 +5,84 @@ import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration2.js";
 
 
 export default class Configurator {
-    constructor(params) {
-        this.params = params;
+
+    static calculate(form){
+
         this.mast = {
-            bom: []
+            extendedHeight:null,
+            nestedHeight:null,
+            noOfTubes:form.end_tube_no - form.start_tube_no +1,
+            tubes:[],
+            bom:[],
+            svg:[]
         };
 
+        this.setDependentProps(form);
+        this.setMastTubes(form);
+        this.setExtendedHeight(form);
+        this.setNestedHeight(form);
+        this.productNaming(form);
+        this.setZPositions(form);
+        this.setPayloadParameters(form);
+        this.setMastSections(form);
+        this.calculateWindLoadsOnTubes(form);
+        this.massEstimation(form);
+        this.setBOM(form);
+        this.getMastTipMoments(form);
+        this.drivePowerEstimation(form);
+        this.setBeamControlHeights(form);
 
-
-        // SVG
-        this.drawType = null;
-        this.svgDiv = null;
-        this.svgWidth = null;
-        this.svgHeight = null;
-        this.scale = null;
-        this.vcline_x = null;
-        this.vcline_info = null;
-
-        //this.force_line_scale = 250 / this.mast.payload.wind_load;
-    }
-
-    run() {
-        console.log("params", this.params);
-        console.log("Config", config)
-
-        this.setDependentProps();
-        this.setMastTubes();
-
-        this.setExtendedHeight();
-        this.setNestedHeight();
-
-        this.setZPositions();
-
-        this.productNaming();
-        this.setPayloadParameters();
-
-        this.setMastSections();
-
-        this.calculateWindLoadsOnTubes();
-
-
-        this.massEstimation();
-
-        this.getMastTipMoments();
-
-        this.drivePowerEstimation();
-
-
-        this.setBeamControlPoints();
-
-        //this.getInternalLoads();
-
-        this.setBOM();
+        // DEFLECTION
+        this.findBeamMoments();
 
         // VIBRATION
-        this.runVibrationAnalysis();
+        this.runVibrationAnalysis(form);
 
-        console.log("Configurator running : Mast", this.mast)
+        // SVG GENERATION
+        this.mast.svg.loads = this.svgDraw(form,"Loads");
+        this.mast.svg.extended = this.svgDraw(form,"Extended");
+        this.mast.svg.nested = this.svgDraw(form,"Nested");
+
+        console.log("FORM:\n",form)
+
+        console.log("MAST:\n",this.mast)
+
+        return this.mast;
+    }
 
 
-        // DRAWNG FUNCTIONS
 
-        //this.svgDraw();
 
+    static setDependentProps(form) {
+
+        // Aluminum
+
+        this.mast.tube_material_density = config.alum_6063_density; // kg/m³
+        this.mast.tube_material_e = config.alum_6063_E; // Pa
+        this.mast.tube_yield_strength = config.alum_6063_yield_strength; // Pa
+        this.mast.tube_ultimate_strength = config.alum_6063_ultimate_strength; // Pa
+
+        this.mast.kama_length =form.overlap - 80
 
     }
 
 
-    setDependentProps() {
-        this.params.noOfTubes =
-            this.params.end_tube_no - this.params.start_tube_no + 1;
-
-        switch (this.params.material) {
-            // Aluminum
-            default:
-                this.params.tube_material_density =
-                    config.alum_6063_density; // kg/m³
-                this.params.tube_material_e = config.alum_6063_E; // Pa
-                this.params.tube_yield_strength =
-                    config.alum_6063_yield_strength; // Pa
-                this.params.tube_ultimate_strength =
-                    config.alum_6063_ultimate_strength; // Pa
-                break;
-        }
-
-
-/*         // Initialize dependent default values
-        this.params.z_offset = Math.round((1000 * Math.sqrt(this.params.sail_area)) / 2, 0);
-        this.params.side_adapter_z =
-            this.params.tube_length + this.params.base_adapter_height - this.params.overlap / 2;
-
-        const selectedMast = config["mast_types"].find(
-            (mast) => mast.value.toString() === this.params.mast_type.toString(),
-        );
-        this.params.head_height = selectedMast ? selectedMast.head_height : null; */
-    }
-
-
-    setMastTubes() {
+    static setMastTubes(form) {
         this.mast.tubes = [];
 
         config.tubes.forEach((tube) => {
             if (
-                tube.no >= this.params.start_tube_no &&
-                tube.no <= this.params.end_tube_no
+                tube.no >= form.start_tube_no &&
+                tube.no <= form.end_tube_no
             ) {
                 // Tube Length
-                tube.length = this.params.tube_length;
+                tube.length = form.tube_length;
 
                 // Set material properties
-                tube.material_density = this.params.tube_material_density;
-                tube.material_e = this.params.tube_material_e;
-                tube.yield_strength = this.params.tube_yield_strength;
-                tube.ultimate_strength =
-                    this.params.tube_ultimate_strength;
+                tube.material_density = this.mast.tube_material_density;
+                tube.material_e = this.mast.tube_material_e;
+                tube.yield_strength = this.mast.tube_yield_strength;
+                tube.ultimate_strength = this.mast.tube_ultimate_strength;
 
                 // Calculate circular area for comparison
                 tube.circularArea = this.setCircularArea(tube);
@@ -132,7 +96,7 @@ export default class Configurator {
                 // Calculate eachTubeMass
                 tube.mass = this.calculateMass(
                     tube,
-                    this.params.tube_length / 1000,
+                    form.tube_length / 1000,
                 ); // kg
 
                 // Calculate Moment Capacity at Yield Strength
@@ -164,25 +128,25 @@ export default class Configurator {
                 tube.EI_Nm2 = tube.material_e * tube.inertia_mm4 * 1e-12; // Nm2
 
                 // SET TUBE STATES
-                tube.config_suffix = '00';
+                tube.config_suffix = 'IB';
 
-                if (tube.no === this.params.start_tube_no) {
+                if (tube.no === form.start_tube_no) {
                     tube.config_suffix = "T"; // Top
                 }
 
-                if (this.params.noOfTubes > 3 && tube.no === this.params.start_tube_no + 1) {
+                if (this.mast.noOfTubes > 3 && tube.no === form.start_tube_no + 1) {
                     tube.config_suffix = "TM"; // Top Minus
                 }
 
-                if (this.params.noOfTubes > 3 && tube.no === this.params.end_tube_no - 1) {
+                if (this.mast.noOfTubes > 3 && tube.no === form.end_tube_no - 1) {
                     tube.config_suffix = "BP"; // Base Plus
                 }
 
-                if (this.params.noOfTubes === 3 && tube.no === this.params.end_tube_no - 1) {
+                if (this.mast.noOfTubes === 3 && tube.no === form.end_tube_no - 1) {
                     tube.config_suffix = "IB"; // In-Between
                 }
 
-                if (tube.no === this.params.end_tube_no) {
+                if (tube.no === form.end_tube_no) {
                     tube.config_suffix = "B"; // Base
                 }
 
@@ -192,7 +156,7 @@ export default class Configurator {
     }
 
 
-    setZPositions() {
+    static setZPositions(form) {
         let ezb, ezt, nzb, nzt;
 
         this.mast.tubes.forEach((tube, index) => {
@@ -201,21 +165,21 @@ export default class Configurator {
                 // Extended State
                 ezt =
                     this.mast.extendedHeight -
-                    this.params.base_adapter_height;
+                    form.payload_adapter_height;
                 ezb = ezt - tube.length;
 
                 // Nested State
                 nzt =
                     this.mast.nestedHeight -
-                    this.params.base_adapter_height;
+                    form.payload_adapter_height;
                 nzb = nzt - tube.length;
             } else {
                 // Extended State
-                ezt = ezb + this.params.overlap;
+                ezt = ezb + form.overlap;
                 ezb = ezt - tube.length;
 
                 // Nested State
-                nzt = nzt - this.params.head_height;
+                nzt = nzt - form.head_height;
                 nzb = nzt - tube.length;
             }
 
@@ -233,52 +197,48 @@ export default class Configurator {
     }
 
 
-
-
-
-    setCircularArea(tube) {
+    static setCircularArea(tube) {
         return Math.PI * tube.od * tube.thk;
     }
 
-    setCircularMomentOfInertia(tube) {
+    static setCircularMomentOfInertia(tube) {
         return (Math.PI * (tube.od ** 4 - tube.id ** 4)) / 64;
     }
 
-    calculateMass(tube, length) {
+    static calculateMass(tube, length) {
         // Length is in m, area is in mm2, density is in kg/m3, mass will be in kg
         return (tube.area_mm2 * length * tube.material_density) / 1000000; // kg
     }
 
-    findQ(tube) {
+    static findQ(tube) {
         let q = (Math.pow(tube.od / 2, 3) - Math.pow(tube.id / 2, 3)) / 6;
         return q; // mm3
     }
 
-    setExtendedHeight() {
-        this.mast.extendedHeight = this.params.noOfTubes * this.params.tube_length -
-            (this.params.noOfTubes - 1) * this.params.overlap +
-            this.params.payload_adapter_height +
-            this.params.base_adapter_height;
+    static setExtendedHeight(form) {
+        this.mast.extendedHeight = this.mast.noOfTubes * form.tube_length -
+            (this.mast.noOfTubes - 1) * form.overlap +
+            form.payload_adapter_height +
+            form.base_adapter_height;
     }
 
 
-    setNestedHeight() {
-        this.mast.nestedHeight = this.params.tube_length +
-            (this.params.noOfTubes - 1) * this.params.head_height +
-            this.params.payload_adapter_height +
-            this.params.base_adapter_height;
+    static setNestedHeight(form) {
+        this.mast.nestedHeight = form.tube_length +
+            (this.mast.noOfTubes - 1) * form.head_height +
+            form.payload_adapter_height +
+            form.base_adapter_height;
     }
 
-    setMastSections() {
+    static setMastSections(form) {
 
         let new_index_no;
         this.mast.sections = [];
+        this.mast.moments = [];
 
         this.mast.tubes.forEach((tube, index) => {
 
             new_index_no = this.mast.tubes.length - index - 1;
-
-            //console.log('setting section config_suffix ', tube.config_suffix)
 
             // TOP SECTION
             if (tube.config_suffix === "T") {
@@ -287,9 +247,9 @@ export default class Configurator {
                     tube_no: tube.no,
                     config_suffix: tube.config_suffix,
                     z_top: this.mast.extendedHeight,
-                    z_bottom: tube.extended_zb + this.params.overlap,
+                    z_bottom: tube.extended_zb + form.overlap,
                     wind_load: {
-                        z: tube.extended_zt - (tube.length - this.params.overlap) / 2,
+                        z: tube.extended_zt - (tube.length - form.overlap) / 2,
                         load: 0 // TODO: Calculate wind load,
                     },
                     tip_load: {
@@ -297,6 +257,10 @@ export default class Configurator {
                         load: -this.mast.payload.wind_load, // TODO: Calculate tip load,
                     }
                 };
+
+                this.mast.moments.push({
+                    z: this.mast.extendedHeight
+                });
             }
 
             // BASE-FIXED SECTION
@@ -312,32 +276,47 @@ export default class Configurator {
                         load: 0 // TODO: Calculate wind load,
                     },
                 };
+
+                this.mast.moments.push({
+                    z: tube.extended_zt
+                });
+
+                this.mast.moments.push({
+                    z: form.side_adapter_z
+                });
+
+                this.mast.moments.push({
+                    z: 0
+                });
             }
 
             // IN-BETWEEN SECTION
-            if (["00", "TM", "BP", "IB"].includes(tube.config_suffix)) {
+            if (["TM", "BP", "IB"].includes(tube.config_suffix)) {
                 this.mast.sections[new_index_no] = {
                     section_no: new_index_no,
                     tube_no: tube.no,
                     config_suffix: tube.config_suffix,
                     z_top: tube.extended_zt,
-                    z_bottom: tube.extended_zt - tube.length + this.params.overlap,
+                    z_bottom: tube.extended_zt - tube.length + form.overlap,
                     wind_load: {
-                        z: tube.extended_zt - (tube.length - this.params.overlap) / 2,
+                        z: tube.extended_zt - (tube.length - form.overlap) / 2,
                         load: 0 // TODO: Calculate wind load,
                     }
                 };
+
+                this.mast.moments.push({
+                    z: tube.extended_zt
+                });
             }
         });
     }
 
-    productNaming() {
-        this.mast.product_code = Math.round(this.mast.extendedHeight / 1000, 0) + this.params.mast_type + "-" + (this.mast.nestedHeight / 1000).toFixed(1) + "-" + this.params.noOfTubes;
+    static productNaming(form) {
+        this.mast.product_code = Math.round(this.mast.extendedHeight / 1000, 0) + form.mast_type + "-" + (this.mast.nestedHeight / 1000).toFixed(1) + "-" + this.mast.noOfTubes;
     }
 
 
-
-    calculateWindLoadsOnTubes() {
+    static calculateWindLoadsOnTubes(form) {
         /*
             1. Calculate Reference Area
             2. Calculate Reference Height
@@ -360,7 +339,7 @@ export default class Configurator {
 
 
         const terrain = config.terrain_category.find(
-            (cat) => cat.no === this.params.terrain_category,
+            (cat) => cat.no === form.terrain_category,
         );
 
         let section_tube, exposed_length;
@@ -402,7 +381,7 @@ export default class Configurator {
             // Calculate the mean wind speed at the height of the tube
             this.mast.sections[i].mean_wind_speed_Vm =
                 (this.mast.sections[i].roughness_factor_Cr_at_Ze *
-                    this.params.wind_speed) /
+                    form.wind_speed) /
                 3.6; // Convert to m/s
 
             // Turbulence Intensity
@@ -418,7 +397,7 @@ export default class Configurator {
             this.mast.sections[i].basic_velocity_pressure_q =
                 0.5 *
                 config.air_density *
-                Math.pow(this.params.wind_speed / 3.6, 2); // Basic velocity pressure in N/m2
+                Math.pow(form.wind_speed / 3.6, 2); // Basic velocity pressure in N/m2
 
             // Peak Velocity Pressure
             // Peak Velocity Pressure Formula: qp =[ 1+ 7* TI ] * 0.5 *  ρ *  Vm^2
@@ -568,6 +547,7 @@ export default class Configurator {
     }
 
 
+
     getInternalLoads() {
 
         // ROOT LOADS
@@ -595,14 +575,11 @@ export default class Configurator {
                 //this.mast.sections[sec_index].control_points[pnt_index].V_wo_adapter_left = this.mast.sections[sec_index].control_points[pnt_index].V_wo_adapter_left;
             });
         });
-
-
-
     }
 
 
 
-    setPayloadParameters() {
+    static setPayloadParameters(form) {
         /*
             Dynamic Pressure Formula:
             1/2 * rho * V^2 * A
@@ -614,63 +591,88 @@ export default class Configurator {
         this.mast.payload = {
             wind_load_z: null,
             wind_load: null,
+            width: null,
+            height: null
         };
 
         this.mast.payload.wind_load_z =
             this.mast.extendedHeight +
-            Math.sqrt(this.params.sail_area * 1e6) / 2;
+            Math.sqrt(form.sail_area * 1e6) / 2;
 
         this.mast.payload.wind_load =
             0.5 *
             config.air_density *
             config.drag_coefficient_Cd *
-            Math.pow(this.params.wind_speed / 3.6, 2) *
-            this.params.sail_area;
+            Math.pow(form.wind_speed / 3.6, 2) *
+            form.sail_area;
+
+        this.mast.payload.width = Math.pow(form.sail_area, 0.5) * 1000; // mm
+        this.mast.payload.height = this.mast.payload.width; // mm
     }
 
 
 
-    getMastTipMoments() {
+    static getMastTipMoments(form) {
 
         // Tip Moment due to horizontal wind load (z_offset)
-        this.mast.sections.at(-1).tip_load.moment_z_offset = this.mast.payload.wind_load * this.params.z_offset / 1000; // Nm
+        const moment_z_offset = -this.mast.payload.wind_load * form.z_offset / 1000; // Nm
+        this.mast.sections.at(-1).tip_load.moment_z_offset = this.mast.payload.wind_load * form.z_offset / 1000; // Nm
+
 
         // Tip Moment due to x-offset of payload Mass
-        this.mast.sections.at(-1).tip_load.moment_x_offset = 9.81 * this.params.payload_mass * this.params.x_offset / 1000; // Nm
+        this.mast.sections.at(-1).tip_load.moment_x_offset = 9.81 * form.payload_mass * form.x_offset / 1000; // Nm
+        const moment_x_offset = -9.81 * form.payload_mass * form.x_offset / 1000; // Nm
+
 
         /* 
             Limit total tip deflection (in x direction) to tip_deflection_percentage% of the extended height of the mast
-            this.data.params.tip_deflection_percentage is a number like 25,50,75,100 ; should be diveded by 100
+            form.tip_deflection_percentage is a number like 25,50,75,100 ; should be diveded by 100
         */
 
         this.mast.allowed_tip_deflection_mm =
             (0.01 *
-                this.params.tip_deflection_percentage *
+                form.tip_deflection_percentage *
                 this.mast.extendedHeight) /
             100; // mm
 
         // Additional Moment due to side deflection of Mast : Inevitable
         // Add some weight to total weight from mast weight
 
-        let deflection_weight = (this.params.payload_mass + 0.2 * this.mast.mass.lifted)
+        let deflection_weight = (form.payload_mass + 0.2 * this.mast.mass.lifted)
         this.mast.sections.at(-1).tip_load.moment_due_deflection = 9.81 * deflection_weight * this.mast.allowed_tip_deflection_mm / 1000; // Nm
+
+        const moment_due_deflection = -9.81 * deflection_weight * this.mast.allowed_tip_deflection_mm / 1000; // Nm
+
 
         this.mast.sections.at(-1).tip_load.moment_tip_total =
             this.mast.sections.at(-1).tip_load.moment_z_offset +
             this.mast.sections.at(-1).tip_load.moment_x_offset +
             this.mast.sections.at(-1).tip_load.moment_due_deflection; // CW is positive
+
+        const moment_tip_total =
+            moment_z_offset +
+            moment_x_offset +
+            moment_due_deflection; // CW is positive
+
+
+
+
+        let foundZ = this.mast.moments.find(m => m.z === this.mast.extendedHeight);
+        
+        if (foundZ) {
+            foundZ.moment_z_offset = moment_z_offset;
+            foundZ.moment_x_offset = moment_x_offset;
+            foundZ.moment_due_deflection = moment_due_deflection;
+            foundZ.moment_tip_total = moment_tip_total;
+        }
     }
 
 
+    static massEstimation(form) {
 
-
-
-
-    massEstimation() {
-
-        switch (this.params.mast_type) {
+        switch (form.mast_type) {
             case "MTNX":
-                this.massEstimationMTNX();
+                this.massEstimationMTNX(form);
                 break;
             case "MTWR":
                 this.massEstimationMTWR();
@@ -679,9 +681,7 @@ export default class Configurator {
 
     }
 
-
-
-    massEstimationMTNX() {
+    static massEstimationMTNX(form) {
 
         /*
         MASS ESTIMATION FOR MTNX MAST
@@ -724,7 +724,7 @@ export default class Configurator {
             }
 
             // ICE BREAKER WEIGHT CALCULATION
-            if (tube.config_suffix == "00") {
+            if (tube.config_suffix == "IB") {
                 this.mast.mass.total += config.weights.ice_breaker["C" + tube.no];
                 this.mast.mass.lifted += config.weights.ice_breaker["C" + tube.no];
             }
@@ -788,23 +788,23 @@ export default class Configurator {
                 this.mast.mass.total += config.weights.welded_bottom_structure["C" + tube.no];
 
                 // MOTOR AND GEARBOX WEIGHT CALCULATION
-                this.mast.mass.total += config.motors.find(
-                    (g) => g.id === this.params.motor_id,
+                this.mast.mass.total += mtnx_bom.motors.find(
+                    (g) => g.id === form.motor_id,
                 )?.mass_kg;
-                this.mast.mass.total += config.gearboxes.find(
-                    (g) => g.id === this.params.gearbox_id,
+                this.mast.mass.total += mtnx_bom.gearboxes.find(
+                    (g) => g.id === form.gearbox_id,
                 )?.mass_kg;
             }
         });
     }
 
-    massEstimationMTWR() {
+    static massEstimationMTWR() {
         // TODO: Implement MTWR mass estimation
     }
 
 
 
-    drivePowerEstimation() {
+    static drivePowerEstimation(form) {
 
         let thread_angle = Math.atan(
             config.screw_lead /
@@ -813,7 +813,7 @@ export default class Configurator {
         let secant = 1 / Math.cos(thread_angle)
 
         this.mast.driveline = {
-            total_load_to_lift: (this.params.payload_mass + this.mast.mass.lifted) * 9.81,
+            total_load_to_lift: (form.payload_mass + this.mast.mass.lifted) * 9.81,
             thread_angle: thread_angle, // Thread angle in radians
             secant: secant,
         }
@@ -834,12 +834,12 @@ export default class Configurator {
             1000; // Convert to Nm
 
         // MOTOR TORQUE
-        this.mast.driveline.motor_power = config.motors.find(
-            (g) => g.id === this.params.motor_id,
+        this.mast.driveline.motor_power = mtnx_bom.motors.find(
+            (g) => g.id === form.motor_id,
         )?.power_kW;
 
-        this.mast.driveline.motor_rpm = config.motors.find(
-            (g) => g.id === this.params.motor_id,
+        this.mast.driveline.motor_rpm = mtnx_bom.motors.find(
+            (g) => g.id === form.motor_id,
         )?.max_speed_rpm;
 
         this.mast.driveline.motor_torque =
@@ -848,13 +848,13 @@ export default class Configurator {
         // LIFTING TORQUE
         this.mast.driveline.lifting_torque =
             this.mast.driveline.motor_torque *
-            config.gearboxes.find(
-                (g) => g.id === this.params.gearbox_id,
+            mtnx_bom.gearboxes.find(
+                (g) => g.id === form.gearbox_id,
             )?.gear_ratio;
 
         // POWER SCREW SPEED
-        this.mast.driveline.gearbox_ratio = config.gearboxes.find(
-            (g) => g.id === this.params.gearbox_id,
+        this.mast.driveline.gearbox_ratio = mtnx_bom.gearboxes.find(
+            (g) => g.id === form.gearbox_id,
         )?.gear_ratio;
 
         this.mast.driveline.screw_rpm =
@@ -869,7 +869,7 @@ export default class Configurator {
     }
 
 
-    setBeamControlPoints() {
+    static setBeamControlHeights(form) {
 
         let reversed_tubes = [...this.mast.tubes].reverse();
 
@@ -900,7 +900,7 @@ export default class Configurator {
                 // b. Tube Wind Load Interface
                 addControlPoint(section.wind_load.z, index); // Add a new Control Point
                 // c. Side Adapter Interface
-                addControlPoint(this.params.side_adapter_z, index); // Add a new Control Point
+                addControlPoint(form.side_adapter_z, index); // Add a new Control Point
                 // d. Upper Section Change Interface
                 addControlPoint(section.z_top, index); // Add a new Control Point
             }
@@ -932,11 +932,11 @@ export default class Configurator {
     MAST VIBRATION ANALYSIS
     */
 
-    runVibrationAnalysis() {
+    static runVibrationAnalysis(form) {
         // Create vibration analyzer with mast data, tube lengths and payload mass
         const analyzer2 = new MastVibration({
             tubes: this.mast.tubes,
-            tip_mass: this.params.payload_mass,
+            tip_mass: form.payload_mass,
             extendedHeight: this.mast.extendedHeight,
             modes: 3,
             integrationSteps: 500,
@@ -949,119 +949,452 @@ export default class Configurator {
         this.mast.resonance_frequencies = [];
 
         frequencies.forEach((freq, index) => {
-            //console.log(`Frequency ${index + 1}:`, freq);
-
             this.mast.resonance_frequencies[index] = {
                 weak: karsilastirma.weak[index],
                 strong: karsilastirma.strong[index],
                 frequency: freq,
             };
         });
+    }
 
-        console.log("Vibration frequencies", this.mast.resonance_frequencies);
+    /*
+    DEFLECTION CALCULATIONS
+    */
+
+
+
+    static findBeamMoments(form,hasSideAdapter = false) {
+
+        //this.calculateMastTopMoments();
+        //this.findForcesMomentsAtControlPoints();
+
+        let root_moment = 0;
+
+        // Find Root Moment without Side Adapter
+        this.mast.sections.forEach(section => {
+            root_moment += section.wind_load.load * section.wind_load.z /1000;
+            console.log("root_momemnt",root_moment,section.wind_load.load,section.wind_load.z);
+        });
+
+        root_moment += -this.mast.payload.wind_load * this.mast.extendedHeight /1000;
+
+        console.log("root_momemnt",root_moment)
+
+        let topObject = this.mast.moments.find(m => m.z === this.mast.extendedHeight);
+        let bottomObject = this.mast.moments.find(m => m.z === 0);
+
+        
+        if (topObject && bottomObject) {
+            bottomObject.root_moment_wo_side_adapter = root_moment + topObject.moment_tip_total;
+        }
+        console.log("root_momemnt sss",root_moment,bottomObject.root_moment_wo_side_adapter)
+
+        return true;
+
+
+        let all_control_point_heights = Object.keys(this.data.control_points).map(Number);
+
+        // Sum All Moments Due To Wind Loads at Each Control Point
+        Object.entries(this.data.control_points).forEach(([z, point]) => {
+
+            let root_moment = point.ext_force * z / 1000; // Nm
+
+            all_control_point_heights.forEach((height) => {
+
+                let moment_at_point = Math.abs(point.ext_force) * height / 1000 + root_moment;
+
+                if (moment_at_point > 0) {
+                    moment_at_point = 0
+                }
+
+                this.data.control_points[height].int_moment += moment_at_point;
+            });
+        });
+
+        // Add Top Moment value to all control points
+        all_control_point_heights.forEach((height) => {
+            this.data.control_points[height].int_moment += this.data.props.payload.total_tip_moment_Nm;
+        });
+
+        this.data.sections = [];
+
+        this.data.params.tubes.forEach((tube, i) => {
+
+            this.data.sections[i] = {};
+
+            all_control_point_heights.forEach((height) => {
+
+                let lower_tube_extended_zt = this.data.params.tubes[i + 1]?.extended_zt || 0;
+
+                if (height <= tube.extended_zt && height >= lower_tube_extended_zt) {
+
+                    const controlPoint = { ...this.data.control_points[height] };
+                    this.data.sections[i][height] = controlPoint;
+                    this.data.sections[i][height].EI_Nm2 = tube.EI_Nm2;
+                    this.data.sections[i][height].M_EI = controlPoint.int_moment / tube.EI_Nm2;
+                }
+            });
+
+            // Top Tube
+            if (i === 0) {
+                this.data.sections[i][this.data.props.extendedHeight] = this.data.control_points[this.data.props.extendedHeight];
+                this.data.sections[i][this.data.props.extendedHeight].EI_Nm2 = tube.EI_Nm2;
+                this.data.sections[i][this.data.props.extendedHeight].M_EI = this.data.sections[i][this.data.props.extendedHeight].int_moment / tube.EI_Nm2;
+            }
+
+            // Bottom Tube
+            if (tube.no === this.data.params.tubes.at(-1).no) {
+                this.data.sections[i][0] = this.data.control_points[0];
+                this.data.sections[i][0].EI_Nm2 = tube.EI_Nm2;
+                this.data.sections[i][0].M_EI = this.data.sections[i][0].int_moment / tube.EI_Nm2;
+            }
+        });
+
+        //this.data.deflection_data = {};
+
+        this.findAllDeflections(false); // w/o side adapter
+        return true;
     }
 
 
+    /*
+    BOM GENERATION
+    */
+    static setBOM(form) {
 
-
-    setBOM() {
-
-
-        let top_fixed_flanges = []
+        let kamaSayisi = 0;
 
         this.mast.sections.forEach((section, index) => {
 
-
-            // Determine tube no
-            let requested_config_name = "C" + String(section.tube_no).padStart(2, '0') + section.config_suffix;
-
-            //console.log("requested_config_name", requested_config_name)
-
-            let flange = mtnx_bom.fixed_top_flange.find(item => item.config_no === requested_config_name);
-
-            this.mast.bom.push(flange);
-
-            // Fixed Top Flange
-            // if (config_suffix === 'fixed_top_flange') {
-            //     // TODO: Add fixed top flange to BOM
-            // }
+            // BASE STRUCTURE
+            if (section.config_suffix === 'B') {
+                const foundBaseStructure = mtnx_bom.base_structure.find((bomitem) => {
+                    return parseInt(bomitem.tube_no) === parseInt(section.tube_no);
+                });
+                foundBaseStructure.quantity = 1
+                this.mast.bom.push(foundBaseStructure);
+            }
 
             // TUBES
-            //let the_tube = this.mast.tubes.find(tube => tube.no === tube_no);
+            this.mast.bom.push({
+                config_no: section.config_suffix,
+                tube_no: section.tube_no,
+                name: "Masttech Yuvarlak Boru Profili : MT-" + section.tube_no,
+                mass_kg: 0.5,
+                part_number: "MT-"+section.tube_no+"-"+section.config_suffix,
+                material:"Aluminium",
+                quantity:1,
+            });
 
-            // this.mast.bom.push({
-            //     type: 'tube',
-            //     part_number: the_tube.part_number,
-            //     length: the_tube.length - 5,
-            //     material: the_tube.material,
-            //     quantity: 1
-            // });
+            // FIXED HEAD FLANGE
+            const foundHeadFlange = mtnx_bom.fixed_top_flange.find((bomitem) => {
+                return parseInt(bomitem.tube_no) === parseInt(section.tube_no) && bomitem.config_no === section.config_suffix;
+            });
+
+            const headFlange = structuredClone(foundHeadFlange);
+
+            headFlange.quantity = 1
+            headFlange.material = "6061 T6"
+            headFlange.part_number = foundHeadFlange.part_number+"-"+section.tube_no+"-"+section.config_suffix
+
+            this.mast.bom.push(headFlange)
+
+            // KAMA SAYISI
+            if (section.config_suffix != 'T') {
+                const foundTube = this.mast.tubes.find((tube) => parseInt(tube.no) === parseInt(section.tube_no));
+                kamaSayisi += foundTube.channel_number;
+            }
+
+            // LOCK LIP
+            if (section.config_suffix != 'B' && section.config_suffix != 'BP') {
+                const foundLip = mtnx_bom.lock_lip.find((bomitem) => {
+                    return parseInt(bomitem.tube_no) === parseInt(section.tube_no);
+                });
+
+
+                // CRITICAL FIX: Create a clean copy so we don't mutate the original master dataset
+                if (foundLip) {
+                    const lockLip = structuredClone(foundLip); 
+                    // Alternatively, use: const lockLip = { ...foundLip }; if it's a shallow object
+
+                    lockLip.part_number = foundLip.part_number + "-" + section.tube_no;
+                    lockLip.quantity = 4;
+
+                    this.mast.bom.push(lockLip);
+                }
+            }
+
+            // NUT FRAMES
+            if (section.config_suffix != 'B') {
+
+                const foundNutFrame = mtnx_bom.nut_frames.find((nframe) => {
+                    return nframe.tube_no === parseInt(section.tube_no);
+                });
+
+                const nutFrame = structuredClone(foundNutFrame);
+                nutFrame.part_number = foundNutFrame.part_number +"-"+ section.tube_no;
+                nutFrame.quantity = 1
+                nutFrame.material = "-"
+
+                this.mast.bom.push(nutFrame)
+            }
+
+            // UPPER KEYS
+            if (section.config_suffix != 'B' && section.config_suffix != 'T') {
+
+                const foundTube = this.mast.tubes.find((tube) => parseInt(tube.no) === parseInt(section.tube_no));
+
+                const foundUpperKeyLong = mtnx_bom.upper_keys.find((ukey) => {
+                    return ukey.tube_no === parseInt(section.tube_no) && ukey.config_suffix === "L";
+                });
+
+                const foundUpperKeyShort = mtnx_bom.upper_keys.find((skey) => {
+                    return skey.tube_no === parseInt(section.tube_no) && skey.config_suffix === "S";
+                });
+
+                if (foundTube.channel_number == 8) {
+
+                    const upperKeyL = structuredClone(foundUpperKeyLong);
+                    upperKeyL.part_number = foundUpperKeyLong.part_number +"-"+ section.tube_no+"L";
+                    upperKeyL.quantity = 2
+
+                    this.mast.bom.push(upperKeyL)
+
+                    const upperKeyS = structuredClone(foundUpperKeyShort);
+                    upperKeyS.part_number = foundUpperKeyShort.part_number +"-"+ section.tube_no+"S";
+                    upperKeyS.quantity = 2
+
+                    this.mast.bom.push(upperKeyS)
+                } 
+
+                if (foundTube.channel_number == 4) {
+                    const upperKeyS = structuredClone(foundUpperKeyShort);
+                    upperKeyS.part_number = foundUpperKeyShort.part_number +"-"+ section.tube_no;
+                    upperKeyS.quantity = 4
+
+                    this.mast.bom.push(upperKeyS)
+                } 
+            }
+
+            // ICE BREAKERS
+            if (section.config_suffix != 'T' ) {
+
+                const foundIceBreaker = mtnx_bom.ice_breakers.find((ib) => {
+                    return ib.tube_no === parseInt(section.tube_no);
+                });
+
+                const iceBreaker = structuredClone(foundIceBreaker);
+                iceBreaker.part_number = foundIceBreaker.part_number +"-"+ section.tube_no;
+                iceBreaker.quantity = 1
+                iceBreaker.material = "-"
+
+                this.mast.bom.push(iceBreaker)
+            }
+
+            // LOCK KEYS AND MECHANISMS
+            const lockKey = structuredClone(mtnx_bom.lock_key);
+            lockKey.quantity = 4*(this.mast.noOfTubes - 2);
+            this.mast.bom.push(lockKey)
+
+            const lockMechanism = structuredClone(mtnx_bom.lock_mechanism);
+            lockMechanism.quantity = 4*(this.mast.noOfTubes - 2);
+            this.mast.bom.push(lockMechanism)
+
+            if (section.config_suffix === 'T' ) {
+
+                // PAYLOAD ADAPTER
+                const foundPayloadAdapter = mtnx_bom.payload_adapters.find((pa) => {
+                    return pa.tube_no === parseInt(section.tube_no);
+                });
+
+                const payloadAdapter = structuredClone(foundPayloadAdapter);
+                payloadAdapter.part_number = foundPayloadAdapter.part_number +"-"+ section.tube_no;
+                payloadAdapter.quantity = 1
+
+                this.mast.bom.push(payloadAdapter)
+
+                // EULER FIXER
+                const foundEulerFixer = mtnx_bom.euler_fixers.find((ef) => {
+                    return ef.tube_no === parseInt(section.tube_no);
+                });
+
+                const eulerFixer = structuredClone(foundEulerFixer);
+                eulerFixer.part_number = foundEulerFixer.part_number +"-"+ section.tube_no;
+                eulerFixer.quantity = 1
+
+                this.mast.bom.push(eulerFixer)
+
+            }   
+            
+            
 
 
 
-            // // UPPER GUIDE KEYS
-            // this.mast.bom.push({
-            //     type: 'guide_key',
-            //     part_number: 'GUIDE_KEY_UPPER',
-            //     length: 100,
-            //     material: 'Steel',
-            //     quantity: 1
-            // });
-
-
-
-
+            
         })
 
-
-        // LOWER GUIDE KEYS
-        // this.mast.bom.push({
-        //     type: 'guide_key',
-        //     part_number: 'GUIDE_KEY_LOWER',
-        //     length: 100,
-        //     material: 'Steel',
-        //     quantity: 1
-        // });
+        // GEARBOX
+        const gearbox = structuredClone(mtnx_bom.gearboxes.find((g) => g.id === form.gearbox_id));
+        gearbox.quantity = 1;
+        gearbox.name = "Gear Box " + gearbox.name;
+        this.mast.bom.push(gearbox)
 
 
+        // MOTOR
+        const motor = structuredClone(mtnx_bom.motors.find((g) => g.id === form.motor_id));
+        motor.quantity = 1;
+        motor.name = "Motor " + motor.name;
+        this.mast.bom.push(motor)
 
+        // KAMA
+        let kama = {}
+        kama.quantity = kamaSayisi;
+        kama.material = mtnx_bom.kama.material;
+        kama.name = mtnx_bom.kama.name + " [ Length="+this.mast.kama_length+" ]";
+        kama.part_number = mtnx_bom.kama.part_number+"-"+this.mast.kama_length;
 
-
+        this.mast.bom.push(kama);
     }
 
-
-
-    svgDraw(drawType) {
-
-
-        this.force_line_scale = 250 / this.mast.payload.wind_load;
+    
 
 
 
+    /*
+    SVG GENERATION : LOADS, NESTED, EXTENDED
+    */
 
-        this.drawType = drawType;
-        this.svgDiv = document.getElementById("div" + drawType);
+    static svgDraw(form,drawState) {
 
-        this.setSvgParams();
+        const ground_h = 200;
 
-        switch (drawType) {
-            case "Loads":
-                this.svgDrawLoads();
-                break;
+        const svg = {
+            box:{
+                w: 0,
+                h: 0
+            },
+            ground:{},
+            payload:{
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0
+            },
+            cop:{
+                x: 0,
+                y: 0,
+                dia:50
+            },
+            tubes:[
 
-            default:
-            case "Extended":
-                this.svgDrawExtended();
-                break;
+            ],
+            payload_adapter:{
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0
+            },
+            side_adapter:{
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0
+            }
+        };
 
-            case "Nested":
-                this.svgDrawNested();
+        switch  (drawState) {
+
+            case 'Loads':
+                svg.box.h = Math.floor(Math.pow(form.sail_area,0.5)*1000 + this.mast.extendedHeight + 1.4*ground_h);
+                svg.box.w = Math.floor(16 * svg.box.h / 19);
+                break
+
+            case 'Extended':
+                svg.box.h = this.mast.extendedHeight + 1.4*ground_h;
+                svg.box.w = Math.floor(16 * svg.box.h / 19);
+                break
+
+            case 'Nested':
+                svg.box.h = this.mast.nestedHeight + 1.4*ground_h;
+                svg.box.w = Math.floor(16 * svg.box.h / 19);
                 break;
         }
+
+        svg.ground = {
+            x: -svg.box.w/2,
+            y: 0,
+            w: svg.box.w,
+            h: ground_h
+        };
+
+        svg.payload = {
+            x: -(this.mast.payload.width / 2 - form.x_offset),
+            y: this.mast.extendedHeight +  ground_h,
+            w: this.mast.payload.width,
+            h: this.mast.payload.height
+        };
+
+
+        svg.cop = {
+            x: form.x_offset,
+            y: this.mast.payload.wind_load_z +  ground_h,
+        };
+
+
+        svg.tubes = [];
+        this.mast.sections.forEach(section => {
+
+            let foundTube = this.mast.tubes.find(tube => tube.no === section.tube_no);
+
+            //console.log("foundTube",foundTube)
+
+            if (foundTube.config_suffix === 'T') {
+                svg.payload_adapter = {
+                    x: -0.8* foundTube.od,
+                    y: this.mast.extendedHeight +  ground_h - form.payload_adapter_height,
+                    w: 1.6* foundTube.od,
+                    h: form.payload_adapter_height
+                };
+
+            }
+
+            svg.tubes.push({
+                x: -foundTube.od/2,
+                y: drawState === 'Extended' || drawState === 'Loads' ? foundTube.extended_zb+ground_h : foundTube.nested_zb+ground_h,
+                w: foundTube.od,
+                h: foundTube.length,
+                load_z:section.wind_load.z,
+                load_value:section.wind_load.load
+            });
+
+            // Side Adapter
+            if (foundTube.config_suffix === 'B') {
+                svg.side_adapter = {
+                    x: 0,
+                    y: foundTube.nested_zt - form.overlap/2,
+                    points:[
+                        {x: -0.7*foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap},
+                        {x: 2.5 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap},
+                        {x: 2.5 * foundTube.od, y: ground_h},
+                        {x: 1.4 * foundTube.od, y: ground_h},
+                        {x: 1.4 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.8*form.overlap},
+                        {x: -0.7*foundTube.od, y: foundTube.nested_zt + ground_h - 0.8*form.overlap},
+                        {x: -0.7*foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap},
+
+                    ]
+
+                };
+            }
+        });
+
+
+        return svg;
+
+
     }
 
 
-    setSvgParams() {
+    static setSvgParams() {
         this.MX = 20;
         this.MY = 20;
 
