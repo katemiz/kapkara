@@ -67,10 +67,10 @@
                     label: "w/o Side Adapter (Nm)",
                     //data: Object.values(data.control_points).map((point) => point.int_moment),
 
-                    data: Object.entries(data.control_points).map(
+                    data: Object.entries(data.graph.moment_wo_adapter).map(
                         ([key, point]) => ({
-                            x: parseInt(key),
-                            y: point.int_moment,
+                            x: point.z,
+                            y: point.M_wo_adapter,
                         }),
                     ),
 
@@ -83,35 +83,55 @@
                     label: "w/ Side Adapter (Nm)",
                     //data: Object.values(data.control_points2).map((point) => point.int_moment),
 
-                    data: Object.entries(data.control_points2).map(
+                    data: Object.entries(data.graph.moment_wo_adapter).map(
                         ([key, point]) => ({
-                            x: parseInt(key),
-                            y: point.int_moment,
+                            x: point.z,
+                            y: point.M_wo_adapter,
                         }),
                     ),
                     borderColor: "#8FB339",
                     yAxisID: "y",
                 },
 
-                // Correctly mapping the nested sections data
-                ...Object.entries(data.sections).map(
-                    ([sectionIndex, sectionData]) => {
-                        return {
-                            label: `M/EI S${sectionIndex}`,
-                            // Convert the sub-keys (3550, 4300, etc.) into x, and extract M_EI for y
-                            data: Object.entries(sectionData)
-                                .map(([xValue, metrics]) => ({
-                                    x: parseFloat(xValue),
-                                    y: metrics.M_EI,
-                                }))
-                                .sort((a, b) => a.x - b.x), // Keeps the line rendering left-to-right
-                            borderColor: "#02182B",
-                            backgroundColor: "rgba(1, 151, 246, 0.1)",
-                            fill: true,
-                            yAxisID: "y1",
-                        };
-                    },
-                ),
+     [{
+      label: 'M/EI Profile (without adapter)',
+      data: data.graph.M_EI_wo_adapter,
+      borderColor: '#2563eb',
+      borderWidth: 2,
+      fill: false,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      // Setting stepped to true or 'before'/'after' handles the step segments beautifully
+      stepped: 'after', 
+      tension: 0 // Keep lines perfectly straight between points
+    }]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             ],
         };
 
@@ -406,6 +426,9 @@
         if ($form.head_height !== selectedMast?.head_height) {
             $form.head_height = selectedMast?.head_height ?? null;
         }
+
+        drawBMChart(results);
+
     });
 
 
@@ -495,9 +518,6 @@
             console.error("Fetch Error:", err);
         }
     }
-
-
-
 
 </script>
 
@@ -1031,8 +1051,7 @@
 
             <!-- BENDING MOMENT DIAGRAM -->
             <div class="container is-hidden" id="divBM">
-                <!--                 <canvas bind:this={chartCanvas}></canvas>
- -->
+                <canvas bind:this={chartCanvas}></canvas>
             </div>
 
             <!-- DEFLECTION DIAGRAM -->

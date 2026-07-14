@@ -8,17 +8,18 @@
         width,
     } = $props();
 
-    const height = $derived(width * 19 / 16);
+    const height = $derived(width * 1.2);
     const scale = $derived(width / data.box.w);
 
     const offsetX = $derived(width / 2);
     const offsetY = $derived(height);
 
+    const fontSize = $derived((16/scale).toFixed(0));
+    const textOffset = $derived(scale ? (16/scale).toFixed(0) : 10);
+
 </script>
 
-<div class="drawing has-background-warning">
-
-    {console.log("MastDrawing width ",width,height,scale)}
+<div class="drawing">
 
     <svg width={width} height={height}>
 
@@ -61,14 +62,29 @@
                 <circle
                     cx={data.cop.x}
                     cy={data.cop.y}
-                    r={50}
+                    r={20}
                     class="center-of-pressure"
                     fill="#444545"
                 />
 
+                <!-- payload load value -->
                 <SvgArrow
                     tipX={data.cop.x}
                     tipY={data.cop.y}
+                    text={-data.cop.load.toFixed(0) + " N"}
+                    length={data.payload.w}
+                    fontSize={fontSize}
+                    direction="R"
+                />
+
+                <!-- Payload Mass  -->
+                <SvgArrow
+                    tipX={data.cop.x}
+                    tipY={data.cop.y}
+                    text={9.81*data.payload.mass.toFixed(0) + " N"}
+                    length={data.payload.mass * data.payload.w / data.cop.load}
+                    fontSize={fontSize}
+                    direction="D"
                 />
 
                 <!-- payload COP line-->
@@ -78,11 +94,54 @@
                     x2={0.4*data.ground.w}
                     y2={data.cop.y}
                     class="tube"
-                    stroke="black"
+                    stroke="gray"
                     stroke-width="3"
                 />
 
+                <!-- payload COP : Height Value-->
+                <text
+                    x={0.4*data.ground.w }
+                    y={-(data.cop.y + 20)}
+                    text-anchor="end"
+                    font-size="{fontSize}"
+                    fill="black"
+                    transform="scale(1,-1)"
+                >
+                   {data.cop.z_value.toFixed(0)}
+                </text>
+
+
+
+
+
             {/if}
+
+
+            <!-- EXTENDED/NESTED LINE AND TEXT -->
+            <line
+                x1={-0.4*data.ground.w}
+                y1={data.payload.y}
+                x2={-data.payload.w *.55}
+                y2={data.payload.y}
+                class="tube"
+                stroke="black"
+                stroke-width="3"
+            />
+
+            <text
+                x={-0.4*data.ground.w }
+                y={-(data.payload.y - textOffset)}
+                text-anchor="start"
+                font-size="{fontSize}"
+                fill="black"
+                transform="scale(1,-1)"
+            >
+                {drawState !== 'Nested' ? 'Extended Height': 'Nested Height'} {data.mast.height}
+            </text>
+
+
+
+
 
             <!-- TUBES -->
             {#each data.tubes as tube}
@@ -113,96 +172,99 @@
                 {/if}
 
                 {#if drawState === 'Loads'}
-                <!-- WIND LOAD ARROW -->
-                <SvgArrow
-                    tipX={tube.x}
-                    tipY={tube.load_z}
-                />
+                    <!-- WIND LOAD ARROW -->
+                    <SvgArrow
+                        tipX={tube.x}
+                        tipY={tube.load_z}
+                        text={-tube.load_value.toFixed(0) + " N"}
+                        length = {tube.load_value * data.payload.w /data.cop.load}
+                        fontSize={fontSize}
+                        direction="R"
+                    />
 
-                <!-- Dimension line : top faces-->
-                <line
-                    x1={0}
-                    y1={tube.load_z}
-                    x2={0.4*data.ground.w}
-                    y2={tube.load_z}
-                    class="tube"
-                    stroke="gray"
-                    stroke-width="3"
-                />
+
+                    <!-- Wind Load Dimension Line and Text : top faces-->
+                    <line
+                        x1={0}
+                        y1={tube.load_z}
+                        x2={0.4*data.ground.w}
+                        y2={tube.load_z}
+                        class="tube"
+                        stroke="gray"
+                        stroke-width="3"
+                    />
+
+                    <text
+                        x={0.4*data.ground.w }
+                        y={-(tube.load_z + 20)}
+                        text-anchor="end"
+                        font-size="{fontSize}"
+                        fill="black"
+                        transform="scale(1,-1)"
+                    >
+                        {tube.load_z.toFixed(0)}
+                    </text>
 
                 {/if}
 
-                <!-- PAYLOAD ADAPTER -->
-                <rect
-                    x={data.payload_adapter.x}
-                    y={data.payload_adapter.y}
-                    width={data.payload_adapter.w}
-                    height={data.payload_adapter.h}
-                    class="tube"
-                    fill="#667a8f"
-                    fill-opacity="0.3"
-                    stroke="black"
-                    stroke-width="3"
-                />
-
-                <!-- <text
-                    x=1000
-                    y=3000
-                    text-anchor="middle"
-                    font-size="140"
-                    fill="black"
-                    transform={`translate(-250,${data.extendedHeight-tube.extended_zt}) scale(1,-1)`}
-                >
-                    {drawState}
-                </text> -->
-
-
-
-<!-- 
-                <SvgArrow
-                    tipX={data.ground.x}
-                    tipY={data.ground.h}
-                />
- -->
-
-
-                <!-- Dimension line : bottom faces-->
+                <!-- Dimension line and text : bottom faces-->
                 <line
                     x1={tube.w/2 +40}
                     y1={tube.y}
                     x2={0.4*data.ground.w}
                     y2={tube.y}
                     class="tube"
-                    stroke="black"
+                    stroke="gray"
                     stroke-width="3"
                 />
 
+                <text
+                    x={0.4*data.ground.w }
+                    y={-(tube.y + 20)}
+                    text-anchor="end"
+                    font-size="{fontSize}"
+                    fill="black"
+                    transform="scale(1,-1)"
+                >
+                   {tube.zb}
+                </text>
 
-                <!-- Dimension line : top faces-->
+                <!-- Dimension line and text : top faces-->
                 <line
                     x1={tube.w/2 +40}
                     y1={tube.y + tube.h}
                     x2={0.4*data.ground.w}
                     y2={tube.y + tube.h}
                     class="tube"
-                    stroke="black"
+                    stroke="gray"
                     stroke-width="3"
                 />
 
-
-
-
-                <!-- <text
-                    x={tube.od/2 + 0.8*data.svg.ground.w/2}
-                    y={tube.extended_zt + data.svg.ground.h+100}
-                    text-anchor="middle"
-                    font-size="140"
+                <text
+                    x={0.4*data.ground.w }
+                    y={-(tube.y + tube.h + 20)}
+                    text-anchor="end"
+                    font-size="{fontSize}"
                     fill="black"
-                    transform={`translate(-250,${data.extendedHeight-tube.extended_zt}) scale(1,-1)`}
+                    transform="scale(1,-1)"
                 >
-                    {tube.extended_zt}mm
-                </text> -->
+                   {tube.zt}
+                </text>
+
             {/each}
+
+            <!-- PAYLOAD ADAPTER -->
+            <rect
+                x={data.payload_adapter.x}
+                y={data.payload_adapter.y}
+                width={data.payload_adapter.w}
+                height={data.payload_adapter.h}
+                class="tube"
+                fill="#667a8f"
+                fill-opacity="0.3"
+                stroke="black"
+                stroke-width="3"
+            />
 
             <!-- SIDE ADAPTER -->
             <polyline
@@ -210,7 +272,7 @@
                 class="tube"
                 fill="red"
                 stroke="black"
-                stroke-width="3"
+                stroke-width={false}
                 fill-opacity="0.3"
             />
             
@@ -221,6 +283,28 @@
                 class="center-of-pressure"
                 fill="#444545"
             />
+
+            {#if drawState === 'Loads'}
+
+            <SvgArrow
+                tipX={data.side_adapter.x}
+                tipY={data.side_adapter.y + data.ground.h}
+                text={"999"}
+                fontSize={fontSize}
+                direction="L"
+            />
+
+            <!-- GROUND REACTION FORCE -->
+
+            <SvgArrow
+                tipX={0}
+                tipY={data.ground.h}
+                text={"999"}
+                fontSize={fontSize}
+                direction="R"
+            />
+            {/if}
+
 
 
         </g>

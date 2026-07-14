@@ -784,9 +784,6 @@ export const config = {
         lock_mechanism_each: 0.15,
     },
 
-
-
-
     materials: [
         {
             name: "aluminum",
@@ -801,7 +798,4 @@ export const config = {
             density: 7850
         }
     ]
-
-
-
 };
