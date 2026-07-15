@@ -4,15 +4,15 @@ import MastVibration from "$modules/PDM/Pages/Engineering/MastVibration2.js";
 
 export default class Configurator {
 
-    static calculate(form){
+    static calculate(form) {
 
         this.mast = {
-            extendedHeight:null,
-            nestedHeight:null,
-            noOfTubes:form.end_tube_no - form.start_tube_no +1,
-            tubes:[],
-            bom:[],
-            svg:[]
+            extendedHeight: null,
+            nestedHeight: null,
+            noOfTubes: form.end_tube_no - form.start_tube_no + 1,
+            tubes: [],
+            bom: [],
+            svg: []
         };
 
         this.setDependentProps(form);
@@ -38,13 +38,13 @@ export default class Configurator {
         this.runVibrationAnalysis(form);
 
         // SVG GENERATION
-        this.mast.svg.loads = this.svgDraw(form,"Loads");
-        this.mast.svg.extended = this.svgDraw(form,"Extended");
-        this.mast.svg.nested = this.svgDraw(form,"Nested");
+        this.mast.svg.loads = this.svgDraw(form, "Loads");
+        this.mast.svg.extended = this.svgDraw(form, "Extended");
+        this.mast.svg.nested = this.svgDraw(form, "Nested");
 
-        console.log("FORM:\n",form)
+        console.log("FORM:\n", form)
 
-        console.log("MAST:\n",this.mast)
+        console.log("MAST:\n", this.mast)
 
         return this.mast;
     }
@@ -61,7 +61,7 @@ export default class Configurator {
         this.mast.tube_yield_strength = config.alum_6063_yield_strength; // Pa
         this.mast.tube_ultimate_strength = config.alum_6063_ultimate_strength; // Pa
 
-        this.mast.kama_length =form.overlap - 80
+        this.mast.kama_length = form.overlap - 80
 
     }
 
@@ -619,7 +619,7 @@ export default class Configurator {
             moment_due_deflection: moment_due_deflection,
             moment_tip_total: moment_tip_total
         };
-        
+
         if (foundZ) {
             foundZ.moment_z_offset = moment_z_offset;
             foundZ.moment_x_offset = moment_x_offset;
@@ -947,8 +947,8 @@ export default class Configurator {
         });
 
         all_loads.push({
-            z:this.mast.extendedHeight,
-            load:this.mast.payload.wind_load
+            z: this.mast.extendedHeight,
+            load: this.mast.payload.wind_load
         })
 
 
@@ -964,14 +964,14 @@ export default class Configurator {
                 .reduce((sum, l) => sum + l.load, 0);
         }
 
-        console.log(-v_left(all_loads, z),-v_right(all_loads, z),z)
+        console.log(-v_left(all_loads, z), -v_right(all_loads, z), z)
 
-        return {left: -v_left(all_loads, z), right: -v_right(all_loads, z)};
+        return { left: -v_left(all_loads, z), right: -v_right(all_loads, z) };
     }
 
 
 
-    static findBeamMoments(form,hasSideAdapter = false) {
+    static findBeamMoments(form, hasSideAdapter = false) {
 
         // Find Root Moment without Side Adapter
         this.mast.sections.forEach(section => {
@@ -987,7 +987,7 @@ export default class Configurator {
 
         this.mast.sections.forEach(section => {
 
-            section.control_points.forEach( point => {
+            section.control_points.forEach(point => {
                 //console.log("point",point.EI)
                 point.M_EI_wo_adapter = point.M_wo_adapter / point.EI;
             })
@@ -1007,13 +1007,16 @@ export default class Configurator {
             );
         }
 
-        let mei_wo_adapter = [];
+        let mei_wo_adapter = {};
 
-        this.mast.sections.forEach(section => {
+        this.mast.sections.forEach((section, key) => {
+
+            mei_wo_adapter[key] = [];
             section.control_points.forEach(point => {
-                mei_wo_adapter.push({
-                x: point.z,             // Height/Position (z) on the horizontal axis
-                y: point.M_EI_wo_adapter // M/EI ratio on the vertical axis
+
+                mei_wo_adapter[key].push({
+                    x: point.z,             // Height/Position (z) on the horizontal axis
+                    y: point.M_EI_wo_adapter // M/EI ratio on the vertical axis
                 });
             });
         });
@@ -1057,9 +1060,9 @@ export default class Configurator {
                 tube_no: section.tube_no,
                 name: "Masttech Yuvarlak Boru Profili : MT-" + section.tube_no,
                 mass_kg: 0.5,
-                part_number: "MT-"+section.tube_no+"-"+section.config_suffix,
-                material:"Aluminium",
-                quantity:1,
+                part_number: "MT-" + section.tube_no + "-" + section.config_suffix,
+                material: "Aluminium",
+                quantity: 1,
             });
 
             // FIXED HEAD FLANGE
@@ -1071,7 +1074,7 @@ export default class Configurator {
 
             headFlange.quantity = 1
             headFlange.material = "6061 T6"
-            headFlange.part_number = foundHeadFlange.part_number+"-"+section.tube_no+"-"+section.config_suffix
+            headFlange.part_number = foundHeadFlange.part_number + "-" + section.tube_no + "-" + section.config_suffix
 
             this.mast.bom.push(headFlange)
 
@@ -1090,7 +1093,7 @@ export default class Configurator {
 
                 // CRITICAL FIX: Create a clean copy so we don't mutate the original master dataset
                 if (foundLip) {
-                    const lockLip = structuredClone(foundLip); 
+                    const lockLip = structuredClone(foundLip);
                     // Alternatively, use: const lockLip = { ...foundLip }; if it's a shallow object
 
                     lockLip.part_number = foundLip.part_number + "-" + section.tube_no;
@@ -1108,7 +1111,7 @@ export default class Configurator {
                 });
 
                 const nutFrame = structuredClone(foundNutFrame);
-                nutFrame.part_number = foundNutFrame.part_number +"-"+ section.tube_no;
+                nutFrame.part_number = foundNutFrame.part_number + "-" + section.tube_no;
                 nutFrame.quantity = 1
                 nutFrame.material = "-"
 
@@ -1131,36 +1134,36 @@ export default class Configurator {
                 if (foundTube.channel_number == 8) {
 
                     const upperKeyL = structuredClone(foundUpperKeyLong);
-                    upperKeyL.part_number = foundUpperKeyLong.part_number +"-"+ section.tube_no+"L";
+                    upperKeyL.part_number = foundUpperKeyLong.part_number + "-" + section.tube_no + "L";
                     upperKeyL.quantity = 2
 
                     this.mast.bom.push(upperKeyL)
 
                     const upperKeyS = structuredClone(foundUpperKeyShort);
-                    upperKeyS.part_number = foundUpperKeyShort.part_number +"-"+ section.tube_no+"S";
+                    upperKeyS.part_number = foundUpperKeyShort.part_number + "-" + section.tube_no + "S";
                     upperKeyS.quantity = 2
 
                     this.mast.bom.push(upperKeyS)
-                } 
+                }
 
                 if (foundTube.channel_number === 4) {
                     const upperKeyS = structuredClone(foundUpperKeyShort);
-                    upperKeyS.part_number = foundUpperKeyShort.part_number +"-"+ section.tube_no;
+                    upperKeyS.part_number = foundUpperKeyShort.part_number + "-" + section.tube_no;
                     upperKeyS.quantity = 4
 
                     this.mast.bom.push(upperKeyS)
-                } 
+                }
             }
 
             // ICE BREAKERS
-            if (section.config_suffix !== 'T' ) {
+            if (section.config_suffix !== 'T') {
 
                 const foundIceBreaker = mtnx_bom.ice_breakers.find((ib) => {
                     return ib.tube_no === parseInt(section.tube_no);
                 });
 
                 const iceBreaker = structuredClone(foundIceBreaker);
-                iceBreaker.part_number = foundIceBreaker.part_number +"-"+ section.tube_no;
+                iceBreaker.part_number = foundIceBreaker.part_number + "-" + section.tube_no;
                 iceBreaker.quantity = 1
                 iceBreaker.material = "-"
 
@@ -1169,14 +1172,14 @@ export default class Configurator {
 
             // LOCK KEYS AND MECHANISMS
             const lockKey = structuredClone(mtnx_bom.lock_key);
-            lockKey.quantity = 4*(this.mast.noOfTubes - 2);
+            lockKey.quantity = 4 * (this.mast.noOfTubes - 2);
             this.mast.bom.push(lockKey)
 
             const lockMechanism = structuredClone(mtnx_bom.lock_mechanism);
-            lockMechanism.quantity = 4*(this.mast.noOfTubes - 2);
+            lockMechanism.quantity = 4 * (this.mast.noOfTubes - 2);
             this.mast.bom.push(lockMechanism)
 
-            if (section.config_suffix === 'T' ) {
+            if (section.config_suffix === 'T') {
 
                 // PAYLOAD ADAPTER
                 const foundPayloadAdapter = mtnx_bom.payload_adapters.find((pa) => {
@@ -1184,7 +1187,7 @@ export default class Configurator {
                 });
 
                 const payloadAdapter = structuredClone(foundPayloadAdapter);
-                payloadAdapter.part_number = foundPayloadAdapter.part_number +"-"+ section.tube_no;
+                payloadAdapter.part_number = foundPayloadAdapter.part_number + "-" + section.tube_no;
                 payloadAdapter.quantity = 1
 
                 this.mast.bom.push(payloadAdapter)
@@ -1195,18 +1198,18 @@ export default class Configurator {
                 });
 
                 const eulerFixer = structuredClone(foundEulerFixer);
-                eulerFixer.part_number = foundEulerFixer.part_number +"-"+ section.tube_no;
+                eulerFixer.part_number = foundEulerFixer.part_number + "-" + section.tube_no;
                 eulerFixer.quantity = 1
 
                 this.mast.bom.push(eulerFixer)
 
-            }   
-            
-            
+            }
 
 
 
-            
+
+
+
         })
 
         // GEARBOX
@@ -1226,13 +1229,13 @@ export default class Configurator {
         let kama = {}
         kama.quantity = kamaSayisi;
         kama.material = mtnx_bom.kama.material;
-        kama.name = mtnx_bom.kama.name + " [ Length="+this.mast.kama_length+" ]";
-        kama.part_number = mtnx_bom.kama.part_number+"-"+this.mast.kama_length;
+        kama.name = mtnx_bom.kama.name + " [ Length=" + this.mast.kama_length + " ]";
+        kama.part_number = mtnx_bom.kama.part_number + "-" + this.mast.kama_length;
 
         this.mast.bom.push(kama);
     }
 
-    
+
 
 
 
@@ -1240,36 +1243,36 @@ export default class Configurator {
     SVG GENERATION : LOADS, NESTED, EXTENDED
     */
 
-    static svgDraw(form,drawState) {
+    static svgDraw(form, drawState) {
 
         const ground_h = 200;
 
         const svg = {
-            box:{
+            box: {
                 w: 0,
                 h: 0
             },
-            mast:{
-                height : drawState === 'Extended' || drawState === 'Loads' ? this.mast.extendedHeight : this.mast.nestedHeight,
+            mast: {
+                height: drawState === 'Extended' || drawState === 'Loads' ? this.mast.extendedHeight : this.mast.nestedHeight,
             },
 
-            ground:{},
-            payload:{},
-            cop:{
+            ground: {},
+            payload: {},
+            cop: {
                 x: 0,
                 y: 0,
-                dia:50
+                dia: 50
             },
 
-            tubes:[],
+            tubes: [],
 
-            payload_adapter:{
+            payload_adapter: {
                 x: 0,
                 y: 0,
                 w: 0,
                 h: 0
             },
-            side_adapter:{
+            side_adapter: {
                 x: 0,
                 y: 0,
                 w: 0,
@@ -1277,26 +1280,26 @@ export default class Configurator {
             }
         };
 
-        switch  (drawState) {
+        switch (drawState) {
 
             case 'Loads':
-                svg.box.h = Math.floor(Math.pow(form.sail_area,0.5)*1000 + this.mast.extendedHeight + 1.4*ground_h);
+                svg.box.h = Math.floor(Math.pow(form.sail_area, 0.5) * 1000 + this.mast.extendedHeight + 1.4 * ground_h);
                 svg.box.w = Math.floor(16 * svg.box.h / 19);
                 break
 
             case 'Extended':
-                svg.box.h = this.mast.extendedHeight + 1.4*ground_h;
+                svg.box.h = this.mast.extendedHeight + 1.4 * ground_h;
                 svg.box.w = Math.floor(16 * svg.box.h / 19);
                 break
 
             case 'Nested':
-                svg.box.h = this.mast.nestedHeight + 1.4*ground_h;
+                svg.box.h = this.mast.nestedHeight + 1.4 * ground_h;
                 svg.box.w = Math.floor(16 * svg.box.h / 19);
                 break;
         }
 
         svg.ground = {
-            x: -svg.box.w/2,
+            x: -svg.box.w / 2,
             y: 0,
             w: svg.box.w,
             h: ground_h
@@ -1304,16 +1307,16 @@ export default class Configurator {
 
         svg.payload = {
             x: -(this.mast.payload.width / 2 - form.x_offset),
-            y: drawState === 'Extended' || drawState === 'Loads' ? this.mast.extendedHeight +  ground_h : this.mast.nestedHeight +  ground_h,
+            y: drawState === 'Extended' || drawState === 'Loads' ? this.mast.extendedHeight + ground_h : this.mast.nestedHeight + ground_h,
             w: this.mast.payload.width,
             h: this.mast.payload.height,
-            mass:form.payload_mass
+            weight: 9.81 * form.payload_mass
         };
 
 
         svg.cop = {
             x: form.x_offset,
-            y: this.mast.payload.wind_load_z +  ground_h,
+            y: this.mast.payload.wind_load_z + ground_h,
             z_value: this.mast.payload.wind_load_z,
             load: this.mast.payload.wind_load
         };
@@ -1326,21 +1329,21 @@ export default class Configurator {
 
             if (foundTube.config_suffix === 'T') {
                 svg.payload_adapter = {
-                    x: -0.8* foundTube.od,
-                    y: drawState === 'Extended' || drawState === 'Loads' ? this.mast.extendedHeight +  ground_h - form.payload_adapter_height : this.mast.nestedHeight +  ground_h - form.payload_adapter_height,
-                    w: 1.6* foundTube.od,
+                    x: -0.8 * foundTube.od,
+                    y: drawState === 'Extended' || drawState === 'Loads' ? this.mast.extendedHeight + ground_h - form.payload_adapter_height : this.mast.nestedHeight + ground_h - form.payload_adapter_height,
+                    w: 1.6 * foundTube.od,
                     h: form.payload_adapter_height
                 };
 
             }
 
             svg.tubes.push({
-                x: -foundTube.od/2,
-                y: drawState === 'Extended' || drawState === 'Loads' ? foundTube.extended_zb+ground_h : foundTube.nested_zb+ground_h,
+                x: -foundTube.od / 2,
+                y: drawState === 'Extended' || drawState === 'Loads' ? foundTube.extended_zb + ground_h : foundTube.nested_zb + ground_h,
                 w: foundTube.od,
                 h: foundTube.length,
-                load_z:section.wind_load.z,
-                load_value:section.wind_load.load,
+                load_z: section.wind_load.z,
+                load_value: section.wind_load.load,
                 zb: drawState === 'Extended' || drawState === 'Loads' ? foundTube.extended_zb : foundTube.nested_zb,
                 zt: drawState === 'Extended' || drawState === 'Loads' ? foundTube.extended_zt : foundTube.nested_zt,
             });
@@ -1349,15 +1352,15 @@ export default class Configurator {
             if (foundTube.config_suffix === 'B') {
                 svg.side_adapter = {
                     x: 0,
-                    y: foundTube.nested_zt - form.overlap/2,
-                    points:[
-                        {x: -0.7*foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap},
-                        {x: 2.5 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap},
-                        {x: 2.5 * foundTube.od, y: ground_h},
-                        {x: 1.4 * foundTube.od, y: ground_h},
-                        {x: 1.4 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.8*form.overlap},
-                        {x: -0.7*foundTube.od, y: foundTube.nested_zt + ground_h - 0.8*form.overlap},
-                        {x: -0.7*foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap},
+                    y: foundTube.nested_zt - form.overlap / 2,
+                    points: [
+                        { x: -0.7 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap },
+                        { x: 2.5 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap },
+                        { x: 2.5 * foundTube.od, y: ground_h },
+                        { x: 1.4 * foundTube.od, y: ground_h },
+                        { x: 1.4 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.8 * form.overlap },
+                        { x: -0.7 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.8 * form.overlap },
+                        { x: -0.7 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap },
 
                     ]
 

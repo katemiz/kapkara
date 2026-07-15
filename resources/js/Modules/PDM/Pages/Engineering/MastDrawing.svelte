@@ -1,12 +1,7 @@
 <script>
-
     import SvgArrow from "$components/SvgArrow.svelte";
 
-    let {
-        data,
-        drawState,
-        width,
-    } = $props();
+    let { data, drawState, width } = $props();
 
     const height = $derived(width * 1.2);
     const scale = $derived(width / data.box.w);
@@ -14,20 +9,18 @@
     const offsetX = $derived(width / 2);
     const offsetY = $derived(height);
 
-    const fontSize = $derived((16/scale).toFixed(0));
-    const textOffset = $derived(scale ? (16/scale).toFixed(0) : 10);
-
+    const fontSize = $derived((16 / scale).toFixed(0));
+    const textOffset = $derived(scale ? (16 / scale).toFixed(0) : 10);
 </script>
 
 <div class="drawing">
-
-    <svg width={width} height={height}>
-
-        <g transform={`
+    <svg {width} {height}>
+        <g
+            transform={`
             translate(${offsetX}, ${offsetY})
             scale(${scale}, -${scale})
-        `}>
-
+        `}
+        >
             <!-- GROUND -->
             <rect
                 x={data.ground.x}
@@ -36,20 +29,20 @@
                 height={data.ground.h}
                 class="ground"
                 fill="#86a1c0"
-            />   
+            />
 
             <!-- CENTERLINE -->
             <line
-                x1=0
+                x1="0"
                 y1={10}
-                x2=0
-                y2={data.box.h -10}
+                x2="0"
+                y2={data.box.h - 10}
                 class="centerline"
                 stroke="#86a1c0"
                 stroke-width="2"
             />
 
-            {#if drawState === 'Loads'}
+            {#if drawState === "Loads"}
                 <!-- PAYLOAD AND CENTER OF PRESSURE (COP) -->
                 <rect
                     x={data.payload.x}
@@ -73,7 +66,7 @@
                     tipY={data.cop.y}
                     text={-data.cop.load.toFixed(0) + " N"}
                     length={data.payload.w}
-                    fontSize={fontSize}
+                    {fontSize}
                     direction="R"
                 />
 
@@ -81,17 +74,18 @@
                 <SvgArrow
                     tipX={data.cop.x}
                     tipY={data.cop.y}
-                    text={9.81*data.payload.mass.toFixed(0) + " N"}
-                    length={data.payload.mass * data.payload.w / data.cop.load}
-                    fontSize={fontSize}
+                    text={data.payload.weight.toFixed(0) + " N"}
+                    length={(0.18 * data.payload.weight * data.payload.w) /
+                        data.cop.load}
+                    {fontSize}
                     direction="D"
                 />
 
                 <!-- payload COP line-->
                 <line
-                    x1={data.cop.x + data.payload.w/4}
+                    x1={data.cop.x + data.payload.w / 4}
                     y1={data.cop.y}
-                    x2={0.4*data.ground.w}
+                    x2={0.4 * data.ground.w}
                     y2={data.cop.y}
                     class="tube"
                     stroke="gray"
@@ -100,28 +94,22 @@
 
                 <!-- payload COP : Height Value-->
                 <text
-                    x={0.4*data.ground.w }
+                    x={0.4 * data.ground.w}
                     y={-(data.cop.y + 20)}
                     text-anchor="end"
-                    font-size="{fontSize}"
+                    font-size={fontSize}
                     fill="black"
                     transform="scale(1,-1)"
                 >
-                   {data.cop.z_value.toFixed(0)}
+                    {data.cop.z_value.toFixed(0)}
                 </text>
-
-
-
-
-
             {/if}
-
 
             <!-- EXTENDED/NESTED LINE AND TEXT -->
             <line
-                x1={-0.4*data.ground.w}
+                x1={-0.4 * data.ground.w}
                 y1={data.payload.y}
-                x2={-data.payload.w *.55}
+                x2={-data.payload.w * 0.55}
                 y2={data.payload.y}
                 class="tube"
                 stroke="black"
@@ -129,23 +117,19 @@
             />
 
             <text
-                x={-0.4*data.ground.w }
+                x={-0.4 * data.ground.w}
                 y={-(data.payload.y - textOffset)}
                 text-anchor="start"
-                font-size="{fontSize}"
+                font-size={fontSize}
                 fill="black"
                 transform="scale(1,-1)"
             >
-                {drawState !== 'Nested' ? 'Extended Height': 'Nested Height'} {data.mast.height}
+                {drawState !== "Nested" ? "Extended Height" : "Nested Height"}
+                {data.mast.height}
             </text>
-
-
-
-
 
             <!-- TUBES -->
             {#each data.tubes as tube}
-
                 <rect
                     x={tube.x}
                     y={tube.y}
@@ -158,36 +142,36 @@
                     stroke-width="3"
                 />
 
-                {#if drawState !== 'Nested'}
-                <!-- GUYING LINES -->
-                <line
-                    x1={-0.5*data.ground.w}
-                    y1={data.ground.h}
-                    x2={tube.x}
-                    y2={tube.y+tube.h}
-                    class="tube"
-                    stroke="black"
-                    stroke-width="3"
-                />
+                {#if drawState !== "Nested"}
+                    <!-- GUYING LINES -->
+                    <line
+                        x1={-0.5 * data.ground.w}
+                        y1={data.ground.h}
+                        x2={tube.x}
+                        y2={tube.y + tube.h}
+                        class="tube"
+                        stroke="black"
+                        stroke-width="3"
+                    />
                 {/if}
 
-                {#if drawState === 'Loads'}
+                {#if drawState === "Loads"}
                     <!-- WIND LOAD ARROW -->
                     <SvgArrow
                         tipX={tube.x}
                         tipY={tube.load_z}
                         text={-tube.load_value.toFixed(0) + " N"}
-                        length = {tube.load_value * data.payload.w /data.cop.load}
-                        fontSize={fontSize}
+                        length={(tube.load_value * data.payload.w) /
+                            data.cop.load}
+                        {fontSize}
                         direction="R"
                     />
-
 
                     <!-- Wind Load Dimension Line and Text : top faces-->
                     <line
                         x1={0}
                         y1={tube.load_z}
-                        x2={0.4*data.ground.w}
+                        x2={0.4 * data.ground.w}
                         y2={tube.load_z}
                         class="tube"
                         stroke="gray"
@@ -195,23 +179,22 @@
                     />
 
                     <text
-                        x={0.4*data.ground.w }
+                        x={0.4 * data.ground.w}
                         y={-(tube.load_z + 20)}
                         text-anchor="end"
-                        font-size="{fontSize}"
+                        font-size={fontSize}
                         fill="black"
                         transform="scale(1,-1)"
                     >
                         {tube.load_z.toFixed(0)}
                     </text>
-
                 {/if}
 
                 <!-- Dimension line and text : bottom faces-->
                 <line
-                    x1={tube.w/2 +40}
+                    x1={tube.w / 2 + 40}
                     y1={tube.y}
-                    x2={0.4*data.ground.w}
+                    x2={0.4 * data.ground.w}
                     y2={tube.y}
                     class="tube"
                     stroke="gray"
@@ -219,21 +202,21 @@
                 />
 
                 <text
-                    x={0.4*data.ground.w }
+                    x={0.4 * data.ground.w}
                     y={-(tube.y + 20)}
                     text-anchor="end"
-                    font-size="{fontSize}"
+                    font-size={fontSize}
                     fill="black"
                     transform="scale(1,-1)"
                 >
-                   {tube.zb}
+                    {tube.zb}
                 </text>
 
                 <!-- Dimension line and text : top faces-->
                 <line
-                    x1={tube.w/2 +40}
+                    x1={tube.w / 2 + 40}
                     y1={tube.y + tube.h}
-                    x2={0.4*data.ground.w}
+                    x2={0.4 * data.ground.w}
                     y2={tube.y + tube.h}
                     class="tube"
                     stroke="gray"
@@ -241,16 +224,15 @@
                 />
 
                 <text
-                    x={0.4*data.ground.w }
+                    x={0.4 * data.ground.w}
                     y={-(tube.y + tube.h + 20)}
                     text-anchor="end"
-                    font-size="{fontSize}"
+                    font-size={fontSize}
                     fill="black"
                     transform="scale(1,-1)"
                 >
-                   {tube.zt}
+                    {tube.zt}
                 </text>
-
             {/each}
 
             <!-- PAYLOAD ADAPTER -->
@@ -268,14 +250,16 @@
 
             <!-- SIDE ADAPTER -->
             <polyline
-                points={data.side_adapter.points.map(p => `${p.x},${p.y}`).join(' ')}
+                points={data.side_adapter.points
+                    .map((p) => `${p.x},${p.y}`)
+                    .join(" ")}
                 class="tube"
                 fill="red"
                 stroke="black"
                 stroke-width={false}
                 fill-opacity="0.3"
             />
-            
+
             <circle
                 cx={data.side_adapter.x}
                 cy={data.side_adapter.y + data.ground.h}
@@ -284,37 +268,25 @@
                 fill="#444545"
             />
 
-            {#if drawState === 'Loads'}
+            {#if drawState === "Loads"}
+                <SvgArrow
+                    tipX={data.side_adapter.x}
+                    tipY={data.side_adapter.y + data.ground.h}
+                    text={"999"}
+                    {fontSize}
+                    direction="L"
+                />
 
-            <SvgArrow
-                tipX={data.side_adapter.x}
-                tipY={data.side_adapter.y + data.ground.h}
-                text={"999"}
-                fontSize={fontSize}
-                direction="L"
-            />
+                <!-- GROUND REACTION FORCE -->
 
-            <!-- GROUND REACTION FORCE -->
-
-            <SvgArrow
-                tipX={0}
-                tipY={data.ground.h}
-                text={"999"}
-                fontSize={fontSize}
-                direction="R"
-            />
+                <SvgArrow
+                    tipX={0}
+                    tipY={data.ground.h}
+                    text={"999"}
+                    {fontSize}
+                    direction="R"
+                />
             {/if}
-
-
-
         </g>
-
     </svg>
-
-
-
-
-
-
-
 </div>

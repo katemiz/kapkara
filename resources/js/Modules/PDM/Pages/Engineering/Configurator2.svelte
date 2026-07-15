@@ -12,7 +12,6 @@
     import JsonTree from "$components/JsonTree.svelte";
     import MastDrawing from "$modules/PDM/Pages/Engineering/MastDrawing.svelte";
 
-
     import { useForm } from "@inertiajs/svelte";
 
     import MakePDF from "$modules/PDM/Pages/Engineering/MakePDF.js";
@@ -39,7 +38,6 @@
     import { config } from "$modules/PDM/Shared/config.js";
     import { mtnx_bom } from "$modules/PDM/Shared/mtnx_bom.js";
 
-
     let chartCanvas;
     let chartInstance;
 
@@ -60,20 +58,18 @@
 
         const min_EI = Math.min(...all_M_EI_values);
 
+        const baseMomentData = Object.values(data.graph.moment_wo_adapter).map(
+            (point) => ({
+                x: point.z,
+                y: point.M_wo_adapter,
+            }),
+        );
+
         const chartData = {
-            //labels: Object.keys(data.control_points).map(Number),
             datasets: [
                 {
                     label: "w/o Side Adapter (Nm)",
-                    //data: Object.values(data.control_points).map((point) => point.int_moment),
-
-                    data: Object.entries(data.graph.moment_wo_adapter).map(
-                        ([key, point]) => ({
-                            x: point.z,
-                            y: point.M_wo_adapter,
-                        }),
-                    ),
-
+                    data: baseMomentData,
                     borderColor: "#D7263D",
                     fill: true,
                     yAxisID: "y",
@@ -81,57 +77,29 @@
 
                 {
                     label: "w/ Side Adapter (Nm)",
-                    //data: Object.values(data.control_points2).map((point) => point.int_moment),
-
-                    data: Object.entries(data.graph.moment_wo_adapter).map(
-                        ([key, point]) => ({
-                            x: point.z,
-                            y: point.M_wo_adapter,
-                        }),
-                    ),
+                    data: baseMomentData,
                     borderColor: "#8FB339",
                     yAxisID: "y",
                 },
 
-     [{
-      label: 'M/EI Profile (without adapter)',
-      data: data.graph.M_EI_wo_adapter,
-      borderColor: '#2563eb',
-      borderWidth: 2,
-      fill: false,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      // Setting stepped to true or 'before'/'after' handles the step segments beautifully
-      stepped: 'after', 
-      tension: 0 // Keep lines perfectly straight between points
-    }]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                // Correctly mapping the nested sections data
+                ...Object.entries(data.graph.M_EI_wo_adapter).map(
+                    ([sectionIndex, sectionData]) => {
+                        return {
+                            label: `M/EI S${sectionIndex}`,
+                            data: Object.values(sectionData)
+                                .map((metrics) => ({
+                                    x: metrics.x,
+                                    y: metrics.y,
+                                }))
+                                .sort((a, b) => a.x - b.x),
+                            borderColor: "#02182B",
+                            backgroundColor: "rgba(1, 151, 246, 0.1)",
+                            fill: true,
+                            yAxisID: "y1",
+                        };
+                    },
+                ),
             ],
         };
 
@@ -151,6 +119,7 @@
                         x: {
                             type: "linear",
                             display: true,
+                            max: 40 + results.extendedHeight,
                             title: {
                                 display: true,
                                 text: "Mast Height, z [mm]",
@@ -389,7 +358,6 @@
             $form.side_adapter_z = parseFloat(qr_arr[17]);
         }
 
-
         observer = new ResizeObserver(() => {
             drawingWidth = drawingContainer.clientWidth;
         });
@@ -400,12 +368,10 @@
         drawingWidth = drawingContainer.clientWidth;
 
         return () => observer.disconnect();
-        
     });
 
     $effect(() => {
-        const z =
-            Math.round(1000 * Math.sqrt($form.sail_area) / 2);
+        const z = Math.round((1000 * Math.sqrt($form.sail_area)) / 2);
 
         if ($form.z_offset !== z) {
             $form.z_offset = z;
@@ -428,9 +394,7 @@
         }
 
         drawBMChart(results);
-
     });
-
 
     let results = $derived.by(() => {
         return Configurator.calculate($form.data());
@@ -518,12 +482,10 @@
             console.error("Fetch Error:", err);
         }
     }
-
 </script>
 
 <Layout>
     <section class="section">
-
         <div class="columns">
             <div class="column is-8">
                 <Title
@@ -893,7 +855,6 @@
 
         <!-- SUMMARY TABLE -->
         <div class="card has-background-white-ter py-2 my-4">
-
             <nav class="level">
                 <div class="level-item has-text-centered">
                     <div>
@@ -917,7 +878,7 @@
                     <div>
                         <p class="heading mb-0">Wind Load on Payload</p>
                         <p class="title mb-0">
-                           {results.payload.wind_load.toFixed(0)}
+                            {results.payload.wind_load.toFixed(0)}
                         </p>
                         <p class="heading">N</p>
                     </div>
@@ -929,7 +890,7 @@
                             Lifted Mass / Total Mast Mass
                         </p>
                         <p class="title mb-0">
-                            {results.mass.lifted.toFixed(0)} / 
+                            {results.mass.lifted.toFixed(0)} /
                             {results.mass.total.toFixed(0)}
                         </p>
                         <p class="heading">kg</p>
@@ -1036,9 +997,12 @@
         </nav>
 
         <div class="card p-4">
-
             <!-- EMPTY DV FOR WIDTH CALCULATON -->
-            <div bind:this={drawingContainer} class="container m-0" id="fixedWidth"></div>
+            <div
+                bind:this={drawingContainer}
+                class="container m-0"
+                id="fixedWidth"
+            ></div>
 
             <!-- LOADS DIAGRAM -->
             <div class="container" id="divLoads">
@@ -1099,9 +1063,7 @@
                                         <tr>
                                             <th>Screw Lead [mm]</th>
                                             <td>
-                                                {config.screw_lead.toFixed(
-                                                    2,
-                                                )}
+                                                {config.screw_lead.toFixed(2)}
                                             </td>
                                         </tr>
 
@@ -1110,13 +1072,11 @@
                                                 >Coefficient of Friction
                                                 [Steel-Bronze]</th
                                             >
-                                            <td
-                                                >
+                                            <td>
                                                 {config.screw_coefficient_of_friction.toFixed(
                                                     2,
                                                 )}
-                                                </td
-                                            >
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -1128,12 +1088,10 @@
                                 >Minimum Torque Required to Extend Mast<br />
                                 <span
                                     class="has-text-weight-normal has-text-success"
-                                    >
-                                    [with {results.mass.lifted.toFixed(
-                                        0,
-                                    )} kg Lifted Mass]
-                                    </span
                                 >
+                                    [with {results.mass.lifted.toFixed(0)} kg Lifted
+                                    Mass]
+                                </span>
                             </th>
                             <td>
                                 <table
@@ -1143,7 +1101,8 @@
                                         <tr>
                                             <th>Selected Motor Power</th>
                                             <td
-                                                >{results.driveline.motor_power} kW</td
+                                                >{results.driveline.motor_power}
+                                                kW</td
                                             >
                                         </tr>
 
@@ -1171,7 +1130,8 @@
                                                 Ratio
                                             </th>
                                             <td
-                                                >{results.driveline.gearbox_ratio}</td
+                                                >{results.driveline
+                                                    .gearbox_ratio}</td
                                             >
                                         </tr>
 
@@ -1328,7 +1288,6 @@
                                     </tbody>
                                 </table>
                             {/if}
-
                         </div>
                     </div>
                 </div>
