@@ -31,16 +31,7 @@
                 fill="#86a1c0"
             />
 
-            <!-- CENTERLINE -->
-            <line
-                x1="0"
-                y1={10}
-                x2="0"
-                y2={data.box.h - 10}
-                class="centerline"
-                stroke="#86a1c0"
-                stroke-width="2"
-            />
+
 
             {#if drawState === "Loads"}
                 <!-- PAYLOAD AND CENTER OF PRESSURE (COP) -->
@@ -269,24 +260,36 @@
             />
 
             {#if drawState === "Loads"}
+
+                <!-- SIDE ADAPTER REACTION FORCE -->
                 <SvgArrow
                     tipX={data.side_adapter.x}
                     tipY={data.side_adapter.y + data.ground.h}
-                    text={"999"}
+                    text={data.side_adapter.load.toFixed(0)}
                     {fontSize}
                     direction="L"
                 />
 
                 <!-- GROUND REACTION FORCE -->
-
                 <SvgArrow
                     tipX={0}
                     tipY={data.ground.h}
-                    text={"999"}
+                    text={-data.ground.reaction_w_adapter.toFixed(0)}
                     {fontSize}
                     direction="R"
                 />
             {/if}
+
+            <!-- CENTERLINE -->
+            <line
+                x1="0"
+                y1={10}
+                x2="0"
+                y2={data.box.h - 10}
+                class="centerline"
+                stroke="#86a1c0"
+                stroke-width="2"
+            />
         </g>
     </svg>
 </div>

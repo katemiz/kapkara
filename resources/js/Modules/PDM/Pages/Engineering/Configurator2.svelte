@@ -6,9 +6,7 @@
     import FormInput from "$components/FormInput.svelte";
     import FormRadio from "$components/FormRadio.svelte";
     import FormSelect from "$components/FormSelect.svelte";
-
     import Pdf from "$components/Icons/Pdf.svelte";
-
     import JsonTree from "$components/JsonTree.svelte";
     import MastDrawing from "$modules/PDM/Pages/Engineering/MastDrawing.svelte";
 
@@ -39,7 +37,9 @@
     import { mtnx_bom } from "$modules/PDM/Shared/mtnx_bom.js";
 
     let chartCanvas;
+    let chartDeflection;
     let chartInstance;
+    let chartDeflectionInstance;
 
     // For tabs and svgDrawings
     let drawingContainer;
@@ -193,20 +193,34 @@
     function drawDeflectionChart(data) {
         if (!chartDeflection) return;
 
-        // 1. Objeyi [height, deflection] çiftlerinden oluşan bir diziye çevirip yüksekliğe göre sıralıyoruz
-        const deflectionWOAdapter = Object.entries(data.deflection_data)
-            .map(([height, deflection]) => ({
-                height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
-                deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
-            }))
-            .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
+        const deflectionPointsWOadapter = (data) => {
 
-        const deflectionWAdapter = Object.entries(data.deflection_data2)
-            .map(([height, deflection]) => ({
-                height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
-                deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
-            }))
-            .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
+            const source = data.deflections.wo_adapter;
+        
+            return Object.keys( source)
+                .sort((a, b) => Number(a) - Number(b)) // Ensure sections are in sequential order
+                .flatMap(sectionKey => 
+                source[sectionKey].map(point => ({
+                    x: point.x,
+                    total_deflection_mm: point.total_deflection_mm
+                }))
+                );
+        };
+
+        // // 1. Objeyi [height, deflection] çiftlerinden oluşan bir diziye çevirip yüksekliğe göre sıralıyoruz
+        // const deflectionWOAdapter = Object.entries(data.deflection_data)
+        //     .map(([height, deflection]) => ({
+        //         height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
+        //         deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
+        //     }))
+        //     .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
+
+        // const deflectionWAdapter = Object.entries(data.deflection_data2)
+        //     .map(([height, deflection]) => ({
+        //         height: Number(height), // Key'ler string geldiği için sayıya çeviriyoruz (0, 1800, 2050...)
+        //         deflection: deflection, // Sehim değeri (0, -2.65, -3.37...)
+        //     }))
+        //     .sort((a, b) => a.height - b.height); // Yüksekliğe göre küçükten büyüğe sırala
 
         const max_deflection = data.deflection_data;
         const ctx = chartDeflection.getContext("2d");
@@ -215,26 +229,22 @@
             datasets: [
                 {
                     label: "Deflection w/o Side Adapter (mm)",
-                    // 2. Map directly to { x, y } coordinates
-                    data: deflectionWOAdapter.map((point) => ({
-                        x: point.height,
-                        y: point.deflection,
-                    })),
+                    data: data.deflections.wo_adapter,
                     borderColor: "#D7263D",
                     yAxisID: "y",
                     tension: 0.35,
                 },
-                {
-                    label: "Deflection w/ Side Adapter (mm)",
-                    // 3. Map this dataset to its own independent { x, y } coordinates
-                    data: deflectionWAdapter.map((point) => ({
-                        x: point.height,
-                        y: point.deflection,
-                    })),
-                    borderColor: "#8FB339",
-                    yAxisID: "y",
-                    tension: 0.35,
-                },
+                // {
+                //     label: "Deflection w/ Side Adapter (mm)",
+                //     // 3. Map this dataset to its own independent { x, y } coordinates
+                //     data: deflectionWAdapter.map((point) => ({
+                //         x: point.height,
+                //         y: point.deflection,
+                //     })),
+                //     borderColor: "#8FB339",
+                //     yAxisID: "y",
+                //     tension: 0.35,
+                // },
             ],
         };
 
@@ -394,6 +404,7 @@
         }
 
         drawBMChart(results);
+        drawDeflectionChart(results);
     });
 
     let results = $derived.by(() => {
@@ -449,7 +460,6 @@
     }
 
     let result = "";
-    let error = "";
 
     async function code2Cad() {
         try {
@@ -1020,7 +1030,7 @@
 
             <!-- DEFLECTION DIAGRAM -->
             <div class="container is-hidden" id="divDeflection">
-                <!-- <canvas bind:this={chartDeflection}></canvas> -->
+                <canvas bind:this={chartDeflection}></canvas>
             </div>
 
             <!-- EXTENDED DIAGRAM -->

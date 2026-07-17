@@ -32,6 +32,11 @@ export default class Configurator {
 
         // DEFLECTION
         this.findBeamMoments();
+                this.setGraphData();
+
+
+        this.findDeflection(form);
+
         this.setGraphData();
 
         // VIBRATION
@@ -845,8 +850,6 @@ export default class Configurator {
                 V_w_adapter_right: 0,
                 M_wo_adapter: 0,
                 M_w_adapter: 0,
-                deflection_wo_adapter: 0,
-                deflection_w_adapter: 0,
             })
         };
 
@@ -892,7 +895,6 @@ export default class Configurator {
     /*
     MAST VIBRATION ANALYSIS
     */
-
     static runVibrationAnalysis(form) {
         // Create vibration analyzer with mast data, tube lengths and payload mass
         const analyzer2 = new MastVibration({
@@ -921,10 +923,9 @@ export default class Configurator {
     /*
     DEFLECTION CALCULATIONS
     */
-    static findInternalMomentAtZ(z) {
+    static findInternalMomentAtZ(z, form, hasSideAdapter = false) {
 
         let internal_moment = this.mast.tip_moment.moment_tip_total;
-
         internal_moment += this.mast.payload.wind_load * (this.mast.extendedHeight - z) / 1000;
 
         this.mast.sections.forEach(section => {
@@ -932,13 +933,28 @@ export default class Configurator {
                 //console.log("section",section.wind_load.z,z,section.wind_load.load);
                 internal_moment += section.wind_load.load * (section.wind_load.z - z) / 1000;
             }
+
+
+
         });
+
+
+            if (hasSideAdapter && form.side_adapter_z >= z) {
+                internal_moment += this.mast.side_reaction * (form.side_adapter_z - z) / 1000;
+
+            }
+
+            if (hasSideAdapter) {
+                console.log("internal_moment",this.mast.side_reaction,internal_moment)
+            }
+
+
 
         return internal_moment;
     }
 
 
-    static findInternalShearAtZ(z) {
+    static findInternalShearAtZ(z,form,hasSideAdapter = false) {
 
         let all_loads = [];
 
@@ -950,6 +966,15 @@ export default class Configurator {
             z: this.mast.extendedHeight,
             load: this.mast.payload.wind_load
         })
+
+        if (hasSideAdapter) {
+            all_loads.push({
+                z: form.side_adapter_z,
+                load: this.mast.side_reaction
+            })
+        }
+
+        console.log("all_loads",all_loads,z)
 
 
         let v_left = (all_loads, z) => {
@@ -964,7 +989,7 @@ export default class Configurator {
                 .reduce((sum, l) => sum + l.load, 0);
         }
 
-        console.log(-v_left(all_loads, z), -v_right(all_loads, z), z)
+        //console.log(-v_left(all_loads, z), -v_right(all_loads, z), z)
 
         return { left: -v_left(all_loads, z), right: -v_right(all_loads, z) };
     }
@@ -976,34 +1001,167 @@ export default class Configurator {
         // Find Root Moment without Side Adapter
         this.mast.sections.forEach(section => {
             section.control_points.forEach(point => {
-                point.M_wo_adapter = this.findInternalMomentAtZ(point.z);
-                const shear = this.findInternalShearAtZ(point.z);
+                point.M_wo_adapter = this.findInternalMomentAtZ(point.z,form,false);
+                const shear = this.findInternalShearAtZ(point.z,form);
                 point.V_wo_adapter_left = shear.left;
                 point.V_wo_adapter_right = shear.right;
             });
         });
 
         // Find M/EI w/o side adapter
-
         this.mast.sections.forEach(section => {
-
             section.control_points.forEach(point => {
                 //console.log("point",point.EI)
                 point.M_EI_wo_adapter = point.M_wo_adapter / point.EI;
             })
         });
 
-
-
         return true;
     }
 
-    static setGraphData() {
 
+    static findDeflection(form) {
+
+        this.mast.deflections = {
+            "wo_adapter":[],
+            "w_adapter":[]
+        }
+
+        this.mast.sections.forEach(section => {
+            section.control_points.forEach(point => {
+                this.mast.deflections.wo_adapter.push({
+                    x: point.z,
+                    y: this.calculateAreaAndCentroid(point.z)
+                })
+            })
+        })
+
+        this.findSideReaction(form)
+
+        // After Side Reaction
+        // Now possible to calculate ground reaction moment
+        // Find Root Moment ** WITH ** Side Adapter
+        this.mast.sections.forEach(section => {
+            section.control_points.forEach(point => {
+                point.M_w_adapter = this.findInternalMomentAtZ(point.z,form,true);
+            });
+        });
+
+
+
+
+
+        const ground_reaction_w_adapter = this.findInternalShearAtZ(0,form,true);
+        this.mast.ground_reaction_w_adapter = ground_reaction_w_adapter.right;
+
+        //console.log(this.findInternalShearAtZ(0,form,true))
+    }
+
+
+    static findSideReaction(form) {
+        let deflection = this.mast.deflections.wo_adapter.find( x => x.x === form.side_adapter_z ).y / 1000; // in m
+        let ei = this.mast.tubes.at(-1).EI_Nm2; // Since fixed adapter will always be on fixed tube
+        this.mast.side_reaction = -(deflection * 3 * ei) / Math.pow(form.side_adapter_z / 1000, 3);
+        return true;
+    }
+
+
+
+
+    static calculateAreaAndCentroid( xLimit) {
+
+
+        let mei_points = {}
+
+        this.mast.sections.forEach((section,key) => {
+            mei_points[key] = []
+            section.control_points.forEach(point => {
+                mei_points[key].push(point)
+            })
+        })
+
+        //let mei_points = mei_wo_adapter(this.mast.sections)
+
+        const sectionKeys1 = Object.keys(this.mast.graph.M_EI_wo_adapter).sort((a, b) => Number(a) - Number(b));
+
+        const sectionKeys = Object.keys(mei_points).sort((a, b) => Number(a) - Number(b));
+
+        
+        // console.log("this.mast.graph.M_EI_wo_adapter",this.mast.graph.M_EI_wo_adapter,mei_points)
+        // console.log("*********************************************************")
+        // console.log("sectionKeys1 sectionKeys",sectionKeys1,sectionKeys)
+
+        let total_deflection_mm = 0;
+        
+        for (const key of sectionKeys) {
+
+            //const points = this.mast.graph.M_EI_wo_adapter[key];
+            const points = mei_points[key];
+            //const points = sectionKeys[key];
+
+            console.log("sectionKeys points",points)
+
+            // If the entire section starts past our global xLimit, we skip calculating it
+            if (points[0].z >= xLimit) {
+                continue;
+            }
+
+            for (let i = 0; i < points.length - 1; i++) {
+
+                const p1 = points[i];
+                const p2 = points[i + 1];
+
+                // If this segment starts after the limit, stop processing this section
+                if (p1.z >= xLimit) break;
+                
+                let xStart = p1.z;
+                let xEnd = p2.z;
+                let yStart = p1.M_EI_wo_adapter;
+                let yEnd = p2.M_EI_wo_adapter;
+                
+                // Clip the segment if it crosses the limit line
+                if (xLimit < xEnd) {
+                    xEnd = xLimit;
+                    const fraction = (xLimit - p1.z) / (p2.z - p1.z);
+                    yEnd = p1.M_EI_wo_adapter + fraction * (p2.M_EI_wo_adapter - p1.M_EI_wo_adapter);
+                }
+                
+                const width = xEnd - xStart;
+                if (width <= 0) continue;
+                
+                // 1. Trapezoidal area for this sub-segment
+                const segmentArea = ((yStart + yEnd) / 2) * width / 1000;
+                
+                // 2. Exact X-centroid coordinate for this sub-trapezoid
+                const localCentroidX = xStart + (width * (yStart + 2 * yEnd)) / (3 * (yStart + yEnd));
+                
+                console.log("a. xStart, xEnd, yStart, yEnd", points[i].z, xEnd, yStart, yEnd)
+                console.log("b.segmentArea, localCetroidX", segmentArea, localCentroidX)
+
+                total_deflection_mm += segmentArea * (xLimit - localCentroidX);
+
+                if (xEnd === xLimit) break;
+            }
+            
+        }
+        
+        return total_deflection_mm;
+    }
+
+
+
+
+    static setGraphData() {
 
         let m_wo_adapter = (sections) => {
             return sections.flatMap(s =>
                 s.control_points.map(cp => ({ z: cp.z, M_wo_adapter: cp.M_wo_adapter }))
+            );
+        }
+
+        let m_w_adapter = (sections) => {
+            return sections.flatMap(s =>
+                s.control_points.map(cp => ({ z: cp.z, M_w_adapter: cp.M_w_adapter }))
             );
         }
 
@@ -1021,17 +1179,11 @@ export default class Configurator {
             });
         });
 
-
-
-
         this.mast.graph = {
             "moment_wo_adapter": m_wo_adapter(this.mast.sections),
+            "moment_w_adapter": m_w_adapter(this.mast.sections),
             "M_EI_wo_adapter": mei_wo_adapter
         }
-
-
-
-
 
     }
 
@@ -1302,7 +1454,8 @@ export default class Configurator {
             x: -svg.box.w / 2,
             y: 0,
             w: svg.box.w,
-            h: ground_h
+            h: ground_h,
+            reaction_w_adapter:this.mast.ground_reaction_w_adapter
         };
 
         svg.payload = {
@@ -1353,6 +1506,7 @@ export default class Configurator {
                 svg.side_adapter = {
                     x: 0,
                     y: foundTube.nested_zt - form.overlap / 2,
+                    load:this.mast.side_reaction,
                     points: [
                         { x: -0.7 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap },
                         { x: 2.5 * foundTube.od, y: foundTube.nested_zt + ground_h - 0.2 * form.overlap },
