@@ -10,15 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create("documents", function (Blueprint $table) {
+        Schema::create('hidden_blades', function (Blueprint $table) {
             $table->id();
-            $table->string("doc_type");
-            $table->integer("document_no");
-            $table->integer("revision")->default(1);
-            $table->text("description");
-            $table->boolean("is_latest")->default(true);
-            $table->text("remarks")->nullable();
-            $table->string("status")->default("DRAFT");
+            $table->string("name");
+            $table->string("lastname");
+            $table->integer("tckn");
+            $table->string("blood");
             $table->userstamps(); // provided by App\Providers\AppServiceProvider
             $table->timestamps();
         });
@@ -29,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists("documents");
+        Schema::dropIfExists('hidden_blades');
     }
 };

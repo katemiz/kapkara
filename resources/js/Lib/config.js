@@ -79,7 +79,7 @@ export const MYAPPS = [
         logo: "yonetici.svg",
         app_hero: "AppHero-Yonetici.svg",
         img: "yonetici_brand_logo.svg",
-        url: "https://yonetici.kapkara.one",
+        url: "/yonetici",
         desc: `
         <p>Gelir/Gider (Aidat, Su/Elektrik/Doğalgaz/Sıcak Su) gibi faturalama ve ödeme takip işlemlerini
         yapıp andında döküm alabileceğiniz bir uygulama.</p>`,

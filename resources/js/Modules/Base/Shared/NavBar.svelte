@@ -1,9 +1,8 @@
 <script>
     import { auth } from "$modules/Auth/auth.svelte.js";
-    import { KAPKARA, MYAPPS, PATHS } from "$lib/config";
-    import { router } from '@inertiajs/svelte';
+    import { MYAPPS, PATHS } from "$lib/config";
+    import { router } from "@inertiajs/svelte";
     import KapkaraIcon from "$components/Icons/KapkaraIcon.svelte";
-
 
     import {
         House,
@@ -15,9 +14,10 @@
         Database,
         Bird,
         Box,
-        ShieldUser
+        ShieldUser,
+        TurkishLira,
+        LibraryBig,
     } from "@lucide/svelte";
-
 
     // Create a simple state variable for the menu
     let isMenuOpen = $state(false);
@@ -25,9 +25,7 @@
     function toggleMenu() {
         isMenuOpen = !isMenuOpen;
     }
-
 </script>
-
 
 <nav class="navbar is-dark">
     <div class="navbar-brand">
@@ -45,7 +43,7 @@
         </a>
 
         <button
-            class="navbar-burger button  {isMenuOpen ? 'is-active' : ''}"
+            class="navbar-burger button {isMenuOpen ? 'is-active' : ''}"
             aria-label="menu"
             data-target="navbarMenu"
             aria-expanded={isMenuOpen}
@@ -60,7 +58,11 @@
 
     <div id="navbarMenu" class="navbar-menu {isMenuOpen ? 'is-active' : ''}">
         <div class="navbar-end">
-            <a href="/" class="navbar-item is-active" onclick={() => isMenuOpen = false}>
+            <a
+                href="/"
+                class="navbar-item is-active"
+                onclick={() => (isMenuOpen = false)}
+            >
                 <span class="icon has-text-warning">
                     <House size={18} />
                 </span>
@@ -70,9 +72,8 @@
                 <a href="/apps" class="navbar-item navbar-link">Apps</a>
 
                 <div class="navbar-dropdown">
-
-                    {#if auth.isAuthenticated && auth.hasRole('admin')}
-                        <a class="navbar-item" href='/admin'>
+                    {#if auth.isAuthenticated && auth.hasRole("admin")}
+                        <a class="navbar-item" href="/admin">
                             <span class="icon">
                                 <ShieldUser size={18} />
                             </span>
@@ -142,19 +143,37 @@
                             <span>Material</span>
                         </a>
 
+                        <a class="navbar-item" href="/mylib">
+                            <span class="icon">
+                                <LibraryBig size={18} />
+                            </span>
+                            <span>My Library</span>
+                        </a>
+
+                        <a class="navbar-item" href="/hidden-blade">
+                            <span class="icon">
+                                <TurkishLira size={18} />
+                            </span>
+                            <span>Hidden Blade</span>
+                        </a>
+
                         <button
                             type="button"
                             class="navbar-item"
-                            onclick={() => router.post('/logout', {}, {
-                                onSuccess: () => router.visit('/')
-                            })}
+                            onclick={() =>
+                                router.post(
+                                    "/logout",
+                                    {},
+                                    {
+                                        onSuccess: () => router.visit("/"),
+                                    },
+                                )}
                         >
                             <span class="icon">
                                 <LogOut size={18} />
                             </span>
                             <span>Logout</span>
                         </button>
-
                     </div>
                 </div>
             {:else}

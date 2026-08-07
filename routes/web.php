@@ -17,6 +17,10 @@ use App\Http\Controllers\MediaController;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\HiddenBladeController;
+
+use App\Http\Controllers\YoneticiController;
+use App\Http\Controllers\MyLibraryController;
 
 use Inertia\Inertia;
 
@@ -79,6 +83,8 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("answer", AnswerController::class);
     Route::resource("material", MaterialController::class);
     Route::resource("user", UserController::class);
+
+    Route::resource("hidden-blade", HiddenBladeController::class);
 });
 
 // 1. Define the GET routes for Fortify views and NAME them
@@ -100,6 +106,10 @@ Route::get(
         "message" => "Welcome to Laravel + Inertia + Svelte 5!",
     ]),
 );
+
+
+
+
 
 // PDM
 Route::middleware(["auth", "verified"])->group(function () {
@@ -142,8 +152,37 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("answer", AnswerController::class);
     Route::resource("user", UserController::class);
 
+    Route::resource("mylib", MyLibraryController::class);
+
+
     // API
     Route::post('/api/code2cad', [ApiController::class, 'runCode2Cad']);
+});
+
+
+
+
+// YONETICI
+
+Route::middleware(["auth", "verified"])->group(function () {
+
+    // Main resource: /yonetici
+    Route::resource("yonetici", YoneticiController::class)
+        ->names([
+            'index' => 'dashboard', // Generates route name 'dashboard'
+        ]);
+
+    // Sub-resource using the SAME controller
+    Route::resource("yonetici/something", YoneticiController::class)
+        ->names([
+            'index' => 'yonetici.something.index',
+            'create' => 'yonetici.something.create',
+            'store' => 'yonetici.something.store',
+            'show' => 'yonetici.something.show',
+            'edit' => 'yonetici.something.edit',
+            'update' => 'yonetici.something.update',
+            'destroy' => 'yonetici.something.destroy',
+        ]);
 });
 
 
