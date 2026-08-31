@@ -3,7 +3,7 @@
 
     import { router } from "@inertiajs/svelte";
 
-    import Layout from "$modules/PDM/Shared/Layout.svelte";
+    import Layout from "$modules/Base/Shared/Layout.svelte";
     import RecordData from "$components/RecordData.svelte";
     import FilesList from "$components/FilesList.svelte";
     import Title from "$components/Title.svelte";

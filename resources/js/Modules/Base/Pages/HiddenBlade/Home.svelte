@@ -1,43 +1,54 @@
 <script>
     import Layout from "../../Shared/Layout.svelte";
 
-    import { Plus } from "@lucide/svelte";
+    import { Copy } from "@lucide/svelte";
+
+    import { fdata } from "./blade.js";
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+    }
 </script>
 
 <Layout>
     <section class="section">
-        <a href="/hidden-blade/create" class="button is-ghost">
-            <span class="icon is-small">
-                <Plus size="20" />
-            </span>
-            <span>Add New</span>
-        </a>
-
-        <div class="columns">
-            <div class="column is-4">
-                <aside class="menu">
-                    <p class="menu-label">Hidden Blade</p>
-                    <ul class="menu-list">
-                        <li>
-                            <a href="/funstuff/gauss"
-                                >Gauss Distribution with Galton Board</a
-                            >
-                        </li>
-                        <li><a href="/">Maxell's Demon (Coming)</a></li>
-                    </ul>
-                </aside>
-            </div>
-
-            <div class="column">
-                <!-- Content area -->
-                sdfdfdg
-            </div>
+        <div class="hero-body">
+            <figure class="image">
+                <img src="/images/Base/hero.svg" alt="Hero" />
+            </figure>
         </div>
+
+        <table class="table is-fullwidth mt-4">
+            <tbody>
+                {#each fdata as kisi}
+                    <tr>
+                        <td class="is-narrow">
+                            <figure class="image is-64x64">
+                                <img
+                                    class="is-rounded"
+                                    src="/images/Base/{kisi.image}"
+                                    alt={kisi.name}
+                                />
+                            </figure>
+                        </td>
+                        <td>
+                            <h1 class="title">{kisi.name}</h1>
+                            <h2 id="tcvn" class="subtitle">
+                                {new Intl.NumberFormat("fr-FR").format(
+                                    kisi.tcvn,
+                                )}
+                                <Copy
+                                    size="18"
+                                    color="blue"
+                                    onclick={() => copyText(kisi.tcvn)}
+                                />
+                            </h2>
+
+                            <p>{kisi.kangrubu}</p>
+                        </td>
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
     </section>
 </Layout>
-
-<style>
-    .section {
-        height: 100dvh;
-    }
-</style>

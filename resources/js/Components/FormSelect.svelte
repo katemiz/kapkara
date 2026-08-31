@@ -73,7 +73,6 @@
             </select>
         </div>
     </div>
-
     {#if hasError}
         <p class="help is-danger">{errorMessage}</p>
     {/if}

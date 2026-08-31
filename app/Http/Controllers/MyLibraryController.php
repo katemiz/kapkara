@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\MyAsset;
 use Illuminate\Http\Request;
@@ -8,107 +9,7 @@ use Inertia\Inertia;
 
 class MyLibraryController extends Controller
 {
-    public $dpOptions = [
 
-        ["value" => "1", "label" => "Option1"],
-        ["value" => "2", "label" => "Option2"],
-        ["value" => "3", "label" => "Option3"],
-        ["value" => "4", "label" => "Option4"]
-    ];
-
-
-
-    public $radioOptions = [
-
-        ["value" => 1, "label" => "Radio Option 1"],
-        ["value" => 2, "label" => "Radio Option 2"],
-        ["value" => 3, "label" => "Radio Option 3"],
-        ["value" => 4, "label" => "Radio Option 4"]
-    ];
-
-    public $checkboxOptions = [
-        ["value" => "1", "label" => "Checkbox Option 1"],
-        ["value" => "2", "label" => "Checkbox Option 2"],
-        ["value" => "3", "label" => "Checkbox Option 3"],
-        ["value" => "4", "label" => "Checkbox Option 4"]
-    ];
-
-    public $veri = [
-        // Level 1 options
-        'level1' => [
-            ['value' => 'electronics', 'label' => 'Electronics'],
-            ['value' => 'clothing', 'label' => 'Clothing'],
-            ['value' => 'books', 'label' => 'Books']
-        ],
-
-        // Level 2 options by parent
-        'level2' => [
-            'electronics' => [
-                ['value' => 'phones', 'label' => 'Phones'],
-                ['value' => 'laptops', 'label' => 'Laptops'],
-                ['value' => 'accessories', 'label' => 'Accessories']
-            ],
-            'clothing' => [
-                ['value' => 'mens', 'label' => "Men's Clothing"],
-                ['value' => 'womens', 'label' => "Women's Clothing"],
-                ['value' => 'kids', 'label' => "Kids' Clothing"]
-            ],
-            'books' => [
-                ['value' => 'fiction', 'label' => 'Fiction'],
-                ['value' => 'nonfiction', 'label' => 'Non-Fiction'],
-                ['value' => 'textbooks', 'label' => 'Textbooks']
-            ]
-        ],
-
-        // Level 3 options by parent
-        'level3' => [
-            'phones' => [
-                ['value' => 'iphone', 'label' => 'iPhone'],
-                ['value' => 'samsung', 'label' => 'Samsung'],
-                ['value' => 'google', 'label' => 'Google Pixel']
-            ],
-            'laptops' => [
-                ['value' => 'macbook', 'label' => 'MacBook'],
-                ['value' => 'dell', 'label' => 'Dell'],
-                ['value' => 'hp', 'label' => 'HP']
-            ],
-            'accessories' => [
-                ['value' => 'chargers', 'label' => 'Chargers'],
-                ['value' => 'cases', 'label' => 'Cases'],
-                ['value' => 'headphones', 'label' => 'Headphones']
-            ],
-            'mens' => [
-                ['value' => 'shirts', 'label' => 'Shirts'],
-                ['value' => 'pants', 'label' => 'Pants'],
-                ['value' => 'shoes', 'label' => 'Shoes']
-            ],
-            'womens' => [
-                ['value' => 'dresses', 'label' => 'Dresses'],
-                ['value' => 'tops', 'label' => 'Tops'],
-                ['value' => 'bottoms', 'label' => 'Bottoms']
-            ],
-            'kids' => [
-                ['value' => 'toddler', 'label' => 'Toddler'],
-                ['value' => 'children', 'label' => 'Children'],
-                ['value' => 'teen', 'label' => 'Teen']
-            ],
-            'fiction' => [
-                ['value' => 'mystery', 'label' => 'Mystery'],
-                ['value' => 'scifi', 'label' => 'Science Fiction'],
-                ['value' => 'romance', 'label' => 'Romance']
-            ],
-            'nonfiction' => [
-                ['value' => 'biography', 'label' => 'Biography'],
-                ['value' => 'history', 'label' => 'History'],
-                ['value' => 'science', 'label' => 'Science']
-            ],
-            'textbooks' => [
-                ['value' => 'math', 'label' => 'Mathematics'],
-                ['value' => 'english', 'label' => 'English'],
-                ['value' => 'science-text', 'label' => 'Science']
-            ]
-        ]
-    ];
 
 
     public $permissions = [
@@ -121,7 +22,6 @@ class MyLibraryController extends Controller
 
 
 
-    public $modelData = [];
 
     public $itemData;
 
@@ -169,12 +69,11 @@ class MyLibraryController extends Controller
      */
     public function create()
     {
-        $this->prepareProps();
+        //$this->prepareProps();
 
         return Inertia::render('MyLib/Form', [
             'asset' => null, // or new Question()
             'isEdit' => false,
-            'fixedData' => $this->modelData
         ]);
     }
 
@@ -215,14 +114,9 @@ class MyLibraryController extends Controller
     {
         $asset = MyAsset::findOrFail($idAsset)->toArray();
 
-        //$asset["myCheckboxMultiple"] = $this->convertJsonToArray($asset["myCheckboxMultiple"]);
-
-        $this->prepareProps();
-
         return Inertia::render('MyLib/Form', [
             'asset' => $asset,
             'isEdit' => true,
-            'fixedData' => $this->modelData
         ]);
     }
 
@@ -256,16 +150,11 @@ class MyLibraryController extends Controller
     }
 
 
-    public function prepareProps()
-    {
 
-        $this->modelData = [];
 
-        $this->modelData["dpOptions"] = $this->dpOptions;
-        $this->modelData["radioOptions"] = $this->radioOptions;
-        $this->modelData["cascadedData"] = $this->veri;
-        $this->modelData["checkboxOptions"] = $this->checkboxOptions;
-    }
+
+
+
 
 
 
@@ -283,24 +172,18 @@ class MyLibraryController extends Controller
 
     public function readInput($request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'asset_type' => 'required|string',
             'remarks' => 'required|string|max:10000',
         ]);
 
-        // Only modify myCheckboxMultiple if it exists (since you have $casts in model, this might not be needed)
-        if (isset($validated['myCheckboxMultiple'])) {
-            $validated['myCheckboxMultiple'] = json_encode($validated['myCheckboxMultiple']);
+        if ($validator->fails()) {
+            dd($validator->errors()->toArray());
         }
 
-        return $validated;
+        return $validator->validated();
     }
-
-
-
-
-
 
 
 
@@ -332,18 +215,6 @@ class MyLibraryController extends Controller
         return [];
     }
 
-    public function SILaddFiles($idModel, $files, )
-    {
-
-        $model = MyAsset::find($idModel);
-
-        foreach ($files as $file) {
-
-            $model
-                ->addMedia($file)
-                ->toMediaCollection();
-        }
-    }
 
 
 
@@ -363,7 +234,7 @@ class MyLibraryController extends Controller
         ]);
 
 
-        $mediaCollectionName = 'gallery_images';
+        $mediaCollectionName = $item->asset_type;
         $uploadedCount = 0;
 
         // 3. Check and process multiple files
@@ -371,6 +242,7 @@ class MyLibraryController extends Controller
 
             // The request->file('myUpload') returns an array of UploadedFile objects
             $files = $request->file('assetFile');
+
 
             foreach ($files as $file) {
                 if ($file->isValid()) {
@@ -383,6 +255,9 @@ class MyLibraryController extends Controller
                         $uploadedCount++;
 
                     } catch (\Exception $e) {
+
+                        dd($files);
+
                         dd(["Failed to upload file {$file->getClientOriginalName()}: " . $e->getMessage()]);
                         // Handle the error (e.g., skip the file, or return an error response)
                     }

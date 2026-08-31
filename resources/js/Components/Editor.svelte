@@ -2,7 +2,6 @@
     import { onMount } from "svelte";
     import Quill from "quill";
     import "quill/dist/quill.snow.css"; // Ensure you import the CSS!
-    import { router } from "@inertiajs/svelte";
 
     let { onUpdate, value, placeholder = "Write something..." } = $props();
     // svelte-ignore non_reactive_update
@@ -47,6 +46,16 @@
         return () => {
             quill = null;
         };
+    });
+
+    $effect(() => {
+        if (quill && value !== quill.root.innerHTML) {
+            if (!value || value === "<p><br></p>") {
+                quill.root.innerHTML = "";
+            } else {
+                quill.root.innerHTML = value;
+            }
+        }
     });
 
     async function imageHandler() {

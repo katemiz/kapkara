@@ -1,5 +1,5 @@
 <script>
-    import Layout from "$modules/PDM/Shared/Layout.svelte";
+    import Layout from "$modules/Base/Shared/Layout.svelte";
     import Title from "$components/Title.svelte";
     import Paginate from "$components/Paginate.svelte";
     import TableRecordsInfo from "$components/TableRecordsInfo.svelte";

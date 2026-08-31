@@ -68,7 +68,7 @@
             title="My Digital Assets"
             subtitle={isEdit & (asset != null)
                 ? "Edit Asset" + asset.id
-                : "Create Asset"}
+                : "Add a New Asset"}
         />
 
         <nav class="level is-mobile">
@@ -76,7 +76,7 @@
             <div class="level-left">
                 <p class="buttons">
                     <a
-                        href="/question"
+                        href="/mylib/create"
                         class="button is-link is-inverted is-outlined"
                     >
                         <span class="icon is-small">
@@ -106,7 +106,7 @@
             </div>
         </nav>
 
-        <form onsubmit={submit} class="">
+        <form onsubmit={submit} novalidate class="">
             <div class="columns">
                 <div class="column is-8">
                     <FormInput
@@ -154,7 +154,7 @@
                 label="Upload Files (PDF, DOCX, TXT)"
                 accept=".pdf,.docx,.doc,.txt,.png"
                 multiple={true}
-                maxSize={100}
+                maxSize={150}
                 showPreview={false}
             />
 

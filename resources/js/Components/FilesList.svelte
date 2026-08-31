@@ -39,7 +39,6 @@
 </script>
 
 {#if media.length > 0}
-
     <table class="table mt-6 has-background-white-ter">
         <caption class="mb-2 has-text-left">
             {media.length === 1 ? "Attachment " : "Attachments "}
@@ -49,13 +48,14 @@
         <tbody>
             {#each media as file}
                 <tr>
-                    <td class="is-narrow"><Paperclip size="16" /></td>
+                    <td class="is-narrow">
+                        <Paperclip size="16" />
+                    </td>
                     <td class="is-narrow">
                         <button
                             type="button"
                             class="is-small has-text-link"
-                            onclick={() =>
-                                downloadFile(file.url, file.name)}
+                            onclick={() => downloadFile(file.url, file.name)}
                         >
                             <span>{file.name}</span>
                         </button>
@@ -77,5 +77,4 @@
             {/each}
         </tbody>
     </table>
-
 {/if}
