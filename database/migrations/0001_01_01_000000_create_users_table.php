@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -21,9 +20,27 @@ return new class extends Migration
             $table->rememberToken();
             $table->text('notes')->nullable();
             $table->boolean(column: 'is_active')->default(true);
+            // $table->foreignId('current_organization_id')
+            //     ->nullable()
+            //     ->constrained('organizations')
+            //     ->nullOnDelete();
+
+
+            $table->string('phone')->nullable();
+            $table->string('locale', 10)->default('en');
+            $table->string('timezone')->default('UTC');
+            $table->boolean('is_super_admin')->default(false);
+            $table->timestamp('suspended_at')->nullable();
+
             $table->userstamps();   // provided by App\Providers\AppServiceProvider
             $table->timestamps();
+            $table->softDeletes();
+
         });
+
+
+
+
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
@@ -39,6 +56,32 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+
+
+
+        Schema::create('personal_access_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('tokenable');
+            $table->string('name');
+            $table->string('token', 64)->unique();
+            $table->text('abilities')->nullable();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamps();
+        });
+
+        // If you add 2FA columns to users later:
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->text('two_factor_secret')->nullable();
+        //     $table->text('two_factor_recovery_codes')->nullable();
+        //     $table->timestamp('two_factor_confirmed_at')->nullable();
+        // });
+
+
+
+
+
     }
 
     /**
@@ -49,5 +92,17 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('personal_access_tokens');
+
     }
+
+
+
+
 };
+
+
+
+
+
+

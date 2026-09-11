@@ -2,6 +2,8 @@
     import Layout from "$modules/Base/Shared/Layout.svelte";
 
     import { KAPKARA } from "$lib/config";
+
+    import { page } from "@inertiajs/svelte";
 </script>
 
 <svelte:head>
@@ -11,6 +13,12 @@
 <Layout>
     <section class="hero is-medium is-bold">
         <div class="hero-body has-background-grey-lighter">
+            {#if $page.props.flash?.status}
+                <div class="notification is-primary is-light">
+                    {$page.props.flash.status}
+                </div>
+            {/if}
+
             <div class="container has-text-right">
                 <div class="columns">
                     <div class="column is-half">

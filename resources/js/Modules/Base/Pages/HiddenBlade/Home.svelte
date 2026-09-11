@@ -2,7 +2,6 @@
     import Layout from "../../Shared/Layout.svelte";
 
     import { Copy } from "@lucide/svelte";
-
     import { fdata } from "./blade.js";
 
     function copyText(text) {
@@ -13,7 +12,7 @@
 <Layout>
     <section class="section">
         <div class="hero-body">
-            <figure class="image">
+            <figure class="image is-3by1">
                 <img src="/images/Base/hero.svg" alt="Hero" />
             </figure>
         </div>

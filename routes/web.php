@@ -10,7 +10,6 @@ use App\Http\Controllers\ItemController;
 
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\EcnController;
-use App\Http\Controllers\ConfiguratorController;
 
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\MediaController;
@@ -24,6 +23,8 @@ use App\Http\Controllers\MyLibraryController;
 
 use Inertia\Inertia;
 
+require __DIR__ . '/setup.php';
+
 
 // 1. Root Route
 // Public Routes
@@ -32,7 +33,7 @@ Route::get(
     fn() => Inertia::render("Modules/Base/Pages/Home", [
         "message" => "Welcome to Laravel + Inertia + Svelte 5!",
     ]),
-);
+)->name("MyHome");
 
 // 2. Main Site Routes
 Route::name("pages.")->group(function () {
@@ -163,7 +164,6 @@ Route::middleware(["auth", "verified"])->group(function () {
 
 
 // YONETICI
-
 Route::middleware(["auth", "verified"])->group(function () {
 
     // Main resource: /yonetici
@@ -184,5 +184,3 @@ Route::middleware(["auth", "verified"])->group(function () {
             'destroy' => 'yonetici.something.destroy',
         ]);
 });
-
-
