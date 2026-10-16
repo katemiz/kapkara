@@ -45,8 +45,8 @@ class MyLibraryController extends Controller
     {
 
         // Add this temporarily to see what's being received
-        \Log::info('Request params:', $request->all());
-        \Log::info('Search param:', ['search' => $request->input('search')]);
+        // \Log::info('Request params:', $request->all());
+        // \Log::info('Search param:', ['search' => $request->input('search')]);
 
 
         return Inertia::render('MyLib/Index', [

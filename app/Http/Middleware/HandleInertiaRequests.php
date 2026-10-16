@@ -16,6 +16,7 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
+
     /**
      * Determines the current asset version.
      *
@@ -25,6 +26,9 @@ class HandleInertiaRequests extends Middleware
     {
         return parent::version($request);
     }
+
+
+
 
     /**
      * Define the props that are shared by default.
@@ -60,8 +64,11 @@ class HandleInertiaRequests extends Middleware
             ],
             // You can also share flash messages (e.g., from Fortify)
             'flash' => [
-                'message' => fn () => $request->session()->get('message'),
-                'status' => fn () => $request->session()->get('status'),
+                'message' => fn() => $request->session()->get('message'),
+                'status' => fn() => $request->session()->get('status'),
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+
             ],
         ]);
     }

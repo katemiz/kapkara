@@ -17,6 +17,7 @@
         ShieldUser,
         TurkishLira,
         LibraryBig,
+        UserStar,
     } from "@lucide/svelte";
 
     // Create a simple state variable for the menu
@@ -112,6 +113,13 @@
                     <ContactRound size={18} />
                 </span>
                 <span>Contact</span>
+            </a>
+
+            <a href="/admin" class="navbar-item has-text-danger">
+                <span class="icon has-text-danger">
+                    <UserStar size={18} />
+                </span>
+                <span>Admin</span>
             </a>
 
             {#if auth.isAuthenticated}

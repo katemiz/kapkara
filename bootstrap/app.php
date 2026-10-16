@@ -6,7 +6,6 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 use App\Http\Middleware\HandleInertiaRequests;
 
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -24,22 +23,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest.setup' => \App\Http\Middleware\RedirectIfInstalled::class,
             'installed' => \App\Http\Middleware\RedirectIfNotInstalled::class,
+            'super_admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
         ]);
 
         // Runs on every web request — redirects to /setup until an organization exists
         $middleware->web(append: [
             \App\Http\Middleware\RedirectIfNotInstalled::class,
         ]);
-
-
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
-
-
-
-
 
 
 

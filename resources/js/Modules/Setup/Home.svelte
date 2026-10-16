@@ -12,21 +12,7 @@
         admin_password_confirmation: "",
     });
 
-    let step = 1;
     let clientError = "";
-
-    function next() {
-        if (!$form.organization_name.trim()) {
-            clientError = "Please enter your organization name.";
-            return;
-        }
-        clientError = "";
-        step = 2;
-    }
-
-    function back() {
-        step = 1;
-    }
 
     function submit() {
         $form.post("/setup", { preserveScroll: true });
@@ -38,22 +24,25 @@
 </svelte:head>
 
 <section class="section">
-    <Title title="Set up your workspace" subtitle="sdfsdf" />
+    <Title title="kapkara Setup" subtitle="Set up your workspace" />
 
-    <div class="notification is-warning is-light">
-        These actions lets you define <strong>organizaion</strong> and
-        <strong>admin user</strong> for that organization
+    <div class="notification is-warning is-light content">
+        Following actions shall be performed:
+        <ul>
+            <li>
+                Set <italic>App Owner</italic> <strong>Organization</strong>
+            </li>
+            <li>
+                Set <strong>App Admin/Super Admin</strong> [Name-Email-Password]
+            </li>
+        </ul>
     </div>
 
     <div class="has-background-grey-lighter p-4">
-        <div class="mb-6">
-            <p class="is-size-3 mt-1">Step {step} of 2</p>
-        </div>
-
-        {#if step === 1}
+        <form on:submit|preventDefault={submit} class="form">
             <div class="field">
                 <label for="organization_name" class="label"
-                    >Organization Name</label
+                    >App Owner Organization Name</label
                 >
                 <div class="control">
                     <input
@@ -80,118 +69,99 @@
                 {/if}
             </div>
 
-            <div class="has-text-right">
-                <button type="button" on:click={next} class="button is-link">
-                    Continue
-                </button>
-            </div>
-        {:else}
-            <form on:submit|preventDefault={submit} class="form">
-                <div class="fixed-grid has-2-cols">
-                    <div class="grid">
-                        <div class="field">
-                            <label for="admin_name" class="label"
-                                >Admin Name</label
-                            >
-                            <input
-                                id="admin_name"
-                                type="text"
-                                bind:value={$form.admin_name}
-                                class="input"
-                            />
-                            {#if $form.errors.admin_name}
-                                <p class="has-text-danger">
-                                    {$form.errors.admin_name}
-                                </p>
-                            {/if}
-                        </div>
-                        <div class="field">
-                            <label for="admin_lastname" class="label"
-                                >Admin Lastname</label
-                            >
-                            <input
-                                id="admin_lastname"
-                                type="text"
-                                bind:value={$form.admin_lastname}
-                                class="input"
-                            />
-                            {#if $form.errors.admin_lastname}
-                                <p class="has-text-danger">
-                                    {$form.errors.admin_lastname}
-                                </p>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-
+            <div class="field-body">
                 <div class="field">
-                    <label for="admin_email" class="label">Email</label>
+                    <label for="admin_name" class="label"
+                        >Super Admin Name</label
+                    >
                     <input
-                        id="admin_email"
-                        type="email"
-                        bind:value={$form.admin_email}
+                        id="admin_name"
+                        type="text"
+                        bind:value={$form.admin_name}
+                        class="input"
+                        placeholder="name"
+                    />
+                    {#if $form.errors.admin_name}
+                        <p class="has-text-danger">
+                            {$form.errors.admin_name}
+                        </p>
+                    {/if}
+                </div>
+                <div class="field">
+                    <label for="admin_lastname" class="label"
+                        >Super Admin Lastname</label
+                    >
+                    <input
+                        id="admin_lastname"
+                        type="text"
+                        bind:value={$form.admin_lastname}
+                        class="input"
+                        placeholder="lastname"
+                    />
+                    {#if $form.errors.admin_lastname}
+                        <p class="has-text-danger">
+                            {$form.errors.admin_lastname}
+                        </p>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="field mt-4">
+                <label for="admin_email" class="label">Email</label>
+                <input
+                    id="admin_email"
+                    type="email"
+                    bind:value={$form.admin_email}
+                    class="input"
+                    placeholder="super_admin@super.org"
+                />
+                {#if $form.errors.admin_email}
+                    <p class="has-text-danger">
+                        {$form.errors.admin_email}
+                    </p>
+                {/if}
+            </div>
+
+            <div class="field-body">
+                <div class="field">
+                    <label for="admin_password" class="label"
+                        >Super User Password</label
+                    >
+                    <input
+                        id="admin_password"
+                        type="password"
+                        bind:value={$form.admin_password}
                         class="input"
                     />
-                    {#if $form.errors.admin_email}
+                    {#if $form.errors.admin_password}
                         <p class="has-text-danger">
-                            {$form.errors.admin_email}
+                            {$form.errors.admin_password}
                         </p>
                     {/if}
                 </div>
 
-                <div class="fixed-grid has-2-cols">
-                    <div class="grid">
-                        <div class="field">
-                            <label for="admin_password" class="label"
-                                >Password</label
-                            >
-                            <input
-                                id="admin_password"
-                                type="password"
-                                bind:value={$form.admin_password}
-                                class="input"
-                            />
-                            {#if $form.errors.admin_password}
-                                <p class="has-text-danger">
-                                    {$form.errors.admin_password}
-                                </p>
-                            {/if}
-                        </div>
-
-                        <div class="field">
-                            <label
-                                for="admin_password_confirmation"
-                                class="label"
-                            >
-                                Confirm password
-                            </label>
-                            <input
-                                id="admin_password_confirmation"
-                                type="password"
-                                bind:value={$form.admin_password_confirmation}
-                                class="input"
-                            />
-                        </div>
-                    </div>
+                <div class="field">
+                    <label for="admin_password_confirmation" class="label">
+                        Confirm password
+                    </label>
+                    <input
+                        id="admin_password_confirmation"
+                        type="password"
+                        bind:value={$form.admin_password_confirmation}
+                        class="input"
+                    />
                 </div>
+            </div>
 
-                <div class="has-text-right">
-                    <button
-                        type="button"
-                        on:click={back}
-                        class="button is-link"
-                    >
-                        Back
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={$form.processing}
-                        class="button is-link"
-                    >
-                        {$form.processing ? "Creating…" : "Create workspace"}
-                    </button>
-                </div>
-            </form>
-        {/if}
+            <div class="field column has-text-right">
+                <button
+                    type="submit"
+                    disabled={$form.processing}
+                    class="button is-link"
+                >
+                    {$form.processing ? "Creating…" : "Create workspace"}
+                </button>
+            </div>
+        </form>
     </div>
 </section>

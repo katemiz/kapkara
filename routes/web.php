@@ -21,6 +21,8 @@ use App\Http\Controllers\HiddenBladeController;
 use App\Http\Controllers\YoneticiController;
 use App\Http\Controllers\MyLibraryController;
 
+
+
 use Inertia\Inertia;
 
 require __DIR__ . '/setup.php';
@@ -34,6 +36,12 @@ Route::get(
         "message" => "Welcome to Laravel + Inertia + Svelte 5!",
     ]),
 )->name("MyHome");
+
+
+Route::get(
+    "/eurobond",
+    fn() => Inertia::render("Modules/Base/Pages/Eurobond"),
+)->name("eurobond");
 
 // 2. Main Site Routes
 Route::name("pages.")->group(function () {
@@ -184,3 +192,37 @@ Route::middleware(["auth", "verified"])->group(function () {
             'destroy' => 'yonetici.something.destroy',
         ]);
 });
+
+
+// SUPER ADMIN
+// routes/web.php
+
+use App\Http\Controllers\SuperAdmin\DashboardController;
+
+
+// Super Admin routes
+Route::middleware(['auth', 'verified', 'super_admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/organizations', [DashboardController::class, 'organizations'])->name('organizations');
+        Route::get('/users', [DashboardController::class, 'users'])->name('users');
+        Route::get('/modules', [DashboardController::class, 'modules'])->name('modules');
+        Route::get('/roles', [DashboardController::class, 'roles'])->name('roles');
+        Route::get('/permissions', [DashboardController::class, 'permissions'])->name('permissions');
+        Route::get('/departments', [DashboardController::class, 'departments'])->name('departments');
+    });
+
+
+
+use App\Http\Controllers\SuperAdmin\OrganizationController;
+
+Route::middleware(['auth', 'verified', 'super_admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // ... your existing dashboard routes ...
+    
+        Route::resource('organizations', OrganizationController::class);
+    });
