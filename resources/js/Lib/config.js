@@ -41,7 +41,7 @@ export const MYAPPS = [
         logo: "tree-view.svg",
         app_hero: "AppHero-RM.svg",
         img: "requirements-stack.svg",
-        url: "/requirements",
+        url: "https://requirements.kapkara.one",
         desc: `
         <p>Private and/or enterprise level Minutes of Meeting (MoM) application with centeralize repository for all data</p>
         <ul>
@@ -79,7 +79,7 @@ export const MYAPPS = [
         logo: "yonetici.svg",
         app_hero: "AppHero-Yonetici.svg",
         img: "yonetici_brand_logo.svg",
-        url: "/yonetici",
+        url: "https://yonetici.kapkara.one",
         desc: `
         <p>Gelir/Gider (Aidat, Su/Elektrik/Doğalgaz/Sıcak Su) gibi faturalama ve ödeme takip işlemlerini
         yapıp andında döküm alabileceğiniz bir uygulama.</p>`,
