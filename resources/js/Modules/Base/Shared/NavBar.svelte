@@ -90,7 +90,7 @@
                                     alt={app.label}
                                 />
                             </span>
-                            <span>{app.name}</span>
+                            <span>{app.name}- AAAAA{app.label}</span>
                         </a>
                     {/each}
                 </div>

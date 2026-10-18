@@ -27,7 +27,7 @@
             doSearch();
         }
 
-        console.log(query, showLatestOnly);
+        //console.log(query, showLatestOnly);
     });
 
     function doSearch() {
