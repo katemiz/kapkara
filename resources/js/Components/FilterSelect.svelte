@@ -1,11 +1,10 @@
 <script>
-    
     /**
      * Reusable Filter Select Component for Laravel-Inertia-Svelte 5
-     * 
+     *
      * @component
      * @example
-     * <FilterSelect 
+     * <FilterSelect
      *   label="Select an option"
      *   name="option"
      *   options={options}
@@ -14,26 +13,18 @@
      *   selectedValue={$bindable(null)}
      * />
      */
-    
-
-
-
-
-
-
-
 
     import { untrack } from "svelte";
 
     // 1. Define Component Props
-    let { 
-        options = [],          // Array: [{ value: 'M-101', label: 'Assembly - Montaj' }]
-        placeholder = "Type to search...", 
-        minChars = 4,          // Minimum characters required to display list
+    let {
+        options = [], // Array: [{ value: 'M-101', label: 'Assembly - Montaj' }]
+        placeholder = "Type to search...",
+        minChars = 4, // Minimum characters required to display list
         selectedValue = $bindable(null), // Two-way bound selection identifier
         label = "",
         name = "",
-        required = false
+        required = false,
     } = $props();
 
     // 2. Local State Runes
@@ -41,24 +32,28 @@
 
     // 3. Derived Computations
     let isQueryLongEnough = $derived(searchQuery.trim().length >= minChars);
-    
+
     // Filters options when search length passes threshold
     let filteredOptions = $derived(
         isQueryLongEnough
-            ? options.filter(opt => 
-                opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+            ? options.filter((opt) =>
+                  opt.label.toLowerCase().includes(searchQuery.toLowerCase()),
               )
-            : []
+            : [],
     );
 
     // Determines the label text of the current choice
-    let selectedLabel = $derived(options.find(opt => opt.value === selectedValue)?.label ?? "");
+    let selectedLabel = $derived(
+        options.find((opt) => opt.value === selectedValue)?.label ?? "",
+    );
 
     // 4. Update search box text if value changes externally, without causing infinite loops
     $effect(() => {
         if (selectedValue) {
             untrack(() => {
-                const matched = options.find(opt => opt.value === selectedValue);
+                const matched = options.find(
+                    (opt) => opt.value === selectedValue,
+                );
                 if (matched) searchQuery = matched.label;
             });
         }
@@ -75,51 +70,41 @@
     }
 </script>
 
-
-
-
-
-
-
-
 <div class="field">
-
-            {#if label}
+    {#if label}
         <label class="label" for={name}>
             {label}
             {#if required}
                 <span class="has-text-danger">*</span>
             {/if}
         </label>
-        {/if}
+    {/if}
     <div class="input-container">
-
-
-
-
-
-
-        <input 
-            type="text" 
+        <input
+            type="text"
             class="search-input"
             {placeholder}
             bind:value={searchQuery}
         />
         {#if selectedValue || searchQuery}
-            <button type="button" class="clear-btn" onclick={clearSelection}>&times;</button>
+            <button type="button" class="clear-btn" onclick={clearSelection}
+                >&times;</button
+            >
         {/if}
     </div>
 
     {#if isQueryLongEnough}
         <div class="linked-results-container">
-            <div class="results-header">Matching Results ({filteredOptions.length})</div>
+            <div class="results-header">
+                Matching Results ({filteredOptions.length})
+            </div>
             <ul class="linked-list">
                 {#if filteredOptions.length === 0}
                     <li class="no-results-msg">No matching records found.</li>
                 {:else}
                     {#each filteredOptions as option}
                         <li>
-                            <button 
+                            <button
                                 type="button"
                                 class="list-item-btn"
                                 class:active={selectedValue === option.value}
@@ -137,18 +122,13 @@
         </div>
     {:else if searchQuery.length > 0}
         <div class="hint-box">
-            Type at least <strong>{minChars - searchQuery.length}</strong> more characters to display list...
+            Type at least <strong>{minChars - searchQuery.length}</strong> more characters
+            to display list...
         </div>
     {/if}
 </div>
 
 <style>
-    .search-select-wrapper {
-        width: 100%;
-        max-width: 450px;
-        font-family: system-ui, sans-serif;
-    }
-
     .input-container {
         position: relative;
         display: flex;
