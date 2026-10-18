@@ -324,6 +324,7 @@ class MyLibraryController extends Controller
 
 
         $this->permissions['is_editable'] = $asset->created_by === auth()->id();
+        $this->permissions['is_deletable'] = $asset->created_by === auth()->id();
 
         return true;
     }

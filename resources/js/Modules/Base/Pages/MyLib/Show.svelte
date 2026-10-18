@@ -139,6 +139,10 @@
                         </a>
                     {/if}
 
+                    {#if permissions.is_deletable}
+                        <DeleteButton url="/mylib/{asset.id}" />
+                    {/if}
+
                     {#if permissions.is_freezable}
                         <button
                             onclick={() => confirmFreezeReleaseRevise("freeze")}
@@ -174,10 +178,6 @@
                                 <LayersPlus size="20" />
                             </span>
                         </button>
-                    {/if}
-
-                    {#if permissions.is_deletable}
-                        <DeleteButton url="/mylib/{asset.id}" />
                     {/if}
                 </div>
             </nav>
