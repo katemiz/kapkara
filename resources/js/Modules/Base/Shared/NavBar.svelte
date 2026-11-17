@@ -18,6 +18,7 @@
         TurkishLira,
         LibraryBig,
         UserStar,
+        Landmark,
     } from "@lucide/svelte";
 
     // Create a simple state variable for the menu
@@ -149,6 +150,13 @@
                                 <Box size={18} />
                             </span>
                             <span>Material</span>
+                        </a>
+
+                        <a class="navbar-item" href="/eurobond-assets">
+                            <span class="icon">
+                                <Landmark size={18} />
+                            </span>
+                            <span>Bonds</span>
                         </a>
 
                         <a class="navbar-item" href="/mylib">

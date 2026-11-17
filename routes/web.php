@@ -20,6 +20,7 @@ use App\Http\Controllers\HiddenBladeController;
 
 use App\Http\Controllers\YoneticiController;
 use App\Http\Controllers\MyLibraryController;
+use App\Http\Controllers\EurobondAssetController;
 
 
 
@@ -90,7 +91,7 @@ Route::middleware(["auth"])->group(function () {
 Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("question", QuestionController::class);
     Route::resource("answer", AnswerController::class);
-    Route::resource("material", MaterialController::class);
+    //Route::resource("material", MaterialController::class);
     Route::resource("user", UserController::class);
 
     Route::resource("hidden-blade", HiddenBladeController::class);
@@ -162,6 +163,8 @@ Route::middleware(["auth", "verified"])->group(function () {
     Route::resource("user", UserController::class);
 
     Route::resource("mylib", MyLibraryController::class);
+
+    Route::resource("eurobond-assets", EurobondAssetController::class);
 
 
     // API
