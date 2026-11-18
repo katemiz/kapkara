@@ -1,6 +1,8 @@
 <script>
     import { useForm } from "@inertiajs/svelte";
 
+    import eurobondCatalog from "$modules/Base/Shared/eurobonds.json";
+
     import Layout from "$modules/Base/Shared/Layout.svelte";
     import FormInput from "$components/FormInput.svelte";
     import FormDate from "$components/FormDate.svelte";
@@ -29,6 +31,47 @@
         first_coupon_date: eurobondAsset?.first_coupon_date ?? "",
     });
 
+    const nameOptions = eurobondCatalog.map((item) => ({
+        value: item.name,
+        label: item.name,
+    }));
+
+    if (
+        eurobondAsset?.name &&
+        !nameOptions.some((option) => option.value === eurobondAsset.name)
+    ) {
+        nameOptions.unshift({
+            value: eurobondAsset.name,
+            label: eurobondAsset.name,
+        });
+    }
+
+    function toIsoDate(value) {
+        const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value ?? "");
+
+        if (!match) {
+            return "";
+        }
+
+        const [, day, month, year] = match;
+        const lastDay = new Date(Number(year), Number(month), 0).getDate();
+        const safeDay = Math.min(Number(day), lastDay);
+
+        return `${year}-${month}-${String(safeDay).padStart(2, "0")}`;
+    }
+
+    function selectEurobond(event) {
+        const name = event.currentTarget.value;
+        $form.name = name;
+
+        const entry = eurobondCatalog.find((item) => item.name === name);
+
+        if (entry) {
+            $form.due_date = toIsoDate(entry.dueDate);
+            $form.coupon_interest_rate = entry.yearlyCouponRate;
+        }
+    }
+
     function submit(event) {
         event.preventDefault();
 
@@ -52,13 +95,34 @@
         <form onsubmit={submit} novalidate>
             <div class="columns">
                 <div class="column is-8">
-                    <FormInput
-                        {form}
-                        name="name"
-                        label="Eurobond Name / Number"
-                        placeholder="Enter name or number"
-                        required={true}
-                    />
+                    <div class="field">
+                        <label class="label" for="name">
+                            Eurobond Name
+                            <span class="has-text-danger">*</span>
+                        </label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select
+                                    id="name"
+                                    value={$form.name}
+                                    onchange={selectEurobond}
+                                    required
+                                >
+                                    <option value="" disabled>
+                                        Select a eurobond
+                                    </option>
+                                    {#each nameOptions as option}
+                                        <option value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    {/each}
+                                </select>
+                            </div>
+                        </div>
+                        {#if $form.errors.name}
+                            <p class="help is-danger">{$form.errors.name}</p>
+                        {/if}
+                    </div>
                 </div>
                 <div class="column is-4">
                     <FormSelect
