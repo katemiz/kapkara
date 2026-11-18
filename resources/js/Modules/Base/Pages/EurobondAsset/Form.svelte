@@ -69,6 +69,7 @@
         if (entry) {
             $form.due_date = toIsoDate(entry.dueDate);
             $form.coupon_interest_rate = entry.yearlyCouponRate;
+            $form.money_unit = entry.money_unit ?? "";
         }
     }
 
