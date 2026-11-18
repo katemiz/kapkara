@@ -22,6 +22,17 @@ class EurobondAssetController extends Controller
     ];
 
     /**
+     * Mark a coupon payment as paid.
+     */
+    public function payCoupon(Request $request, EurobondCoupon $eurobondCoupon): RedirectResponse
+    {
+        $eurobondCoupon->update(['paid_at' => now()]);
+
+        return redirect()->route('eurobond-assets.index', $request->only(['search', 'person']))
+            ->with('success', 'Coupon marked as paid.');
+    }
+
+    /**
      * Display a paginated, searchable list of eurobond assets.
      */
     public function index(Request $request): Response

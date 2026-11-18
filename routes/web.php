@@ -164,6 +164,9 @@ Route::middleware(["auth", "verified"])->group(function () {
 
     Route::resource("mylib", MyLibraryController::class);
 
+    Route::patch("eurobond-assets/coupons/{eurobondCoupon}/pay", [EurobondAssetController::class, "payCoupon"])
+        ->name("eurobond-assets.coupon.pay");
+
     Route::resource("eurobond-assets", EurobondAssetController::class);
 
 

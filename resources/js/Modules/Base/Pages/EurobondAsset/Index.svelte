@@ -47,6 +47,21 @@
         );
     }
 
+    function markPaid(couponId) {
+        router.patch(
+            `/eurobond-assets/coupons/${couponId}/pay`,
+            { search: query, person },
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    }
+
+    function isPastDue(date) {
+        return new Date(date).getTime() < Date.now();
+    }
+
     function formatDate(date) {
         if (!date) {
             return "";
@@ -270,8 +285,10 @@
                                 <th>#</th>
                                 <th>Payment Date</th>
                                 <th>Asset</th>
+                                <th>Person</th>
                                 <th>Unit</th>
                                 <th class="has-text-right">Amount</th>
+                                <th>Paid</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -289,6 +306,7 @@
                                             {coupon.asset?.name}
                                         </a>
                                     </td>
+                                    <td>{coupon.asset?.person}</td>
                                     <td>{coupon.asset?.money_unit}</td>
                                     <td class="has-text-right">
                                         {#if coupon.is_last}
@@ -297,6 +315,19 @@
                                                 >Last</span
                                             >
                                         {/if}{formatMoney(coupon.amount)}
+                                    </td>
+                                    <td>
+                                        {#if coupon.paid_at}
+                                            {formatDate(coupon.paid_at)}
+                                        {:else if isPastDue(coupon.payment_date)}
+                                            <button
+                                                type="button"
+                                                class="button is-small is-link is-light"
+                                                onclick={() => markPaid(coupon.id)}
+                                            >
+                                                Set Paid
+                                            </button>
+                                        {/if}
                                     </td>
                                 </tr>
                             {/each}
