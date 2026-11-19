@@ -320,14 +320,11 @@
                                             >
                                         {/if}{formatMoney(coupon.amount)}
                                     </td>
+
                                     <td>
                                         {#if coupon.paid_at}
-                                            w <span
-                                                class="tag is-success is-light"
-                                            >
-                                                Paid
-                                            </span>
-                                        {:else}
+                                            {formatDate(coupon.paid_at)}
+                                        {:else if isPastDue(coupon.payment_date)}
                                             <button
                                                 type="button"
                                                 class="button is-small is-link is-light"
