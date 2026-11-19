@@ -106,5 +106,23 @@
         "dueDate": "15.05.2034",
         "yearlyCouponRate": 7.625,
         "money_unit": "USD"
+    },
+    {
+        "name": "USM88269US88",
+        "dueDate": "24.07.2027",
+        "yearlyCouponRate": 8.6,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123CT57",
+        "dueDate": "26.04.2029",
+        "yearlyCouponRate": 7.625,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123DT49",
+        "dueDate": "14.03.2033",
+        "yearlyCouponRate": 6.3,
+        "money_unit": "USD"
     }
 ]

@@ -28,7 +28,11 @@
 
         clearSearchIcon = !!currentQuery;
 
-        if (currentQuery && currentQuery.length > 0 && currentQuery.length <= 2) {
+        if (
+            currentQuery &&
+            currentQuery.length > 0 &&
+            currentQuery.length <= 2
+        ) {
             return;
         }
 
@@ -318,12 +322,17 @@
                                     </td>
                                     <td>
                                         {#if coupon.paid_at}
-                                            {formatDate(coupon.paid_at)}
-                                        {:else if isPastDue(coupon.payment_date)}
+                                            w <span
+                                                class="tag is-success is-light"
+                                            >
+                                                Paid
+                                            </span>
+                                        {:else}
                                             <button
                                                 type="button"
                                                 class="button is-small is-link is-light"
-                                                onclick={() => markPaid(coupon.id)}
+                                                onclick={() =>
+                                                    markPaid(coupon.id)}
                                             >
                                                 Set Paid
                                             </button>
