@@ -38,7 +38,7 @@ class EurobondAssetController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->input('search');
-        $persons = ['KAT', 'AST', 'MDT', 'HDT'];
+        $persons = ['KAT', 'AST', 'MDT', 'HET'];
         $person = $request->input('person', 'ALL');
         $person = in_array($person, $persons, true) ? $person : 'ALL';
 

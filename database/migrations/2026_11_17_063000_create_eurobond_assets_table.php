@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->decimal("buy_price", 15, 3);
             $table->enum("money_unit", ["EUR", "USD"]);
             $table->enum("bank", ["ISBANK", "AKBANK"]);
-            $table->enum("person", ["KAT", "AST", "MDT", "HDT"]);
+            $table->enum("person", ["KAT", "AST", "MDT", "HET"]);
             $table->date("first_coupon_date");
             $table->userstamps(); // provided by App\Providers\AppServiceProvider
             $table->timestamps();
