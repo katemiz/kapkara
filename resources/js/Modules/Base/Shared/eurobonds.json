@@ -6,6 +6,12 @@
         "money_unit": "USD"
     },
     {
+        "name": "TRT030327F17",
+        "dueDate": "03.03.2027",
+        "yearlyCouponRate": 5.1,
+        "money_unit": "EUR"
+    },
+    {
         "name": "US900123AY60",
         "dueDate": "17.03.2036",
         "yearlyCouponRate": 6.875,
@@ -50,7 +56,7 @@
     {
         "name": "US900123CQ19",
         "dueDate": "24.10.2028",
-        "yearlyCouponRate": 6.1254,
+        "yearlyCouponRate": 6.125,
         "money_unit": "USD"
     },
     {
@@ -109,7 +115,7 @@
     },
     {
         "name": "USM88269US88",
-        "dueDate": "24.07.2027",
+        "dueDate": "24.09.2027",
         "yearlyCouponRate": 8.6,
         "money_unit": "USD"
     },
@@ -123,6 +129,60 @@
         "name": "US900123DT49",
         "dueDate": "14.03.2033",
         "yearlyCouponRate": 6.3,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123DU12",
+        "dueDate": "14.01.2038",
+        "yearlyCouponRate": 6.875,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123DG28",
+        "dueDate": "19.01.2038",
+        "yearlyCouponRate": 9.375,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123AT75",
+        "dueDate": "14.02.2034",
+        "yearlyCouponRate": 8.00,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123CM05",
+        "dueDate": "11.05.2047",
+        "yearlyCouponRate": 5.75,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123DJ66",
+        "dueDate": "13.07.2030",
+        "yearlyCouponRate": 9.125,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123DL13",
+        "dueDate": "17.07.2032",
+        "yearlyCouponRate": 7.125,
+        "money_unit": "USD"
+    },
+    {
+        "name": "XS2790222116",
+        "dueDate": "21.05.2030",
+        "yearlyCouponRate": 5.875,
+        "money_unit": "EUR"
+    },
+    {
+        "name": "US900123DF45",
+        "dueDate": "15.01.2028",
+        "yearlyCouponRate": 9.875,
+        "money_unit": "USD"
+    },
+    {
+        "name": "US900123DH01",
+        "dueDate": "14.03.2029",
+        "yearlyCouponRate": 9.375,
         "money_unit": "USD"
     }
 ]

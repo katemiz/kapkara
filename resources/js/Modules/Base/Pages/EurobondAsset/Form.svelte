@@ -190,7 +190,7 @@
             </p>
 
             <div class="columns">
-                <div class="column is-6">
+                <div class="column is-4">
                     <FormInput
                         {form}
                         name="amount"
